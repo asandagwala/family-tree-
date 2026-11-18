@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutGrid, Network, Users } from "lucide-react";
+import { Images, LayoutGrid, Network, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
@@ -13,6 +13,7 @@ const NAV = [
   { href: "/", label: "Overview", icon: LayoutGrid },
   { href: "/tree", label: "Family tree", icon: Network },
   { href: "/people", label: "People", icon: Users },
+  { href: "/album", label: "Album", icon: Images },
 ];
 
 type NavProps = { active: (href: string) => boolean };

@@ -16,6 +16,9 @@ Built with Next.js 16, React 19, Tailwind CSS 4, Convex, and Claude.
 - **Profiles**: story, life details, clan name, parents, partners, children
   and siblings, plus a photo gallery (upload, drag and drop, set as portrait,
   lightbox).
+- **Family album**: a page per gathering (wedding, umemulo, graduation,
+  funeral, reunion...) with its photos, its story and who was there. People's
+  profiles list the gatherings they were at.
 - **Ask the family**: a chat drawer, open from anywhere, that answers from the
   tree's records and links each person it mentions to their profile.
 
@@ -55,5 +58,7 @@ call it).
 | `components/dashboard.tsx` | Overview page |
 | `components/tree-view.tsx` | Interactive tree |
 | `components/person-profile.tsx` | Profile, relatives, gallery |
+| `convex/album.ts` | Gatherings and their photos |
+| `components/album-view.tsx`, `gathering-view.tsx` | Album and gathering pages |
 | `components/chat/` | Assistant drawer and conversation state |
 | `public/heritage/` | Archive photographs used in the design |

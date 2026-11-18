@@ -5,8 +5,6 @@ import {
   ArrowLeft,
   Briefcase,
   Camera,
-  ChevronLeft,
-  ChevronRight,
   Home,
   ImagePlus,
   Link2,
@@ -19,15 +17,16 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { api } from "@/convex/_generated/api";
-import type { Id } from "@/convex/_generated/dataModel";
 import { age, errorMessage, formatDate, fullName, genderLabel, lifespan, type Person, type PersonId } from "@/lib/people";
+import { gatheringKindLabel } from "@/lib/gatherings";
 import { uploadImage } from "@/lib/upload";
 import { siblingsOf, useFamily, type Family } from "@/lib/use-family";
 import { UmbhacoBand } from "./beadwork";
 import { useChat } from "./chat/chat-context";
 import { PersonEditor, type EditorMode, type Relation } from "./person-editor";
+import { Lightbox } from "./lightbox";
 import { Portrait } from "./portrait";
 import { btnGhost, btnPrimary, btnSecondary, Modal } from "./ui/modal";
 import { AskIcon } from "./ask-icon";
@@ -181,6 +180,7 @@ function ProfileBody({ person, family }: { person: Person; family: Family }) {
           </section>
 
           <Gallery person={person} />
+          <PersonGatherings person={person} />
         </div>
 
         {/* Family */}
@@ -525,59 +525,27 @@ function Gallery({ person }: { person: Person }) {
   );
 }
 
-function Lightbox(props: {
-  urls: (string | null)[];
-  storageIds: Id<"_storage">[];
-  index: number;
-  onIndex: (i: number) => void;
-  onClose: () => void;
-}) {
-  const { urls, index, onIndex, onClose } = props;
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowRight") onIndex((index + 1) % urls.length);
-      if (e.key === "ArrowLeft") onIndex((index - 1 + urls.length) % urls.length);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [index, urls.length, onIndex, onClose]);
 
+/* ---------- Gatherings they were at ---------- */
+
+function PersonGatherings({ person }: { person: Person }) {
+  const gatherings = useQuery(api.album.gatheringsFor, { personId: person._id });
+  if (!gatherings || gatherings.length === 0) return null;
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-ink/90 p-6" onClick={onClose}>
-      {urls[index] && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={urls[index]!} alt="" className="max-h-full max-w-full rounded-3xl object-contain shadow-2xl" onClick={(e) => e.stopPropagation()} />
-      )}
-      <button type="button" onClick={onClose} aria-label="Close" className="absolute right-6 top-6 grid h-11 w-11 place-items-center rounded-full bg-mist/10 text-mist hover:bg-mist/20">
-        <X size={20} />
-      </button>
-      {urls.length > 1 && (
-        <>
-          <button
-            type="button"
-            aria-label="Previous"
-            onClick={(e) => {
-              e.stopPropagation();
-              onIndex((index - 1 + urls.length) % urls.length);
-            }}
-            className="absolute left-6 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-mist/10 text-mist hover:bg-mist/20"
-          >
-            <ChevronLeft size={22} />
-          </button>
-          <button
-            type="button"
-            aria-label="Next"
-            onClick={(e) => {
-              e.stopPropagation();
-              onIndex((index + 1) % urls.length);
-            }}
-            className="absolute right-6 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-mist/10 text-mist hover:bg-mist/20"
-          >
-            <ChevronRight size={22} />
-          </button>
-        </>
-      )}
-    </div>
+    <section className="animate-rise rounded-[1.75rem] border border-line bg-card p-7">
+      <h2 className="font-display text-2xl font-semibold text-ink">Gatherings</h2>
+      <ul className="mt-4 divide-y divide-line">
+        {gatherings.map((g) => (
+          <li key={g._id}>
+            <Link href={`/album/${g._id}`} className="flex items-baseline justify-between gap-4 py-3 hover:text-ochre-deep">
+              <span className="font-medium">{g.title}</span>
+              <span className="shrink-0 text-xs text-muted">
+                {[gatheringKindLabel[g.kind], g.date && formatDate(g.date)].filter(Boolean).join(" · ")}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
