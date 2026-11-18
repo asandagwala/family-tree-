@@ -8,6 +8,19 @@ export const genderValidator = v.union(
   v.literal("unknown"),
 );
 
+export const gatheringKind = v.union(
+  v.literal("wedding"),
+  v.literal("umemulo"),
+  v.literal("imbeleko"),
+  v.literal("graduation"),
+  v.literal("funeral"),
+  v.literal("memorial"),
+  v.literal("birthday"),
+  v.literal("christmas"),
+  v.literal("reunion"),
+  v.literal("other"),
+);
+
 /** Editable fields of a person (the profile photo is set separately). */
 export const personFields = {
   firstName: v.string(),
@@ -49,6 +62,24 @@ export default defineSchema({
   settings: defineTable({
     familyName: v.optional(v.string()),
   }),
+
+  // Family album: one gathering per function or event.
+  gatherings: defineTable({
+    title: v.string(),
+    kind: gatheringKind,
+    date: v.optional(v.string()), // a year or a full date
+    place: v.optional(v.string()),
+    story: v.optional(v.string()),
+    coverId: v.optional(v.id("_storage")),
+    // Who was there. Kept small (capped in the mutations).
+    peopleIds: v.array(v.id("people")),
+  }),
+
+  gatheringPhotos: defineTable({
+    gatheringId: v.id("gatherings"),
+    storageId: v.id("_storage"),
+    caption: v.optional(v.string()),
+  }).index("by_gatheringId", ["gatheringId"]),
 
   // Photo gallery for a person.
   photos: defineTable({

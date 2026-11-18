@@ -87,7 +87,23 @@ export const treeForAssistant = internalQuery({
       photoCounts[p._id] = photos.length + (p.photoId ? 1 : 0);
     }
     const settings = await ctx.db.query("settings").first();
-    return { ...tree, photoCounts, familyName: settings?.familyName ?? null };
+    const gatherings = [];
+    for (const g of await ctx.db.query("gatherings").take(200)) {
+      const photos = await ctx.db
+        .query("gatheringPhotos")
+        .withIndex("by_gatheringId", (q) => q.eq("gatheringId", g._id))
+        .take(1000);
+      gatherings.push({
+        title: g.title,
+        kind: g.kind,
+        date: g.date ?? null,
+        place: g.place ?? null,
+        story: g.story ?? null,
+        peopleIds: g.peopleIds,
+        photoCount: photos.length,
+      });
+    }
+    return { ...tree, photoCounts, familyName: settings?.familyName ?? null, gatherings };
   },
 });
 
@@ -164,6 +180,11 @@ export const deletePerson = mutation({
       .withIndex("by_personId", (q) => q.eq("personId", id))) {
       await ctx.storage.delete(photo.storageId);
       await ctx.db.delete("photos", photo._id);
+    }
+    for (const g of await ctx.db.query("gatherings").take(500)) {
+      if (g.peopleIds.includes(id)) {
+        await ctx.db.patch("gatherings", g._id, { peopleIds: g.peopleIds.filter((p) => p !== id) });
+      }
     }
     const person = await ctx.db.get("people", id);
     if (person?.photoId) await ctx.storage.delete(person.photoId);
@@ -463,6 +484,11 @@ export const deletePhoto = mutation({
 export const clearAll = internalMutation({
   args: {},
   handler: async (ctx) => {
+    for await (const ph of ctx.db.query("gatheringPhotos")) {
+      await ctx.storage.delete(ph.storageId);
+      await ctx.db.delete("gatheringPhotos", ph._id);
+    }
+    for await (const g of ctx.db.query("gatherings")) await ctx.db.delete("gatherings", g._id);
     for (const table of ["parentLinks", "partnerships", "photos", "people"] as const) {
       for await (const doc of ctx.db.query(table)) {
         if (table === "photos" && "storageId" in doc) await ctx.storage.delete(doc.storageId);

@@ -7,7 +7,7 @@ import { action, env } from "./_generated/server";
 const INSTRUCTIONS = `You are the family historian for a private family tree app. Family members ask you questions about their relatives, and you answer from the family records below.
 
 How to answer:
-- Use only the records. If something isn't recorded, say so plainly and suggest which detail someone could add to the tree. Never invent names, dates, places or stories.
+- Use only the records (the family tree and the family album). If something isn't recorded, say so plainly and suggest which detail someone could add to the tree. Never invent names, dates, places or stories.
 - You may reason from the records: ages, how two people are related (cousin, grand-aunt, in-law), who is the eldest, where the family comes from, gaps worth filling.
 - When you mention a person, link them as a Markdown link with their id: [Nomvula Ntshona](person:ID). Link each person the first time you mention them.
 - Write warmly and briefly, like a knowledgeable relative: a few sentences or a short bulleted list. No headings, no tables.
@@ -20,6 +20,15 @@ function describeTree(tree: {
   partnerships: Doc<"partnerships">[];
   photoCounts: Record<string, number>;
   familyName: string | null;
+  gatherings: {
+    title: string;
+    kind: string;
+    date: string | null;
+    place: string | null;
+    story: string | null;
+    peopleIds: string[];
+    photoCount: number;
+  }[];
 }) {
   const name = new Map(tree.people.map((p) => [p._id as string, `${p.firstName} ${p.lastName}`.trim()]));
   const ref = (id: string) => `${name.get(id) ?? "unknown"} (${id})`;
@@ -57,7 +66,23 @@ function describeTree(tree: {
     return `- ${ref(p._id)}\n  ${facts.join("\n  ")}`;
   });
   const heading = tree.familyName ? `The ${tree.familyName} family` : "Family";
-  return `${heading} records (${tree.people.length} people):\n${lines.join("\n")}`;
+  const album = tree.gatherings.length
+    ? `\n\nFamily album (${tree.gatherings.length} gatherings):\n` +
+      tree.gatherings
+        .map((g) => {
+          const facts = [
+            `kind: ${g.kind}`,
+            g.date && `date: ${g.date}`,
+            g.place && `place: ${g.place}`,
+            `people there: ${g.peopleIds.map(ref).join(", ") || "not recorded"}`,
+            `photos: ${g.photoCount}`,
+            g.story && `story: ${g.story.replace(/\s+/g, " ")}`,
+          ].filter(Boolean);
+          return `- ${g.title}\n  ${facts.join("\n  ")}`;
+        })
+        .join("\n")
+    : "";
+  return `${heading} records (${tree.people.length} people):\n${lines.join("\n")}${album}`;
 }
 
 export const ask = action({

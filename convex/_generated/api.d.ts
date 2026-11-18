@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as album from "../album.js";
 import type * as assistant from "../assistant.js";
 import type * as family from "../family.js";
 
@@ -18,6 +19,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  album: typeof album;
   assistant: typeof assistant;
   family: typeof family;
 }>;
