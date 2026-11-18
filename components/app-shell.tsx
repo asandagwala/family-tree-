@@ -1,0 +1,130 @@
+"use client";
+
+import { LayoutGrid, Network, Users } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Suspense, type ReactNode } from "react";
+import { ChatDrawer } from "./chat/chat-drawer";
+import { useChat } from "./chat/chat-context";
+import { LogoMark } from "./logo";
+import { AskIcon } from "./ask-icon";
+
+const NAV = [
+  { href: "/", label: "Overview", icon: LayoutGrid },
+  { href: "/tree", label: "Family tree", icon: Network },
+  { href: "/people", label: "People", icon: Users },
+];
+
+type NavProps = { active: (href: string) => boolean };
+
+/** Reads the URL, so it renders inside Suspense (Next prerenders the shell). */
+function WithActive({ render }: { render: (p: NavProps) => ReactNode }) {
+  const pathname = usePathname();
+  return <>{render({ active: (href) => (href === "/" ? pathname === "/" : pathname.startsWith(href)) })}</>;
+}
+
+function ActiveAware({ render }: { render: (p: NavProps) => ReactNode }) {
+  return (
+    <Suspense fallback={render({ active: () => false })}>
+      <WithActive render={render} />
+    </Suspense>
+  );
+}
+
+function SidebarNav({ active }: NavProps) {
+  return (
+    <nav className="flex flex-col gap-1 px-3">
+      {NAV.map(({ href, label, icon: Icon }) => (
+        <Link
+          key={href}
+          href={href}
+          className={`flex items-center gap-3 rounded-full px-4 py-2.5 text-sm transition-colors ${
+            active(href) ? "bg-mint text-forest-deep font-medium" : "text-muted hover:bg-paper hover:text-ink"
+          }`}
+        >
+          <Icon size={17} strokeWidth={1.8} />
+          {label}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
+function MobileNavLinks({ active }: NavProps) {
+  return (
+    <>
+      {NAV.map(({ href, label, icon: Icon }) => (
+        <Link
+          key={href}
+          href={href}
+          aria-label={label}
+          className={`grid h-10 w-10 place-items-center rounded-full ${active(href) ? "bg-mint text-forest-deep" : "text-muted"}`}
+        >
+          <Icon size={18} />
+        </Link>
+      ))}
+    </>
+  );
+}
+
+export function AppShell({ children }: { children: ReactNode }) {
+  const chat = useChat();
+
+  return (
+    <div className="flex h-full">
+      {/* Sidebar */}
+      <aside className="relative hidden w-64 shrink-0 flex-col overflow-hidden border-r border-line bg-card text-ink md:flex">
+        <Link href="/" className="flex items-center gap-3 px-6 pb-8 pt-7">
+          <LogoMark className="text-forest" />
+          <span>
+            <span className="block font-display text-2xl font-semibold leading-none tracking-wide">Imvelaphi</span>
+            <span className="mt-1 block text-[11px] uppercase tracking-[0.2em] text-moss">Family archive</span>
+          </span>
+        </Link>
+
+        <ActiveAware render={(p) => <SidebarNav {...p} />} />
+
+        <div className="px-3 pt-6">
+          <button
+            type="button"
+            onClick={() => chat.open()}
+            className="flex w-full items-center gap-3 rounded-full border border-line px-4 py-2.5 text-sm text-ink transition-colors hover:border-sage hover:bg-mint/40"
+          >
+            <AskIcon size={17} className="text-forest" />
+            Ask the family
+          </button>
+        </div>
+
+        <div className="mt-auto">
+          <div className="mx-4 mb-5 overflow-hidden rounded-3xl">
+            <div className="duotone-wrap aspect-[4/3]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/heritage/elders.jpg" alt="" className="duotone h-full w-full object-cover object-top" />
+              <p className="absolute inset-x-0 bottom-0 z-10 p-4 font-display text-lg italic leading-snug text-mist">
+                “Umntu ngumntu ngabantu.”
+              </p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main */}
+      <main className="relative min-w-0 flex-1 overflow-y-auto scrollbar-thin pb-20 md:pb-0">{children}</main>
+
+      {/* Mobile bottom nav */}
+      <nav className="fixed inset-x-3 bottom-3 z-30 flex items-center justify-around rounded-full border border-line bg-card px-2 py-2 text-ink shadow-xl md:hidden">
+        <ActiveAware render={(p) => <MobileNavLinks {...p} />} />
+        <button
+          type="button"
+          aria-label="Ask the family"
+          onClick={() => chat.open()}
+          className="grid h-10 w-10 place-items-center rounded-full text-forest"
+        >
+          <AskIcon size={18} />
+        </button>
+      </nav>
+
+      <ChatDrawer />
+    </div>
+  );
+}

@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+/* Palette: light, airy neutrals carry the interface; charcoal is for text.
+   Green is the accent: the tree, active states, primary actions. */
+:root {
+  --ink: #121418;
+  --night: #16191e;
+  --coal: #252a32;
+  --slate: #404f68;
+  --slate-soft: #7a859d;
+  --silver: #c4cad4;
+  --mist: #eceef1;
+  --paper: #f6f6f4;
+  --card: #ffffff;
+  --line: #e4e6ea;
+  --muted: #6b7382;
+  /* green accents (as on the tree) */
+  --mint: #daf1de;
+  --forest: #235347;
+  --forest-deep: #163832;
+  --sage: #8eb69b;
+  /* Umbhaco: cream cloth, black braid, orange and turquoise stripes */
+  --cream: #f5efe4;
+  --ochre: #dd6b2b;
+  --ochre-deep: #b4501c;
+  --ochre-soft: #fbeadd;
+  --bead-blue: #2a9db3;
+  --bead-blue-soft: #dff2f5;
+  --moss: #738a6e;
+  --evergreen: #344c3d;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-night: var(--night);
+  --color-coal: var(--coal);
+  --color-slate: var(--slate);
+  --color-slate-soft: var(--slate-soft);
+  --color-silver: var(--silver);
+  --color-mist: var(--mist);
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-line: var(--line);
+  --color-muted: var(--muted);
+  --color-mint: var(--mint);
+  --color-forest: var(--forest);
+  --color-forest-deep: var(--forest-deep);
+  --color-sage: var(--sage);
+  --color-cream: var(--cream);
+  --color-ochre: var(--ochre);
+  --color-ochre-deep: var(--ochre-deep);
+  --color-ochre-soft: var(--ochre-soft);
+  --color-bead-blue: var(--bead-blue);
+  --color-bead-blue-soft: var(--bead-blue-soft);
+  --color-moss: var(--moss);
+  --color-evergreen: var(--evergreen);
+  --font-sans: var(--font-geist-sans);
+  --font-display: var(--font-cormorant);
+}
+
+html,
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+::selection {
+  background: var(--mist);
+  color: var(--ink);
+}
+
+/* Black-and-white archive photo, darkened toward the base so text reads. In the
+   components layer so utilities like `absolute` can override position. */
+@layer components {
+  .duotone {
+    filter: grayscale(1) contrast(1.08);
+  }
+  .duotone-wrap {
+    position: relative;
+    isolation: isolate;
+  }
+  .duotone-wrap::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgb(22 25 30 / 0) 45%, rgb(22 25 30 / 0.55));
+    pointer-events: none;
+  }
+  /* Cormorant's default old-style figures make "11" read as "II". */
+  .font-display {
+    font-variant-numeric: lining-nums;
+  }
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--silver) transparent;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-rise {
+  animation: rise 0.35s ease-out both;
+}
