@@ -193,12 +193,11 @@ function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
           <div className="absolute inset-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/heritage/rondavels.jpg"
-              alt="Turquoise rondavels with thatched roofs in golden grass"
-              className="h-full w-full object-cover object-[33%_60%]"
+              src="/heritage/walking-colour.jpg"
+              alt="Two young women in white beaded dress walking past homesteads in the hills"
+              className="h-full w-full object-cover object-[50%_85%] sepia-[.12] saturate-[.9]"
             />
           </div>
-          <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-cream to-transparent" />
         </div>
       </div>
       <UmbhacoBand height={30} />
