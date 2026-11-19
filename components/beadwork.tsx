@@ -200,20 +200,20 @@ export function MonoBeadTrim({ height = 20, className = "" }: { height?: number;
 /**
  * A compact umbhaco trim for small places like menu items: the same stripes
  * as the full band (black edge, orange, a small zigzag, turquoise), drawn at
- * a size where every line stays crisp. 12px tall.
+ * a size where every line stays crisp. 8px tall.
  */
 export function UmbhacoTrim({ className = "" }: { className?: string }) {
   return (
-    <svg aria-hidden className={className} width="100%" height={12} style={{ display: "block" }}>
+    <svg aria-hidden className={className} width="100%" height={8} style={{ display: "block" }}>
       <defs>
-        <pattern id="umbhaco-trim-zig" width={8} height={12} patternUnits="userSpaceOnUse">
-          <path d="M0 5 L2 9 L4 5 L6 9 L8 5" fill="none" stroke="var(--ink)" strokeWidth={1} />
+        <pattern id="umbhaco-trim-zig" width={6} height={8} patternUnits="userSpaceOnUse">
+          <path d="M0 3.2 L1.5 5.8 L3 3.2 L4.5 5.8 L6 3.2" fill="none" stroke="var(--ink)" strokeWidth={0.9} />
         </pattern>
       </defs>
-      <rect y={0} width="100%" height={1.5} fill="var(--ink)" />
-      <rect y={2.5} width="100%" height={1.5} fill="var(--ochre)" />
-      <rect width="100%" height={12} fill="url(#umbhaco-trim-zig)" />
-      <rect y={10.5} width="100%" height={1.5} fill="var(--bead-blue)" />
+      <rect y={0} width="100%" height={1} fill="var(--ink)" />
+      <rect y={1.6} width="100%" height={1} fill="var(--ochre)" />
+      <rect width="100%" height={8} fill="url(#umbhaco-trim-zig)" />
+      <rect y={7} width="100%" height={1} fill="var(--bead-blue)" />
     </svg>
   );
 }

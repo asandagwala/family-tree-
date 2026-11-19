@@ -42,8 +42,8 @@ function SidebarNav({ active }: NavProps) {
         <Link
           key={href}
           href={href}
-          className={`group relative flex items-center gap-3 overflow-hidden rounded-xl px-4 pb-4 pt-2.5 text-sm transition-colors ${
-            active(href) ? "bg-cream font-medium text-ink" : "text-muted hover:bg-cream/60 hover:text-ink"
+          className={`group relative flex items-center gap-3 overflow-hidden rounded-xl px-4 pb-3 pt-2.5 text-sm transition-colors ${
+            active(href) ? "bg-bead-blue-soft font-medium text-ink" : "text-muted hover:bg-bead-blue-soft/60 hover:text-ink"
           }`}
         >
           <Icon size={17} strokeWidth={1.8} />
@@ -71,7 +71,7 @@ function MobileNavLinks({ active }: NavProps) {
           key={href}
           href={href}
           aria-label={label}
-          className={`grid h-10 w-10 place-items-center rounded-full ${active(href) ? "bg-cream text-ink" : "text-muted"}`}
+          className={`grid h-10 w-10 place-items-center rounded-full ${active(href) ? "bg-bead-blue-soft text-ink" : "text-muted"}`}
         >
           <Icon size={18} />
         </Link>
