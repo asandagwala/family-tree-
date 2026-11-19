@@ -141,3 +141,28 @@ export function BeadNet({ className = "", cell = 22 }: { className?: string; cel
     </svg>
   );
 }
+
+/**
+ * A quiet tone-on-tone band of diamonds (an outlined diamond around a small
+ * solid one), used as the header strip on People cards.
+ */
+export function DiamondBand({ color, height = 16, className = "" }: { color: string; height?: number; className?: string }) {
+  const id = `diamond-band-${height}-${color.replace(/[^a-z0-9]/gi, "")}`;
+  const h = height;
+  return (
+    <svg aria-hidden className={className} width="100%" height={h} style={{ display: "block" }}>
+      <defs>
+        <pattern id={id} width={h} height={h} patternUnits="userSpaceOnUse">
+          <path
+            d={`M${h / 2} ${h * 0.08} L${h * 0.92} ${h / 2} L${h / 2} ${h * 0.92} L${h * 0.08} ${h / 2} Z`}
+            fill="none"
+            stroke={color}
+            strokeWidth={h / 14}
+          />
+          <path d={`M${h / 2} ${h * 0.32} L${h * 0.68} ${h / 2} L${h / 2} ${h * 0.68} L${h * 0.32} ${h / 2} Z`} fill={color} />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill={`url(#${id})`} />
+    </svg>
+  );
+}

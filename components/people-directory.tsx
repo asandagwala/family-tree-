@@ -2,6 +2,7 @@
 
 import { Search, UserPlus } from "lucide-react";
 import Link from "next/link";
+import { DiamondBand } from "./beadwork";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { fullName, lifespan } from "@/lib/people";
@@ -89,14 +90,19 @@ export function PeopleDirectory() {
             <li key={p._id} className="animate-rise" style={{ animationDelay: `${Math.min(i, 12) * 30}ms` }}>
               <Link
                 href={`/people/${p._id}`}
-                className="group flex h-full flex-col items-center rounded-[1.75rem] border border-line bg-card px-4 pb-5 pt-6 text-center transition-all hover:-translate-y-0.5 hover:shadow-md"
+                className="group flex h-full flex-col items-center overflow-hidden rounded-[1.75rem] border border-line bg-card text-center transition-all hover:-translate-y-0.5 hover:border-sage hover:shadow-lg"
               >
-                <Portrait person={p} size={80} />
-                <div className="flex flex-1 flex-col pt-4">
+                <div className="relative h-16 w-full bg-forest-night">
+                  <DiamondBand color="var(--forest-deep)" height={16} className="absolute inset-x-0 bottom-0" />
+                </div>
+                <Portrait person={p} size={84} className="-mt-11 ring-offset-card" />
+                <div className="flex flex-1 flex-col px-4 pb-5 pt-3">
                   <p className="font-display text-xl font-semibold leading-tight text-night">{fullName(p)}</p>
                   <p className="mt-1 text-xs text-muted">{lifespan(p) || "Dates unknown"}</p>
                   {p.clanName && (
-                    <span className="mt-2 text-xs text-muted">{p.clanName} clan</span>
+                    <span className="mx-auto mt-3 rounded-full bg-mint px-3 py-1 text-[11px] font-medium uppercase tracking-wider text-forest-deep">
+                      {p.clanName}
+                    </span>
                   )}
                 </div>
               </Link>
