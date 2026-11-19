@@ -20,6 +20,8 @@ function describeTree(tree: {
   partnerships: Doc<"partnerships">[];
   photoCounts: Record<string, number>;
   familyName: string | null;
+  familyClan: string | null;
+  familyClanPraise: string | null;
   gatherings: {
     title: string;
     kind: string;
@@ -65,7 +67,13 @@ function describeTree(tree: {
     ].filter(Boolean);
     return `- ${ref(p._id)}\n  ${facts.join("\n  ")}`;
   });
-  const heading = tree.familyName ? `The ${tree.familyName} family` : "Family";
+  const clan = [
+    tree.familyClan && `Family isiduko: ${tree.familyClan}`,
+    tree.familyClanPraise && `Izithakazelo: ${tree.familyClanPraise.replace(/\s+/g, " ")}`,
+  ]
+    .filter(Boolean)
+    .join("; ");
+  const heading = (tree.familyName ? `The ${tree.familyName} family` : "Family") + (clan ? ` (${clan})` : "");
   const album = tree.gatherings.length
     ? `\n\nFamily album (${tree.gatherings.length} gatherings):\n` +
       tree.gatherings

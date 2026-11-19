@@ -34,6 +34,12 @@ export const personFields = {
   clanName: v.optional(v.string()), // isiduko
   occupation: v.optional(v.string()),
   notes: v.optional(v.string()), // their story
+  // Ways to connect, shared with the family
+  whatsapp: v.optional(v.string()), // phone number, e.g. +27 82 123 4567
+  instagram: v.optional(v.string()), // handle
+  facebook: v.optional(v.string()), // profile link or name
+  tiktok: v.optional(v.string()), // handle
+  linkedin: v.optional(v.string()), // profile link
 };
 
 export default defineSchema({
@@ -61,6 +67,9 @@ export default defineSchema({
   // App-wide settings; a single row.
   settings: defineTable({
     familyName: v.optional(v.string()),
+    clanName: v.optional(v.string()), // the family's isiduko
+    clanPraise: v.optional(v.string()), // izithakazelo, as the family recites them
+    whatsappGroupUrl: v.optional(v.string()), // family WhatsApp group invite link
   }),
 
   // Family album: one gathering per function or event.

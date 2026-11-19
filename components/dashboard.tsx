@@ -540,32 +540,45 @@ function MissingDetails({ family }: { family: Family }) {
 
 function EmptyWelcome({ onAdd, adding, family, onClose }: { onAdd: () => void; adding: boolean; family: Family; onClose: () => void }) {
   const loadSample = useMutation(api.family.loadSampleFamily);
+  const settings = useQuery(api.family.getSettings);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const name = settings?.familyName;
   return (
-    <div className="relative flex min-h-full flex-col overflow-hidden bg-cream text-ink">
-      <div className="absolute inset-y-0 right-0 hidden w-1/3 opacity-25 lg:block">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/heritage/walking.jpg" alt="" className="duotone h-full w-full object-cover" />
-      </div>
-      <div className="relative z-10 mx-auto flex max-w-2xl flex-1 flex-col items-center justify-center px-6 py-16 text-center">
-        <p className="text-xs uppercase tracking-[0.3em] text-ochre-deep">Imvelaphi · where we come from</p>
-        <h1 className="mt-5 font-display text-6xl font-semibold leading-[0.95] sm:text-7xl">
-          Begin your family&apos;s <span className="italic text-ochre-deep">story</span>
-        </h1>
-        <p className="mt-5 max-w-md text-ink/70">
-          Add yourself or the eldest relative you know. Branch out to parents, partners and children, add photos, and
-          ask questions about everyone you&apos;ve recorded.
-        </p>
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <button type="button" onClick={onAdd} className={btnPrimary}>
-            <UserPlus size={16} /> Add the first person
-          </button>
-          <button type="button" onClick={() => loadSample().catch((e) => setError(errorMessage(e)))} className={btnSecondary}>
-            Explore a sample family
-          </button>
+    <div className="flex min-h-full flex-col bg-cream text-ink">
+      <div className="grid flex-1 lg:grid-cols-[1.1fr_1fr]">
+        <div className="flex flex-col justify-center px-8 py-16 sm:px-14 lg:px-20">
+          <p className="text-xs uppercase tracking-[0.3em] text-ochre-deep">Imvelaphi · where we come from</p>
+          <h1 className="mt-5 max-w-xl font-display text-6xl font-semibold leading-[0.95] sm:text-7xl">
+            {name ? (
+              <>
+                Begin the <span className="italic text-ochre-deep">{name}</span> family&apos;s story
+              </>
+            ) : (
+              <>
+                Begin your family&apos;s <span className="italic text-ochre-deep">story</span>
+              </>
+            )}
+          </h1>
+          <p className="mt-6 max-w-md text-lg leading-relaxed text-ink/70">
+            Add yourself or the eldest relative you know. Branch out to parents, partners and children, add photos, and
+            ask questions about everyone you&apos;ve recorded.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <button type="button" onClick={onAdd} className={btnPrimary}>
+              <UserPlus size={16} /> Add the first person
+            </button>
+            <button type="button" onClick={() => loadSample().catch((e) => setError(errorMessage(e)))} className={btnSecondary}>
+              Explore a sample family
+            </button>
+          </div>
+          {error && <p className="mt-4 text-sm text-red-700">{error}</p>}
         </div>
-        {error && <p className="mt-4 text-sm text-red-700">{error}</p>}
+        <div className="relative hidden lg:block">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/heritage/walking.jpg" alt="" className="duotone absolute inset-0 h-full w-full object-cover object-[50%_35%]" />
+          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-cream to-transparent" />
+        </div>
       </div>
       <UmbhacoBand height={46} />
       {adding && <PersonEditor mode={{ kind: "new" }} family={family} onClose={onClose} onSaved={(id) => router.push(`/people/${id}`)} />}

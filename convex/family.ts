@@ -44,7 +44,12 @@ export const getSettings = query({
   args: {},
   handler: async (ctx) => {
     const row = await ctx.db.query("settings").first();
-    return { familyName: row?.familyName ?? null };
+    return {
+      familyName: row?.familyName ?? null,
+      clanName: row?.clanName ?? null,
+      clanPraise: row?.clanPraise ?? null,
+      whatsappGroupUrl: row?.whatsappGroupUrl ?? null,
+    };
   },
 });
 
@@ -56,6 +61,31 @@ export const setFamilyName = mutation({
     const value = name === "" ? undefined : name;
     if (row) await ctx.db.patch("settings", row._id, { familyName: value });
     else await ctx.db.insert("settings", { familyName: value });
+    return null;
+  },
+});
+
+/** Updates only the settings passed; an empty string clears that setting. */
+export const updateSettings = mutation({
+  args: {
+    clanName: v.optional(v.string()),
+    clanPraise: v.optional(v.string()),
+    whatsappGroupUrl: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const patch: Record<string, string | undefined> = {};
+    for (const [key, value] of Object.entries(args)) {
+      if (value === undefined) continue;
+      const trimmed = value.trim();
+      patch[key] = trimmed === "" ? undefined : trimmed;
+    }
+    const url = patch.whatsappGroupUrl;
+    if (url && !/^https:\/\/(chat\.whatsapp\.com|wa\.me)\//.test(url)) {
+      throw new ConvexError("Paste the group's invite link. It starts with https://chat.whatsapp.com/");
+    }
+    const row = await ctx.db.query("settings").first();
+    if (row) await ctx.db.patch("settings", row._id, patch);
+    else await ctx.db.insert("settings", patch);
     return null;
   },
 });
@@ -103,7 +133,19 @@ export const treeForAssistant = internalQuery({
         photoCount: photos.length,
       });
     }
-    return { ...tree, photoCounts, familyName: settings?.familyName ?? null, gatherings };
+    // Contact details (phone numbers, social handles) are deliberately not sent to the assistant.
+    const people = tree.people.map(
+      ({ whatsapp: _w, instagram: _i, facebook: _f, tiktok: _t, linkedin: _l, ...rest }) => rest,
+    );
+    return {
+      ...tree,
+      people,
+      photoCounts,
+      familyName: settings?.familyName ?? null,
+      familyClan: settings?.clanName ?? null,
+      familyClanPraise: settings?.clanPraise ?? null,
+      gatherings,
+    };
   },
 });
 
