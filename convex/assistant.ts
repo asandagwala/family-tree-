@@ -2,7 +2,7 @@ import { GoogleGenAI, type Content } from "@google/genai";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
-import { action, env } from "./_generated/server";
+import { action, env, internalAction } from "./_generated/server";
 
 const INSTRUCTIONS = `You are the family historian for a private family tree app. Family members ask you questions about their relatives, and you answer from the family records below.
 
@@ -95,7 +95,8 @@ function describeTree(tree: {
 
 // Tried in order: if one is busy (429/503) or unavailable to this key (404), the next is used.
 // Set GEMINI_MODEL in Convex to pin one.
-const DEFAULT_MODELS = ["gemini-flash-latest", "gemini-3.1-flash-lite", "gemini-flash-lite-latest"];
+// All confirmed available to the project key with `npx convex run assistant:availableModels`.
+const DEFAULT_MODELS = ["gemini-3.5-flash", "gemini-2.5-flash", "gemini-3.1-flash-lite"];
 
 const NOT_SET_UP =
   "The family assistant isn't switched on yet. Add your Google AI Studio key with `npx convex env set GEMINI_API_KEY` and ask again.";
@@ -158,9 +159,27 @@ Today's date: ${today}.`;
           };
         }
         // 404 (model not available to this key), 429 (busy) or 5xx: try the next model.
+        console.warn(`Gemini model ${model} failed`, status, error);
       }
     }
     console.error("All Gemini models failed", lastError);
     return { ok: false, text: "The assistant is busy right now. Please try again in a moment." };
+  },
+});
+
+/** Lists the Gemini models this deployment's key can use for chat.
+ *  Run with `npx convex run assistant:availableModels` (add --prod for production). */
+export const availableModels = internalAction({
+  args: {},
+  handler: async (): Promise<string[]> => {
+    if (!env.GEMINI_API_KEY) return [];
+    const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
+    const names: string[] = [];
+    for await (const model of await ai.models.list()) {
+      if (model.name && model.supportedActions?.includes("generateContent")) {
+        names.push(model.name.replace(/^models\//, ""));
+      }
+    }
+    return names;
   },
 });
