@@ -33,7 +33,6 @@ export function Dashboard() {
       {/* The banner runs edge to edge; the cards below sit in the page column. */}
       <Hero family={family} onAdd={() => setAdding(true)} />
       <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-8 sm:py-8">
-      <Stats family={family} />
       <div className="grid gap-6 lg:grid-cols-5">
         <BirthsByDecade family={family} className="lg:col-span-3" />
         <UpcomingBirthdays family={family} className="lg:col-span-2" />
@@ -80,8 +79,18 @@ function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
 
   return (
     <section className="relative overflow-hidden bg-cream text-ink">
-      <div className="grid lg:grid-cols-[1.2fr_1fr]">
-        <div className="relative z-10 flex flex-col justify-between gap-8 px-7 py-10 sm:px-12 lg:py-14 lg:pl-16">
+      <div className="grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+        {/* A tall column suits the portrait photo: the women and the hills both fit, no fade. */}
+        <div className="relative h-72 sm:h-96 lg:h-auto lg:min-h-[600px]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/heritage/walking-colour.jpg"
+            alt="Two young women in white beaded dress walking past homesteads in the hills"
+            className="absolute inset-0 h-full w-full object-cover object-[50%_80%] sepia-[.12] saturate-[.9]"
+          />
+        </div>
+
+        <div className="relative z-10 flex flex-col justify-center px-7 py-10 sm:px-12 lg:px-14 lg:py-14">
           <div>
             <p className="text-xs uppercase tracking-[0.25em] text-ochre-deep">Imvelaphi · where we come from</p>
             {editingName !== null ? (
@@ -144,7 +153,7 @@ function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
             </p>
           </div>
 
-          <div>
+          <div className="mt-8">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -187,17 +196,8 @@ function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
               </button>
             </div>
           </div>
-        </div>
 
-        <div className="relative hidden min-h-[440px] lg:block">
-          <div className="absolute inset-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/heritage/walking-colour.jpg"
-              alt="Two young women in white beaded dress walking past homesteads in the hills"
-              className="h-full w-full object-cover object-[50%_85%] sepia-[.12] saturate-[.9]"
-            />
-          </div>
+          <StatsRow family={family} />
         </div>
       </div>
       <UmbhacoBand height={30} />
@@ -210,7 +210,7 @@ function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
 // Each headline number wears one of the palette's colours.
 const STAT_COLOURS = ["text-ochre-deep", "text-bead-blue-deep", "text-forest", "text-marigold-deep"];
 
-function Stats({ family }: { family: Family }) {
+function StatsRow({ family }: { family: Family }) {
   const stats = useMemo(() => {
     const layout = layoutTree({
       ids: family.list.map((p) => p._id),
@@ -222,29 +222,23 @@ function Stats({ family }: { family: Family }) {
     const places = new Set(
       family.list.flatMap((p) => [p.birthPlace, p.currentPlace]).filter(Boolean).map((s) => s!.toLowerCase()),
     ).size;
-    const photos = family.list.filter((p) => p.photoUrl).length;
     return [
-      { label: "Family members", value: family.list.length, note: `${photos} with portraits` },
-      { label: "Generations", value: gens, note: "recorded so far" },
-      { label: "Living", value: living, note: `${family.list.length - living} remembered` },
-      { label: "Places", value: places, note: "born or living in" },
+      { label: "Family members", value: family.list.length },
+      { label: "Generations", value: gens },
+      { label: "Living", value: living },
+      { label: "Places", value: places },
     ];
   }, [family]);
 
   return (
-    <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+    <dl className="mt-10 grid grid-cols-2 gap-y-5 border-t border-ink/10 pt-6 sm:grid-cols-4">
       {stats.map((s, i) => (
-        <div
-          key={s.label}
-          className="animate-rise relative overflow-hidden rounded-[1.75rem] border border-line bg-card p-5 sm:p-6"
-          style={{ animationDelay: `${i * 60}ms` }}
-        >
-          <p className="text-xs font-medium uppercase tracking-wider text-muted">{s.label}</p>
-          <p className={`mt-2 font-display text-5xl font-semibold leading-none ${STAT_COLOURS[i]}`}>{s.value}</p>
-          <p className="mt-2 text-xs text-muted">{s.note}</p>
+        <div key={s.label} className={i > 0 ? "sm:border-l sm:border-ink/10 sm:pl-5" : ""}>
+          <dt className="text-[11px] font-medium uppercase tracking-wider text-muted">{s.label}</dt>
+          <dd className={`mt-1 font-display text-4xl font-semibold leading-none ${STAT_COLOURS[i]}`}>{s.value}</dd>
         </div>
       ))}
-    </section>
+    </dl>
   );
 }
 
@@ -252,7 +246,7 @@ function Stats({ family }: { family: Family }) {
 
 function Card({ title, action, children, className = "" }: { title: string; action?: React.ReactNode; children: React.ReactNode; className?: string }) {
   return (
-    <section className={`animate-rise rounded-[1.75rem] border border-line bg-card p-6 ${className}`}>
+    <section className={`animate-rise min-w-0 rounded-[1.75rem] border border-line bg-card p-6 ${className}`}>
       <div className="mb-5 flex items-center justify-between gap-3">
         <h2 className="font-display text-2xl font-semibold text-ink">{title}</h2>
         {action}
@@ -481,7 +475,7 @@ function ClanNames({ family }: { family: Family }) {
       ) : (
         <div className="space-y-4">
           {clans.map(([clan, members]) => (
-            <div key={clan} className="flex items-center gap-4">
+            <div key={clan} className="flex flex-wrap items-center gap-x-4 gap-y-2">
               <span className="w-36 shrink-0 truncate font-display text-2xl font-semibold text-ink">{clan}</span>
               <div className="flex -space-x-2">
                 {members.slice(0, 6).map((p) => (
