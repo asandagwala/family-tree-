@@ -51,16 +51,24 @@ call it).
 ## Sign-in and the family code
 
 Everyone signs in with their **Google account** or an **email address and
-password** (email accounts confirm their address through a link first). A new
-account then enters the **family code** once, which connects it to the family's
-tree. Until then they can only explore the sample family.
+password** (email accounts confirm their address through a link first).
+
+Many families can use the same site, each with its own private tree. After
+signing in for the first time, a person either **starts a new family tree**
+(they give the family name and get a family code, e.g. `RUBULUZA-7KQ4MX2P`) or
+**joins** one by entering the code a relative shared. The code shows on the
+front door and in the Stay connected card, with a copy button. Until they join,
+people can only explore the sample family.
+
+A deployment that ran the app before families existed moves its one family
+into a family row with `npx convex run migrations:intoFamilies` (add `--prod`
+for the live site); it prints the new family code.
 
 Set these on each Convex deployment (`npx convex env set NAME` prompts for the
 value; add `--prod` for the live site):
 
 | Name | What it is |
 | --- | --- |
-| `FAMILY_CODE` | The code relatives share to join the tree |
 | `AUTH_GOOGLE_CLIENT_ID`, `AUTH_GOOGLE_CLIENT_SECRET` | A Google Cloud OAuth client (Web application) |
 | `RESEND_API_KEY` | From resend.com, sends confirmation and reset emails |
 | `RESEND_FROM` | e.g. `Imvelaphi <hello@your-domain>` on a domain verified with Resend |

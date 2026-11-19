@@ -437,22 +437,33 @@ function ResetPasswordScreen({ code }: { code: string }) {
   );
 }
 
+/** After signing in: join a family's tree with its code, or start a new one. */
 function FamilyCodeScreen({ name }: { name: string | null }) {
   const joinFamily = useMutation(api.users.joinFamily);
+  const startFamily = useMutation(api.users.startFamily);
   const loadSample = useMutation(api.family.loadSampleFamily);
   const { signOut } = useAuthActions();
   const { enterSample } = useSampleMode();
   const router = useRouter();
-  const [code, setCode] = useState("");
+  const [starting, setStarting] = useState(false);
+  const [value, setValue] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function switchMode() {
+    setStarting(!starting);
+    setValue("");
+    setError(null);
+  }
 
   async function submit(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
     setError(null);
     try {
-      await joinFamily({ code });
+      if (starting) await startFamily({ familyName: value });
+      else await joinFamily({ code: value });
+      router.push("/");
     } catch (err) {
       setError(errorMessage(err));
     } finally {
@@ -462,27 +473,38 @@ function FamilyCodeScreen({ name }: { name: string | null }) {
 
   return (
     <AuthLayout>
-      <Heading eyebrow={`Molo${name ? `, ${name}` : ""}`}>
-        Enter the family <span className="italic text-ochre-deep">code</span>
-      </Heading>
+      {starting ? (
+        <Heading eyebrow={`Welcome${name ? `, ${name}` : ""}`}>
+          Start your family&apos;s <span className="italic text-ochre-deep">tree</span>
+        </Heading>
+      ) : (
+        <Heading eyebrow={`Welcome${name ? `, ${name}` : ""}`}>
+          Enter the family <span className="italic text-ochre-deep">code</span>
+        </Heading>
+      )}
       <p className="mt-6 max-w-md text-lg leading-relaxed text-ink/70">
-        The archive is private to the family. Ask a relative for the family code: it connects your account to your
-        family&apos;s tree, and you only need to enter it once.
+        {starting
+          ? "Give your family's name. You'll get a family code to share, so relatives can join the same tree."
+          : "Each family's archive is private. Ask a relative for your family code: it connects your account to your family's tree, and you only need to enter it once."}
       </p>
       <form onSubmit={submit} className="mt-8 max-w-md space-y-3">
         <input
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
           required
           autoComplete="off"
-          aria-label="Family code"
-          placeholder="Family code"
+          autoCapitalize={starting ? "words" : "characters"}
+          aria-label={starting ? "Family name" : "Family code"}
+          placeholder={starting ? "Family name, e.g. Rubuluza" : "Family code"}
           className={inputCls}
         />
         <button type="submit" disabled={busy} className={`${btnPrimary} w-full`}>
-          {busy ? "Checking…" : "Join the family"}
+          {starting ? (busy ? "Starting…" : "Start the family tree") : busy ? "Checking…" : "Join the family"}
         </button>
         {error && <ErrorNote>{error}</ErrorNote>}
+        <button type="button" onClick={switchMode} className="px-1 text-sm text-muted hover:text-ink hover:underline">
+          {starting ? "Have a family code? Join your family" : "No code yet? Start a new family tree"}
+        </button>
       </form>
       <div className="mt-8 flex max-w-md flex-wrap items-center gap-3 border-t border-ink/10 pt-6">
         <button

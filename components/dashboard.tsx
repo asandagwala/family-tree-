@@ -15,6 +15,7 @@ import { useFamily, type Family } from "@/lib/use-family";
 import { AskIcon } from "./ask-icon";
 import { UmbhacoBand } from "./beadwork";
 import { useChat } from "./chat/chat-context";
+import { FamilyCode } from "./family-code";
 import { FamilyDetailsEditor, type FamilySettings } from "./family-details-editor";
 import { PersonEditor } from "./person-editor";
 import { Portrait } from "./portrait";
@@ -578,6 +579,8 @@ function StayConnected({ family }: { family: Family }) {
           Change group link
         </button>
       )}
+
+      {!sample && settings?.familyCode && <FamilyCode code={settings.familyCode} className="mt-4" />}
 
       <p className="mt-5 text-xs font-medium uppercase tracking-wider text-muted">Find each other</p>
       {reachable.length === 0 ? (

@@ -9,36 +9,72 @@ import {
 } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { personFields } from "./schema";
-import { canAccess, personIsSample, requireAccess } from "./access";
+import {
+  canAccess,
+  canAccessPerson,
+  inSpace,
+  requireAccess,
+  requirePersonAccess,
+  spaceFields,
+  vSpace,
+  type Space,
+} from "./access";
 
 // A family tree is shown as a whole, so the whole tree is loaded at once,
 // capped so a runaway table can't blow the query limits.
 const MAX_PEOPLE = 2000;
-const MAX_LINKS = 4000;
 
-/** The real family or the sample family, never both. */
+/** The caller's own family or the sample family, never both. */
 export const spaceArg = { sample: v.optional(v.boolean()) };
 
-async function loadTree(ctx: QueryCtx, sample: boolean) {
-  const [all, links, pairs] = await Promise.all([
-    ctx.db.query("people").take(MAX_PEOPLE),
-    ctx.db.query("parentLinks").take(MAX_LINKS),
-    ctx.db.query("partnerships").take(MAX_LINKS),
-  ]);
-  const people = all.filter((p) => !!p.sample === sample);
+/** Everyone in a space (a family's people, or the sample family). */
+export async function peopleIn(ctx: QueryCtx, space: Space) {
+  const rows = await ctx.db
+    .query("people")
+    .withIndex("by_familyId", (q) => q.eq("familyId", space.sample ? undefined : space.familyId))
+    .take(MAX_PEOPLE);
+  return rows.filter((p) => inSpace(p, space));
+}
+
+/** A space's gatherings. */
+export async function gatheringsIn(ctx: QueryCtx, space: Space, limit: number) {
+  const rows = await ctx.db
+    .query("gatherings")
+    .withIndex("by_familyId", (q) => q.eq("familyId", space.sample ? undefined : space.familyId))
+    .take(limit);
+  return rows.filter((g) => inSpace(g, space));
+}
+
+async function loadTree(ctx: QueryCtx, space: Space) {
+  const people = await peopleIn(ctx, space);
   const ids = new Set<string>(people.map((p) => p._id));
+  // Each link is found from its child (parent links) or its lower id (partnerships).
+  const [links, pairs] = await Promise.all([
+    Promise.all(
+      people.map((p) => ctx.db.query("parentLinks").withIndex("by_childId", (q) => q.eq("childId", p._id)).take(2)),
+    ),
+    Promise.all(
+      people.map((p) =>
+        ctx.db
+          .query("partnerships")
+          .withIndex("by_personA_and_personB", (q) => q.eq("personA", p._id))
+          .take(20),
+      ),
+    ),
+  ]);
   return {
     people,
-    parentLinks: links.filter((l) => ids.has(l.childId) && ids.has(l.parentId)),
-    partnerships: pairs.filter((p) => ids.has(p.personA) && ids.has(p.personB)),
+    parentLinks: links.flat().filter((l) => ids.has(l.parentId)),
+    partnerships: pairs.flat().filter((p) => ids.has(p.personB)),
   };
 }
 
 export const getTree = query({
   args: spaceArg,
   handler: async (ctx, { sample }) => {
-    if (!(await canAccess(ctx, !!sample))) return { people: [], parentLinks: [], partnerships: [] };
-    const tree = await loadTree(ctx, !!sample);
+    const space = await canAccess(ctx, !!sample);
+    if (!space) return { people: [], parentLinks: [], partnerships: [] };
+    const tree = await loadTree(ctx, space);
     const people = await Promise.all(
       tree.people.map(async (p) => ({
         ...p,
@@ -51,31 +87,35 @@ export const getTree = query({
 
 // ---------- Settings ----------
 
+/** The caller's family: its name, clan, WhatsApp group and family code. */
 export const getSettings = query({
   args: {},
   handler: async (ctx) => {
-    if (!(await canAccess(ctx, false))) {
-      return { familyName: null, clanName: null, clanPraise: null, whatsappGroupUrl: null };
-    }
-    const row = await ctx.db.query("settings").first();
+    const space = await canAccess(ctx, false);
+    const family = space && !space.sample ? await ctx.db.get("families", space.familyId) : null;
     return {
-      familyName: row?.familyName ?? null,
-      clanName: row?.clanName ?? null,
-      clanPraise: row?.clanPraise ?? null,
-      whatsappGroupUrl: row?.whatsappGroupUrl ?? null,
+      familyName: family?.name ?? null,
+      familyCode: family?.code ?? null,
+      clanName: family?.clanName ?? null,
+      clanPraise: family?.clanPraise ?? null,
+      whatsappGroupUrl: family?.whatsappGroupUrl ?? null,
     };
   },
 });
 
+async function requireFamily(ctx: MutationCtx) {
+  const space = await requireAccess(ctx, false);
+  if (space.sample) throw new ConvexError("Join or start a family first.");
+  return space.familyId;
+}
+
 export const setFamilyName = mutation({
   args: { familyName: v.string() },
   handler: async (ctx, { familyName }) => {
-    await requireAccess(ctx, false);
+    const familyId = await requireFamily(ctx);
     const name = familyName.trim();
-    const row = await ctx.db.query("settings").first();
-    const value = name === "" ? undefined : name;
-    if (row) await ctx.db.patch("settings", row._id, { familyName: value });
-    else await ctx.db.insert("settings", { familyName: value });
+    if (!name) throw new ConvexError("Give the family a name.");
+    await ctx.db.patch("families", familyId, { name });
     return null;
   },
 });
@@ -88,7 +128,7 @@ export const updateSettings = mutation({
     whatsappGroupUrl: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await requireAccess(ctx, false);
+    const familyId = await requireFamily(ctx);
     const patch: Record<string, string | undefined> = {};
     for (const [key, value] of Object.entries(args)) {
       if (value === undefined) continue;
@@ -99,9 +139,7 @@ export const updateSettings = mutation({
     if (url && !/^https:\/\/(chat\.whatsapp\.com|wa\.me)\//.test(url)) {
       throw new ConvexError("Paste the group's invite link. It starts with https://chat.whatsapp.com/");
     }
-    const row = await ctx.db.query("settings").first();
-    if (row) await ctx.db.patch("settings", row._id, patch);
-    else await ctx.db.insert("settings", patch);
+    await ctx.db.patch("families", familyId, patch);
     return null;
   },
 });
@@ -136,9 +174,9 @@ export const renameSurname = internalMutation({
 
 /** The tree as the family assistant sees it. */
 export const treeForAssistant = internalQuery({
-  args: spaceArg,
-  handler: async (ctx, { sample }) => {
-    const tree = await loadTree(ctx, !!sample);
+  args: { space: vSpace },
+  handler: async (ctx, { space }) => {
+    const tree = await loadTree(ctx, space);
     const photoCounts: Record<string, number> = {};
     for (const p of tree.people) {
       const photos = await ctx.db
@@ -147,10 +185,9 @@ export const treeForAssistant = internalQuery({
         .take(100);
       photoCounts[p._id] = photos.length + (p.photoId ? 1 : 0);
     }
-    const settings = await ctx.db.query("settings").first();
+    const family = space.sample ? null : await ctx.db.get("families", space.familyId);
     const gatherings = [];
-    for (const g of await ctx.db.query("gatherings").take(200)) {
-      if (!!g.sample !== !!sample) continue;
+    for (const g of await gatheringsIn(ctx, space, 200)) {
       const photos = await ctx.db
         .query("gatheringPhotos")
         .withIndex("by_gatheringId", (q) => q.eq("gatheringId", g._id))
@@ -174,9 +211,9 @@ export const treeForAssistant = internalQuery({
       ...tree,
       people,
       photoCounts,
-      familyName: settings?.familyName ?? null,
-      familyClan: settings?.clanName ?? null,
-      familyClanPraise: settings?.clanPraise ?? null,
+      familyName: family?.name ?? null,
+      familyClan: family?.clanName ?? null,
+      familyClanPraise: family?.clanPraise ?? null,
       gatherings,
     };
   },
@@ -207,9 +244,9 @@ function requireName(firstName: string) {
 export const createPerson = mutation({
   args: { ...personFields, ...spaceArg },
   handler: async (ctx, { sample, ...args }) => {
-    await requireAccess(ctx, !!sample);
+    const space = await requireAccess(ctx, !!sample);
     requireName(args.firstName);
-    const fields = { ...clean(args), ...(sample ? { sample: true } : {}) };
+    const fields = { ...clean(args), ...spaceFields(space) };
     return await ctx.db.insert("people", fields);
   },
 });
@@ -217,7 +254,7 @@ export const createPerson = mutation({
 export const updatePerson = mutation({
   args: { id: v.id("people"), ...personFields },
   handler: async (ctx, { id, ...rest }) => {
-    await requireAccess(ctx, await personIsSample(ctx, id));
+    await requirePersonAccess(ctx, id);
     requireName(rest.firstName);
     const fields = clean(rest);
     // Patch every editable field so cleared ones are removed, while the
@@ -232,7 +269,7 @@ export const updatePerson = mutation({
 export const deletePerson = mutation({
   args: { id: v.id("people") },
   handler: async (ctx, { id }) => {
-    await requireAccess(ctx, await personIsSample(ctx, id));
+    const space = await requirePersonAccess(ctx, id);
     for await (const link of ctx.db
       .query("parentLinks")
       .withIndex("by_parentId_and_childId", (q) => q.eq("parentId", id))) {
@@ -259,7 +296,7 @@ export const deletePerson = mutation({
       await ctx.storage.delete(photo.storageId);
       await ctx.db.delete("photos", photo._id);
     }
-    for (const g of await ctx.db.query("gatherings").take(500)) {
+    for (const g of await gatheringsIn(ctx, space, 500)) {
       if (g.peopleIds.includes(id)) {
         await ctx.db.patch("gatherings", g._id, { peopleIds: g.peopleIds.filter((p) => p !== id) });
       }
@@ -270,6 +307,12 @@ export const deletePerson = mutation({
     return null;
   },
 });
+
+/** Whether two people are in the same tree (missing people count as not). */
+async function sameTree(ctx: MutationCtx, a: Id<"people">, b: Id<"people">) {
+  const [x, y] = await Promise.all([ctx.db.get("people", a), ctx.db.get("people", b)]);
+  return !!x && !!y && !!x.sample === !!y.sample && x.familyId === y.familyId;
+}
 
 async function requirePerson(ctx: MutationCtx, id: Id<"people">) {
   const person = await ctx.db.get("people", id);
@@ -302,9 +345,8 @@ async function isAncestor(
 export const addParent = mutation({
   args: { childId: v.id("people"), parentId: v.id("people") },
   handler: async (ctx, { childId, parentId }) => {
-    const sample = await personIsSample(ctx, childId);
-    await requireAccess(ctx, sample);
-    if ((await personIsSample(ctx, parentId)) !== sample) {
+    await requirePersonAccess(ctx, childId);
+    if (!(await sameTree(ctx, childId, parentId))) {
       throw new ConvexError("Those two people are in different family trees.");
     }
     if (childId === parentId) {
@@ -335,7 +377,7 @@ export const addParent = mutation({
 export const removeParent = mutation({
   args: { childId: v.id("people"), parentId: v.id("people") },
   handler: async (ctx, { childId, parentId }) => {
-    await requireAccess(ctx, await personIsSample(ctx, childId));
+    await requirePersonAccess(ctx, childId);
     const link = await ctx.db
       .query("parentLinks")
       .withIndex("by_parentId_and_childId", (q) =>
@@ -354,9 +396,8 @@ function orderPair(a: Id<"people">, b: Id<"people">) {
 export const addPartner = mutation({
   args: { personId: v.id("people"), partnerId: v.id("people") },
   handler: async (ctx, { personId, partnerId }) => {
-    const sample = await personIsSample(ctx, personId);
-    await requireAccess(ctx, sample);
-    if ((await personIsSample(ctx, partnerId)) !== sample) {
+    await requirePersonAccess(ctx, personId);
+    if (!(await sameTree(ctx, personId, partnerId))) {
       throw new ConvexError("Those two people are in different family trees.");
     }
     if (personId === partnerId) {
@@ -379,7 +420,7 @@ export const addPartner = mutation({
 export const removePartner = mutation({
   args: { personId: v.id("people"), partnerId: v.id("people") },
   handler: async (ctx, { personId, partnerId }) => {
-    await requireAccess(ctx, await personIsSample(ctx, personId));
+    await requirePersonAccess(ctx, personId);
     const pair = orderPair(personId, partnerId);
     const existing = await ctx.db
       .query("partnerships")
@@ -398,7 +439,7 @@ export const loadSampleFamily = mutation({
   handler: async (ctx) => {
     await requireAccess(ctx, true);
     // The sample lives in its own space; load it once and reuse it.
-    const existing = (await ctx.db.query("people").take(MAX_PEOPLE)).some((p) => p.sample);
+    const existing = (await peopleIn(ctx, { sample: true })).length > 0;
     if (existing) return null;
 
     type P = {
@@ -514,7 +555,7 @@ export const generateUploadUrl = mutation({
 export const setProfilePhoto = mutation({
   args: { personId: v.id("people"), storageId: v.union(v.id("_storage"), v.null()) },
   handler: async (ctx, { personId, storageId }) => {
-    await requireAccess(ctx, await personIsSample(ctx, personId));
+    await requirePersonAccess(ctx, personId);
     const person = await requirePerson(ctx, personId);
     if (person.photoId && person.photoId !== storageId) {
       // Keep the old portrait if it also lives in the gallery.
@@ -534,7 +575,7 @@ export const setProfilePhoto = mutation({
 export const listPhotos = query({
   args: { personId: v.id("people") },
   handler: async (ctx, { personId }) => {
-    if (!(await canAccess(ctx, await personIsSample(ctx, personId)))) return [];
+    if (!(await canAccessPerson(ctx, personId))) return [];
     const photos = await ctx.db
       .query("photos")
       .withIndex("by_personId", (q) => q.eq("personId", personId))
@@ -553,7 +594,7 @@ export const addPhoto = mutation({
     caption: v.optional(v.string()),
   },
   handler: async (ctx, { personId, storageId, caption }) => {
-    await requireAccess(ctx, await personIsSample(ctx, personId));
+    await requirePersonAccess(ctx, personId);
     await requirePerson(ctx, personId);
     const trimmed = caption?.trim();
     return await ctx.db.insert("photos", {
@@ -568,7 +609,7 @@ export const deletePhoto = mutation({
   args: { photoId: v.id("photos") },
   handler: async (ctx, { photoId }) => {
     const owned = await ctx.db.get("photos", photoId);
-    if (owned) await requireAccess(ctx, await personIsSample(ctx, owned.personId));
+    if (owned) await requirePersonAccess(ctx, owned.personId);
     const photo = await ctx.db.get("photos", photoId);
     if (!photo) return null;
     const person = await ctx.db.get("people", photo.personId);
@@ -590,7 +631,7 @@ export const clearAll = internalMutation({
       await ctx.db.delete("gatheringPhotos", ph._id);
     }
     for await (const g of ctx.db.query("gatherings")) await ctx.db.delete("gatherings", g._id);
-    for await (const row of ctx.db.query("settings")) await ctx.db.delete("settings", row._id);
+    for await (const row of ctx.db.query("families")) await ctx.db.delete("families", row._id);
     for (const table of ["parentLinks", "partnerships", "photos", "people"] as const) {
       for await (const doc of ctx.db.query(table)) {
         if (table === "photos" && "storageId" in doc) await ctx.storage.delete(doc.storageId);

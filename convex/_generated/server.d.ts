@@ -32,7 +32,6 @@ type Env = {
   readonly CONVEX_SITE_URL: string;
   readonly AUTH_GOOGLE_CLIENT_ID: string;
   readonly AUTH_GOOGLE_CLIENT_SECRET: string;
-  readonly FAMILY_CODE: string | undefined;
   readonly GEMINI_API_KEY: string | undefined;
   readonly GEMINI_MODEL: string | undefined;
   readonly RESEND_API_KEY: string | undefined;

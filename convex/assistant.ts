@@ -122,7 +122,8 @@ export const ask = action({
     sample: v.optional(v.boolean()),
   },
   handler: async (ctx, { messages, sample }): Promise<{ ok: boolean; text: string }> => {
-    if (!(await ctx.runQuery(internal.access.check, { sample: !!sample }))) {
+    const space = await ctx.runQuery(internal.access.check, { sample: !!sample });
+    if (!space) {
       return { ok: false, text: "Please sign in, and enter the family code, to ask about the family." };
     }
     const apiKey = env.GEMINI_API_KEY;
@@ -133,7 +134,7 @@ export const ask = action({
       return { ok: false, text: "Ask me something about the family." };
     }
 
-    const tree = await ctx.runQuery(internal.family.treeForAssistant, { sample });
+    const tree = await ctx.runQuery(internal.family.treeForAssistant, { space });
     const today = new Date().toISOString().slice(0, 10);
     const systemInstruction = `${INSTRUCTIONS}
 

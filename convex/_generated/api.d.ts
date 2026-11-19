@@ -13,6 +13,7 @@ import type * as album from "../album.js";
 import type * as assistant from "../assistant.js";
 import type * as auth from "../auth.js";
 import type * as family from "../family.js";
+import type * as migrations from "../migrations.js";
 import type * as users from "../users.js";
 
 import type {
@@ -27,6 +28,7 @@ declare const fullApi: ApiFromModules<{
   assistant: typeof assistant;
   auth: typeof auth;
   family: typeof family;
+  migrations: typeof migrations;
   users: typeof users;
 }>;
 

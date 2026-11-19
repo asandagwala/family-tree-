@@ -9,7 +9,6 @@ import resend from "@convex-dev/resend/convex.config.js";
 // Set secrets with `npx convex env set NAME` (it prompts for the value):
 // - GEMINI_API_KEY (Google AI Studio) powers the family assistant; GEMINI_MODEL
 //   optionally pins one model.
-// - FAMILY_CODE is what a new member enters once to join the real family tree.
 // - AUTH_GOOGLE_CLIENT_ID / AUTH_GOOGLE_CLIENT_SECRET come from Google Cloud.
 // - RESEND_API_KEY and RESEND_FROM send the email confirmation and reset links.
 // - SITE_URL is where the app is served (the links in emails point there).
@@ -17,7 +16,6 @@ const app = defineApp({
   env: {
     GEMINI_API_KEY: v.optional(v.string()),
     GEMINI_MODEL: v.optional(v.string()),
-    FAMILY_CODE: v.optional(v.string()),
     AUTH_GOOGLE_CLIENT_ID: v.string(),
     AUTH_GOOGLE_CLIENT_SECRET: v.string(),
     RESEND_API_KEY: v.optional(v.string()),

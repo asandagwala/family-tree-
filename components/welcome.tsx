@@ -9,6 +9,7 @@ import { errorMessage } from "@/lib/people";
 import { useSampleMode } from "@/lib/sample-mode";
 import { useFamily } from "@/lib/use-family";
 import { UmbhacoBand } from "./beadwork";
+import { FamilyCode } from "./family-code";
 import { PersonEditor } from "./person-editor";
 import { btnPrimary, btnSecondary } from "./ui/modal";
 
@@ -81,6 +82,7 @@ export function Welcome() {
             )}
           </div>
           {error && <p className="mt-4 text-sm text-red-700">{error}</p>}
+          {settings?.familyCode && <FamilyCode code={settings.familyCode} className="mt-8 max-w-md" />}
         </div>
         <div className="relative order-first h-56 @xl:h-72 @3xl:order-2 @3xl:h-auto">
           {/* eslint-disable-next-line @next/next/no-img-element */}

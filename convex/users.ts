@@ -2,14 +2,14 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { vGoogleProfile } from "@convex-dev/auth/methods/google/server";
 import { components } from "./_generated/api";
-import { env, internalMutation, mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query, type MutationCtx } from "./_generated/server";
 
-// New accounts start outside the family until they enter the family code.
+// New accounts start outside any family until they join or start one.
 export const createUserGoogle = internalMutation({
   args: { method: v.object({ name: v.literal("google"), profile: vGoogleProfile }) },
   returns: v.id("users"),
   handler: async (ctx, { method: { profile } }) => {
-    return await ctx.db.insert("users", { member: false, name: profile.name, email: profile.email });
+    return await ctx.db.insert("users", { name: profile.name, email: profile.email });
   },
 });
 
@@ -17,11 +17,11 @@ export const createUserEmail = internalMutation({
   args: { method: v.object({ name: v.literal("emailPassword"), profile: v.object({}) }) },
   returns: v.id("users"),
   handler: async (ctx) => {
-    return await ctx.db.insert("users", { member: false });
+    return await ctx.db.insert("users", {});
   },
 });
 
-/** Who is signed in, and whether they have joined the family. */
+/** Who is signed in, and which family they belong to. */
 export const me = query({
   args: {},
   handler: async (ctx) => {
@@ -31,33 +31,74 @@ export const me = query({
     const email = user?.email ?? (await ctx.runQuery(components.authEmail.verifiedEmails.getPrimaryEmail, { userId }));
     // Greet by first name when Google gave one, otherwise by email address.
     const firstName = user?.name?.split(" ")[0];
-    return { signedIn: true as const, member: !!user?.member, name: firstName ?? email ?? null };
+    return { signedIn: true as const, member: !!user?.familyId, name: firstName ?? email ?? null };
   },
 });
 
-/** Compare without revealing, through timing, how much of the code was right. */
-function sameCode(a: string, b: string) {
-  const x = a.trim().toLowerCase();
-  const y = b.trim().toLowerCase();
-  let diff = x.length ^ y.length;
-  for (let i = 0; i < Math.max(x.length, y.length); i++) {
-    diff |= (x.charCodeAt(i) || 0) ^ (y.charCodeAt(i) || 0);
-  }
-  return diff === 0;
+// No 0/O, 1/I/L: easy to read out over the phone.
+const CODE_ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+const CODE_LENGTH = 8; // 31^8 codes: far too many to guess
+
+/** Upper case, without spaces, so "rubuluza-7kq4 mx2p" finds RUBULUZA-7KQ4MX2P. */
+function normalizeCode(code: string) {
+  return code.toUpperCase().replace(/\s+/g, "");
 }
 
-/** Join the family by entering the family code. */
+function randomPart() {
+  const bytes = new Uint8Array(CODE_LENGTH);
+  crypto.getRandomValues(bytes);
+  return [...bytes].map((b) => CODE_ALPHABET[b % CODE_ALPHABET.length]).join("");
+}
+
+/** A new, unused family code that starts with the family name. */
+export async function newFamilyCode(ctx: MutationCtx, familyName: string) {
+  const prefix =
+    familyName
+      .normalize("NFKD")
+      .replace(/[^A-Za-z]/g, "")
+      .toUpperCase()
+      .slice(0, 12) || "FAMILY";
+  for (;;) {
+    const code = `${prefix}-${randomPart()}`;
+    const taken = await ctx.db
+      .query("families")
+      .withIndex("by_code", (q) => q.eq("code", code))
+      .unique();
+    if (!taken) return code;
+  }
+}
+
+async function requireUser(ctx: MutationCtx) {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) throw new ConvexError("Please sign in first.");
+  return userId;
+}
+
+/** Join an existing family's tree with its family code. */
 export const joinFamily = mutation({
   args: { code: v.string() },
   handler: async (ctx, { code }) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new ConvexError("Please sign in first.");
-    const expected = env.FAMILY_CODE;
-    if (!expected) {
-      throw new ConvexError("The family code hasn't been set up yet. Ask whoever manages the archive.");
-    }
-    if (!sameCode(code, expected)) throw new ConvexError("That code isn't right. Check it and try again.");
-    await ctx.db.patch("users", userId, { member: true });
+    const userId = await requireUser(ctx);
+    const family = await ctx.db
+      .query("families")
+      .withIndex("by_code", (q) => q.eq("code", normalizeCode(code)))
+      .unique();
+    if (!family) throw new ConvexError("We couldn't find a family with that code. Check it and try again.");
+    await ctx.db.patch("users", userId, { familyId: family._id });
+    return null;
+  },
+});
+
+/** Start a new family tree; the caller gets its family code to share. */
+export const startFamily = mutation({
+  args: { familyName: v.string() },
+  handler: async (ctx, { familyName }) => {
+    const userId = await requireUser(ctx);
+    const name = familyName.trim();
+    if (!name) throw new ConvexError("Enter the family name, e.g. Rubuluza.");
+    if (name.length > 60) throw new ConvexError("That family name is too long.");
+    const familyId = await ctx.db.insert("families", { name, code: await newFamilyCode(ctx, name) });
+    await ctx.db.patch("users", userId, { familyId });
     return null;
   },
 });

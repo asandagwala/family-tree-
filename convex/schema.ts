@@ -46,9 +46,13 @@ export default defineSchema({
   people: defineTable({
     ...personFields,
     photoId: v.optional(v.id("_storage")),
-    // true = part of the sample family people can explore; never shown in the real archive
+    // The family whose tree this person is in (unset for the sample family).
+    familyId: v.optional(v.id("families")),
+    // true = part of the sample family people can explore; never shown in a real family's tree
     sample: v.optional(v.boolean()),
-  }).index("by_lastName_and_firstName", ["lastName", "firstName"]),
+  })
+    .index("by_lastName_and_firstName", ["lastName", "firstName"])
+    .index("by_familyId", ["familyId"]),
 
   // One row per parent → child link. A child has at most two parents.
   parentLinks: defineTable({
@@ -66,14 +70,24 @@ export default defineSchema({
     .index("by_personA_and_personB", ["personA", "personB"])
     .index("by_personB", ["personB"]),
 
-  // Signed-in accounts (usernames and passkeys live in the Convex Auth components).
+  // One per family using the app. Relatives join with its code.
+  families: defineTable({
+    name: v.string(), // the family name, e.g. Rubuluza
+    code: v.string(), // the family code, upper case, e.g. RUBULUZA-7KQ4MX
+    clanName: v.optional(v.string()), // the family's isiduko
+    clanPraise: v.optional(v.string()), // izithakazelo, as the family recites them
+    whatsappGroupUrl: v.optional(v.string()), // family WhatsApp group invite link
+  }).index("by_code", ["code"]),
+
+  // Signed-in accounts (emails and passwords live in the Convex Auth components).
   users: defineTable({
-    member: v.optional(v.boolean()), // entered the family code
+    familyId: v.optional(v.id("families")), // set once they join or start a family
+    member: v.optional(v.boolean()), // before families: entered the one family code (migrated away)
     name: v.optional(v.string()), // from Google
     email: v.optional(v.string()), // from Google; email sign-ins keep theirs in the auth component
   }),
 
-  // App-wide settings; a single row.
+  // Before families: the one family's details (migrated into families).
   settings: defineTable({
     familyName: v.optional(v.string()),
     clanName: v.optional(v.string()), // the family's isiduko
@@ -91,8 +105,9 @@ export default defineSchema({
     coverId: v.optional(v.id("_storage")),
     // Who was there. Kept small (capped in the mutations).
     peopleIds: v.array(v.id("people")),
+    familyId: v.optional(v.id("families")),
     sample: v.optional(v.boolean()),
-  }),
+  }).index("by_familyId", ["familyId"]),
 
   gatheringPhotos: defineTable({
     gatheringId: v.id("gatherings"),
