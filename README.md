@@ -48,6 +48,19 @@ An empty tree offers a sample three-generation family. To wipe the tree
 during development: `npx convex run family:clearAll` (internal; the app can't
 call it).
 
+## Deploying
+
+Live at https://imvelaphi-family-tree.vercel.app (Vercel project
+`imvelaphi-family-tree`, backed by the Convex **production** deployment).
+
+```bash
+npx convex deploy                 # push backend changes to production
+npx vercel deploy --prod          # build and publish the website
+```
+
+The production backend needs its own Gemini key, once:
+`npx convex env set GEMINI_API_KEY --prod`.
+
 ## Project layout
 
 | Path | What it holds |
