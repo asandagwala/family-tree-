@@ -48,6 +48,27 @@ An empty tree offers a sample three-generation family. To wipe the tree
 during development: `npx convex run family:clearAll` (internal; the app can't
 call it).
 
+## Sign-in and the family code
+
+Everyone signs in with a username and a **passkey** (fingerprint, face or PIN
+on their own device). New accounts then enter the **family code** once to see
+the real archive; anyone signed in can explore the sample family.
+
+Set the family code on each Convex deployment (it prompts for the value):
+
+```bash
+npx convex env set FAMILY_CODE            # development
+npx convex env set FAMILY_CODE --prod     # live site
+```
+
+Passkeys are tied to the site's domain. Local development needs nothing extra.
+For the live site, set once on production:
+
+```bash
+npx convex env set PASSKEY_RP_ID imvelaphi-family-tree.vercel.app --prod
+npx convex env set PASSKEY_ORIGIN https://imvelaphi-family-tree.vercel.app --prod
+```
+
 ## Deploying
 
 Live at https://imvelaphi-family-tree.vercel.app (Vercel project
