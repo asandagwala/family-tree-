@@ -196,3 +196,24 @@ export function MonoBeadTrim({ height = 20, className = "" }: { height?: number;
     </svg>
   );
 }
+
+/**
+ * A compact umbhaco trim for small places like menu items: the same stripes
+ * as the full band (black edge, orange, a small zigzag, turquoise), drawn at
+ * a size where every line stays crisp. 12px tall.
+ */
+export function UmbhacoTrim({ className = "" }: { className?: string }) {
+  return (
+    <svg aria-hidden className={className} width="100%" height={12} style={{ display: "block" }}>
+      <defs>
+        <pattern id="umbhaco-trim-zig" width={8} height={12} patternUnits="userSpaceOnUse">
+          <path d="M0 5 L2 9 L4 5 L6 9 L8 5" fill="none" stroke="var(--ink)" strokeWidth={1} />
+        </pattern>
+      </defs>
+      <rect y={0} width="100%" height={1.5} fill="var(--ink)" />
+      <rect y={2.5} width="100%" height={1.5} fill="var(--ochre)" />
+      <rect width="100%" height={12} fill="url(#umbhaco-trim-zig)" />
+      <rect y={10.5} width="100%" height={1.5} fill="var(--bead-blue)" />
+    </svg>
+  );
+}

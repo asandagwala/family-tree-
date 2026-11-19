@@ -9,6 +9,7 @@ import { useChat } from "./chat/chat-context";
 import { LogoMark } from "./logo";
 import { useSampleMode } from "@/lib/sample-mode";
 import { AskIcon } from "./ask-icon";
+import { UmbhacoTrim } from "./beadwork";
 
 const NAV = [
   { href: "/overview", label: "Overview", icon: LayoutGrid },
@@ -41,12 +42,21 @@ function SidebarNav({ active }: NavProps) {
         <Link
           key={href}
           href={href}
-          className={`flex items-center gap-3 rounded-full px-4 py-2.5 text-sm transition-colors ${
-            active(href) ? "bg-ochre-soft text-ochre-deep font-medium" : "text-muted hover:bg-paper hover:text-ink"
+          className={`group relative flex items-center gap-3 overflow-hidden rounded-xl px-4 pb-4 pt-2.5 text-sm transition-colors ${
+            active(href) ? "bg-cream font-medium text-ink" : "text-muted hover:bg-cream/60 hover:text-ink"
           }`}
         >
           <Icon size={17} strokeWidth={1.8} />
           {label}
+          {/* umbhaco trim: always on for the current page, slides in on hover */}
+          <span
+            aria-hidden
+            className={`pointer-events-none absolute inset-x-0 bottom-0 transition-all duration-200 ${
+              active(href) ? "opacity-100" : "translate-y-1 opacity-0 group-hover:translate-y-0 group-hover:opacity-100"
+            }`}
+          >
+            <UmbhacoTrim />
+          </span>
         </Link>
       ))}
     </nav>
@@ -61,7 +71,7 @@ function MobileNavLinks({ active }: NavProps) {
           key={href}
           href={href}
           aria-label={label}
-          className={`grid h-10 w-10 place-items-center rounded-full ${active(href) ? "bg-ochre-soft text-ochre-deep" : "text-muted"}`}
+          className={`grid h-10 w-10 place-items-center rounded-full ${active(href) ? "bg-cream text-ink" : "text-muted"}`}
         >
           <Icon size={18} />
         </Link>
