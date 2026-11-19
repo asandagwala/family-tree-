@@ -43,7 +43,7 @@ function SidebarNav({ active }: NavProps) {
           key={href}
           href={href}
           className={`group relative flex items-center gap-3 overflow-hidden rounded-xl px-4 pb-3 pt-2.5 text-sm transition-colors ${
-            active(href) ? "bg-bead-blue-soft font-medium text-ink" : "text-muted hover:bg-bead-blue-soft/60 hover:text-ink"
+            active(href) ? "bg-bead-blue-soft font-medium text-bead-blue-deep" : "text-muted hover:bg-bead-blue-soft/60 hover:text-bead-blue-deep"
           }`}
         >
           <Icon size={17} strokeWidth={1.8} />
@@ -71,7 +71,7 @@ function MobileNavLinks({ active }: NavProps) {
           key={href}
           href={href}
           aria-label={label}
-          className={`grid h-10 w-10 place-items-center rounded-full ${active(href) ? "bg-bead-blue-soft text-ink" : "text-muted"}`}
+          className={`grid h-10 w-10 place-items-center rounded-full ${active(href) ? "bg-bead-blue-soft text-bead-blue-deep" : "text-muted"}`}
         >
           <Icon size={18} />
         </Link>
