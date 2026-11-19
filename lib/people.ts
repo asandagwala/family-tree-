@@ -67,3 +67,12 @@ export function initialsTone(id: string) {
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
   return INITIALS_TONES[h % INITIALS_TONES.length];
 }
+
+/** Neutral greys for initials on black-and-white pages. */
+const MONO_TONES = ["#f4f4f2", "#ebebe8", "#e1e1de"];
+
+export function initialsMonoTone(id: string) {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return MONO_TONES[h % MONO_TONES.length];
+}

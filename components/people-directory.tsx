@@ -2,14 +2,17 @@
 
 import { Search, UserPlus } from "lucide-react";
 import Link from "next/link";
-import { DiamondBand } from "./beadwork";
+import { MonoBeadTrim } from "./beadwork";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { fullName, lifespan } from "@/lib/people";
 import { useFamily } from "@/lib/use-family";
 import { PersonEditor } from "./person-editor";
 import { Portrait } from "./portrait";
-import { btnPrimary } from "./ui/modal";
+
+// Black-and-white page: a black primary button instead of the usual green.
+const btnMono =
+  "inline-flex items-center justify-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-coal disabled:opacity-50";
 
 type Filter = "all" | "living" | "remembered";
 
@@ -39,10 +42,10 @@ export function PeopleDirectory() {
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8 sm:py-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.25em] text-moss">The family</p>
-          <h1 className="mt-1 font-display text-5xl font-semibold text-night">People</h1>
+          <p className="text-xs uppercase tracking-[0.25em] text-muted">The family</p>
+          <h1 className="mt-1 font-display text-5xl font-semibold text-ink">People</h1>
         </div>
-        <button type="button" onClick={() => setAdding(true)} className={btnPrimary} disabled={!family}>
+        <button type="button" onClick={() => setAdding(true)} className={btnMono} disabled={!family}>
           <UserPlus size={16} /> Add a family member
         </button>
       </header>
@@ -55,7 +58,7 @@ export function PeopleDirectory() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by name, clan, place…"
-            className="w-full rounded-full border border-line bg-card py-2.5 pl-10 pr-4 text-sm outline-none focus:border-slate-soft"
+            className="w-full rounded-full border border-line bg-card py-2.5 pl-10 pr-4 text-sm outline-none focus:border-ink"
           />
         </div>
         <div className="flex rounded-full border border-line bg-card p-1" role="tablist" aria-label="Filter people">
@@ -67,7 +70,7 @@ export function PeopleDirectory() {
               aria-selected={filter === f}
               onClick={() => setFilter(f)}
               className={`rounded-full px-4 py-1.5 text-sm capitalize transition-colors ${
-                filter === f ? "bg-forest text-white" : "text-slate hover:bg-mist/60"
+                filter === f ? "bg-ink text-white" : "text-ink/70 hover:bg-paper"
               }`}
             >
               {f}
@@ -90,17 +93,18 @@ export function PeopleDirectory() {
             <li key={p._id} className="animate-rise" style={{ animationDelay: `${Math.min(i, 12) * 30}ms` }}>
               <Link
                 href={`/people/${p._id}`}
-                className="group flex h-full flex-col items-center overflow-hidden rounded-[1.75rem] border border-line bg-card text-center transition-all hover:-translate-y-0.5 hover:border-sage hover:shadow-lg"
+                className="group flex h-full flex-col items-center overflow-hidden rounded-[1.75rem] border border-line bg-card text-center transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-lg"
               >
-                <div className="relative h-16 w-full bg-forest-deep">
-                  <DiamondBand color="var(--forest)" height={16} className="absolute inset-x-0 bottom-0" />
+                <div className="w-full">
+                  <div className="h-12 bg-ink" />
+                  <MonoBeadTrim height={18} />
                 </div>
-                <Portrait person={p} size={84} className="-mt-11 ring-offset-card" />
+                <Portrait person={p} size={84} mono className="-mt-14 ring-offset-card" />
                 <div className="flex flex-1 flex-col px-4 pb-5 pt-3">
-                  <p className="font-display text-xl font-semibold leading-tight text-night">{fullName(p)}</p>
+                  <p className="font-display text-xl font-semibold leading-tight text-ink">{fullName(p)}</p>
                   <p className="mt-1 text-xs text-muted">{lifespan(p) || "Dates unknown"}</p>
                   {p.clanName && (
-                    <span className="mx-auto mt-3 rounded-full bg-mint px-3 py-1 text-[11px] font-medium uppercase tracking-wider text-forest-deep">
+                    <span className="mx-auto mt-3 rounded-full bg-ink px-3 py-1 text-[11px] font-medium uppercase tracking-wider text-white">
                       {p.clanName}
                     </span>
                   )}

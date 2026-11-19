@@ -166,3 +166,33 @@ export function DiamondBand({ color, height = 16, className = "" }: { color: str
     </svg>
   );
 }
+
+/**
+ * Black-and-white beaded trim, after the edging on white beaded dresses:
+ * black triangles hanging from a black edge onto white beads, with a row of
+ * small black beads below. Designed 20 units tall and scaled to `height`.
+ */
+export function MonoBeadTrim({ height = 20, className = "" }: { height?: number; className?: string }) {
+  const k = height / 20;
+  const w = 12 * k;
+  const id = `mono-trim-${height}`;
+  return (
+    <svg aria-hidden className={className} width="100%" height={height} style={{ display: "block" }}>
+      <defs>
+        <pattern id={id} width={w} height={height} patternUnits="userSpaceOnUse">
+          <rect width={w} height={height} fill="#ffffff" />
+          {/* a black triangle hanging from the top edge */}
+          <path d={`M0 0 L${w} 0 L${w / 2} ${11 * k} Z`} fill="var(--ink)" />
+          {/* a white bead set in each triangle */}
+          <circle cx={w / 2} cy={3.4 * k} r={1.4 * k} fill="#ffffff" />
+          {/* a black bead between the teeth, and a row of small beads below */}
+          <circle cx={0} cy={11 * k} r={1.5 * k} fill="var(--ink)" />
+          <circle cx={w} cy={11 * k} r={1.5 * k} fill="var(--ink)" />
+          <circle cx={w / 4} cy={16.5 * k} r={1.1 * k} fill="var(--ink)" />
+          <circle cx={(3 * w) / 4} cy={16.5 * k} r={1.1 * k} fill="var(--ink)" />
+        </pattern>
+      </defs>
+      <rect width="100%" height={height} fill={`url(#${id})`} />
+    </svg>
+  );
+}
