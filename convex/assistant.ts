@@ -93,10 +93,20 @@ function describeTree(tree: {
   return `${heading} records (${tree.people.length} people):\n${lines.join("\n")}${album}`;
 }
 
-// Tried in order: if one is busy (429/503) or unavailable to this key (404), the next is used.
-// Set GEMINI_MODEL in Convex to pin one.
-// All confirmed available to the project key with `npx convex run assistant:availableModels`.
-const DEFAULT_MODELS = ["gemini-3.5-flash", "gemini-2.5-flash", "gemini-3.1-flash-lite"];
+// Tried in order. A busy model (429/503) gets one quick retry before the next is
+// tried; a model this key can't use (404) is skipped. Set GEMINI_MODEL to pin one.
+// Check what a key can use with `npx convex run assistant:availableModels`.
+// The lite models answer family questions well and stay available when the
+// larger flash models are overloaded, so they go first.
+const DEFAULT_MODELS = [
+  "gemini-3.5-flash-lite",
+  "gemini-3.1-flash-lite",
+  "gemini-3.8-flash",
+  "gemini-3.7-flash",
+  "gemini-3.5-flash",
+];
+const BUSY_RETRY_MS = 800;
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const NOT_SET_UP =
   "The family assistant isn't switched on yet. Add your Google AI Studio key with `npx convex env set GEMINI_API_KEY` and ask again.";
@@ -138,29 +148,34 @@ Today's date: ${today}.`;
     const models = env.GEMINI_MODEL ? [env.GEMINI_MODEL] : DEFAULT_MODELS;
     let lastError: unknown;
     for (const model of models) {
-      try {
-        const response = await ai.models.generateContent({
-          model,
-          contents,
-          config: { systemInstruction, temperature: 0.3 },
-        });
-        const text = (response.text ?? "").trim();
-        if (!text) {
-          return { ok: false, text: "I couldn't answer that one. Try asking about someone in the family." };
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          const response = await ai.models.generateContent({
+            model,
+            contents,
+            config: { systemInstruction, temperature: 0.3 },
+          });
+          const text = (response.text ?? "").trim();
+          if (!text) {
+            return { ok: false, text: "I couldn't answer that one. Try asking about someone in the family." };
+          }
+          return { ok: true, text };
+        } catch (error) {
+          lastError = error;
+          const status = (error as { status?: number }).status;
+          if (status === 400 || status === 401 || status === 403) {
+            console.error("Gemini rejected the request", status, error);
+            return {
+              ok: false,
+              text: "The assistant's key was rejected. Check GEMINI_API_KEY in your Convex settings.",
+            };
+          }
+          console.warn(`Gemini model ${model} failed (attempt ${attempt + 1})`, status, error);
+          // Busy (429/5xx) or a dropped connection (no status): worth one retry.
+          const busy = status === undefined || status === 429 || status >= 500;
+          if (!busy) break; // e.g. 404: this key can't use the model, so move on
+          if (attempt === 0) await sleep(BUSY_RETRY_MS);
         }
-        return { ok: true, text };
-      } catch (error) {
-        lastError = error;
-        const status = (error as { status?: number }).status;
-        if (status === 400 || status === 401 || status === 403) {
-          console.error("Gemini rejected the request", status, error);
-          return {
-            ok: false,
-            text: "The assistant's key was rejected. Check GEMINI_API_KEY in your Convex settings.",
-          };
-        }
-        // 404 (model not available to this key), 429 (busy) or 5xx: try the next model.
-        console.warn(`Gemini model ${model} failed`, status, error);
       }
     }
     console.error("All Gemini models failed", lastError);
