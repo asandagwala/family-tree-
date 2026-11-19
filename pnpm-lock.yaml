@@ -168,7 +168,10 @@ importers:
     dependencies:
       '@convex-dev/auth':
         specifier: ^2.0.0
-        version: 2.0.0(convex@1.50.0(react@19.3.0))(next@16.4.6(@babel/core@7.29.13(supports-color@7.2.0))(@opentelemetry/api@1.10.0)(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7)
+        version: 2.0.0(@convex-dev/resend@0.2.10(convex-helpers@0.1.136(convex@1.50.0(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7))(convex@1.50.0(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7))(convex@1.50.0(react@19.3.0))(next@16.4.6(@babel/core@7.29.13(supports-color@7.2.0))(@opentelemetry/api@1.10.0)(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7)
+      '@convex-dev/resend':
+        specifier: ^0.2.10
+        version: 0.2.10(convex-helpers@0.1.136(convex@1.50.0(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7))(convex@1.50.0(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7)
       '@google/genai':
         specifier: ^3.6.0
         version: 3.6.0(supports-color@7.2.0)
@@ -314,6 +317,18 @@ packages:
     peerDependenciesMeta:
       react:
         optional: true
+
+  '@convex-dev/resend@0.2.10':
+    resolution: {integrity: sha512-+REZw2Uyt9ht37uTyxFIurntjzRL36369Gwpa53VDlRRcgh/JBxhKbFUeg8brTNiHrSiqB18FZofimi+YWuVgg==}
+    peerDependencies:
+      convex: ^1.43.0
+      convex-helpers: ^0.1.106
+
+  '@convex-dev/workpool@0.4.16':
+    resolution: {integrity: sha512-QtR9lEidys0yGtjlbtJzhcC6RGxs4uICnewWZmiolDnUlX4Y8z5v4hGwDzON3TRDIzL3Pd/WPY/jXRKZnQW4Bg==}
+    peerDependencies:
+      convex: ^1.43.0
+      convex-helpers: ^0.1.94
 
   '@emnapi/runtime@1.11.3':
     resolution: {integrity: sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA==}
@@ -907,6 +922,9 @@ packages:
   '@simplewebauthn/server@14.1.0':
     resolution: {integrity: sha512-HPRRBR4Vzr45+RVvbmf6JuCfGdYYcSs4Pnnnp9YSY2IABa4JKnG+wxybczoB7rmdLCOMS/mbBa2ZL/Bcz58UlA==}
     engines: {node: '>=22.0.0'}
+
+  '@stablelib/base64@1.0.1':
+    resolution: {integrity: sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ==}
 
   '@swc/helpers@0.5.23':
     resolution: {integrity: sha512-5lSsMOTXURePglDfvuAQUqkGek9Hg2kksOYay2m0+XR++b2NWYL/4sWyuvVBIs8oKnJaxkdi9whaL/sqN13afw==}
@@ -1676,6 +1694,9 @@ packages:
   fast-levenshtein@2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
 
+  fast-sha256@1.3.0:
+    resolution: {integrity: sha512-n11RGP/lrWEFI/bWdygLxhI+pVeo1ZYIVwvvPkW7azl/rOy+F3HYRZ2K5zeE9mmkhQppyv9sQFx0JM9UabnpPQ==}
+
   fastq@1.20.3:
     resolution: {integrity: sha512-XKv5nnLs6nLF71NgiKJLIZFLkPyIEuOselLG7ujZnGrRfQK8HpvY+WqKhAJUAdLomwVHErVS4LfxFlPq0/FTAw==}
 
@@ -2297,6 +2318,9 @@ packages:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
     engines: {node: '>= 0.4'}
 
+  postal-mime@2.7.6:
+    resolution: {integrity: sha512-UUlyE2KlxmvwMGq060onF/VWU3zD6dVW31FwokQ5v26jWd35fbs2MoTFzh+jXnPwAyV2MULMKXcBInGOl5TO6Q==}
+
   postcss@8.5.23:
     resolution: {integrity: sha512-g50586zr4bZmwFiTlflMu8E0bDTb5I5gertgwAKmsdUlTQIhZtunzUlD1WSzwcVWPoAVpsrA6vlfCD7oXvRwgg==}
     engines: {node: ^10 || ^12 || >=14}
@@ -2353,6 +2377,19 @@ packages:
   regexp.prototype.flags@1.5.4:
     resolution: {integrity: sha512-dYqgNSZbDwkaJ2ceRd9ojCGjBq+mOm9LmtXnAnEGyHhN/5R7iDW2TRw3h+o/jCFxus3P2LfWIIiwowAjANm7IA==}
     engines: {node: '>= 0.4'}
+
+  remeda@2.62.2:
+    resolution: {integrity: sha512-yhYfowrECXAgq0Izf4ucBIxBMUnHZQmqlV7h0483V2Ej8sjGwI2qivOvJB2Yiaqo16xP/okIhv7X9jjT0Vla2Q==}
+    engines: {node: '>=18.0.0'}
+
+  resend@6.39.0:
+    resolution: {integrity: sha512-szNf/OR2I5rreOt5dQr7+aZLGFhkNJ0pSjzQIkU1oIrfh7kMZFDJQ3/Cc9s1yVeapafYFg0/aNyj41lsbHPeUw==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@react-email/render': '*'
+    peerDependenciesMeta:
+      '@react-email/render':
+        optional: true
 
   resolve-from@4.0.0:
     resolution: {integrity: sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==}
@@ -2456,6 +2493,12 @@ packages:
   stable-hash@0.0.5:
     resolution: {integrity: sha512-+L3ccpzibovGXFK+Ap/f8LOS0ahMrHTf3xu7mMLSpEGU0EO9ucaysSylKo9eRDFNhWve/y275iPmIZ4z39a9iA==}
 
+  standardwebhooks@1.0.0:
+    resolution: {integrity: sha512-BbHGOQK9olHPMvQNHWul6MYlrRTAOKn03rOe4A8O3CLWhNf4YHBqq2HJKKC+sfqpxiBY52pNeesD6jIiLDz8jg==}
+
+  standardwebhooks@1.1.1:
+    resolution: {integrity: sha512-bCbX9ZEyFkWPsRz7Bl3NuQUJohmwGSev/yhr7vhaGPlc4AfIrspIRa6cPTBuI1ItmrTDJ4d/S2hCsfe4+vQGnQ==}
+
   stop-iteration-iterator@1.1.0:
     resolution: {integrity: sha512-eLoXW/DHyl62zxY4SCaIgnRhuMr6ri4juEYARS8E6sCEqzKpOiE521Ucofdx+KnDZl5xmvGYaaKCk5FEOxJCoQ==}
     engines: {node: '>= 0.4'}
@@ -2511,6 +2554,9 @@ packages:
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  svix@1.99.1:
+    resolution: {integrity: sha512-JfpvbAg5iT5NagDAfOq3e6Ci6NbOMbMm6C3DnfDBB60m2JDK+Z2hXPE9XNAmutb53DCdPoih1V70IbklZnX09A==}
 
   tailwindcss@4.3.3:
     resolution: {integrity: sha512-gOhV3P7ufE62QDGg1zVaTgCR+EtPv92k2nIhVcVKcLmxT1sUBsQGhnZj175j+MqRt4zLF7ic+sCYjfhxMxj7YQ==}
@@ -2758,7 +2804,7 @@ snapshots:
       '@babel/helper-string-parser': 7.29.14
       '@babel/helper-validator-identifier': 7.29.7
 
-  '@convex-dev/auth@2.0.0(convex@1.50.0(react@19.3.0))(next@16.4.6(@babel/core@7.29.13(supports-color@7.2.0))(@opentelemetry/api@1.10.0)(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7)':
+  '@convex-dev/auth@2.0.0(@convex-dev/resend@0.2.10(convex-helpers@0.1.136(convex@1.50.0(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7))(convex@1.50.0(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7))(convex@1.50.0(react@19.3.0))(next@16.4.6(@babel/core@7.29.13(supports-color@7.2.0))(@opentelemetry/api@1.10.0)(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7)':
     dependencies:
       '@convex-dev/batch-worker': 0.3.6(convex@1.50.0(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7)
       '@convex-dev/rate-limiter': 0.3.2(convex@1.50.0(react@19.3.0))(react@19.3.0)
@@ -2769,6 +2815,7 @@ snapshots:
       jose: 5.10.0
       password-hash-wasm: 0.0.0
     optionalDependencies:
+      '@convex-dev/resend': 0.2.10(convex-helpers@0.1.136(convex@1.50.0(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7))(convex@1.50.0(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7)
       next: 16.4.6(@babel/core@7.29.13(supports-color@7.2.0))(@opentelemetry/api@1.10.0)(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react: 19.3.0
     transitivePeerDependencies:
@@ -2795,6 +2842,37 @@ snapshots:
       convex: 1.50.0(react@19.3.0)
     optionalDependencies:
       react: 19.3.0
+
+  '@convex-dev/resend@0.2.10(convex-helpers@0.1.136(convex@1.50.0(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7))(convex@1.50.0(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7)':
+    dependencies:
+      '@convex-dev/rate-limiter': 0.3.2(convex@1.50.0(react@19.3.0))(react@19.3.0)
+      '@convex-dev/workpool': 0.4.16(convex-helpers@0.1.136(convex@1.50.0(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7))(convex@1.50.0(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7)
+      convex: 1.50.0(react@19.3.0)
+      convex-helpers: 0.1.136(convex@1.50.0(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7)
+      remeda: 2.62.2
+      resend: 6.39.0
+      svix: 1.99.1
+    transitivePeerDependencies:
+      - '@react-email/render'
+      - '@standard-schema/spec'
+      - hono
+      - prettier
+      - react
+      - typescript
+      - zod
+
+  '@convex-dev/workpool@0.4.16(convex-helpers@0.1.136(convex@1.50.0(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7))(convex@1.50.0(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7)':
+    dependencies:
+      '@convex-dev/batch-worker': 0.3.6(convex@1.50.0(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7)
+      convex: 1.50.0(react@19.3.0)
+      convex-helpers: 0.1.136(convex@1.50.0(react@19.3.0))(prettier@3.10.1)(react@19.3.0)(typescript@5.9.3)(zod@4.6.7)
+    transitivePeerDependencies:
+      - '@standard-schema/spec'
+      - hono
+      - prettier
+      - react
+      - typescript
+      - zod
 
   '@emnapi/runtime@1.11.3':
     dependencies:
@@ -3291,6 +3369,8 @@ snapshots:
       '@peculiar/asn1-x509-post-quantum': 2.11.1
       '@peculiar/x509': 2.2.0
       reflect-metadata: 0.2.2
+
+  '@stablelib/base64@1.0.1': {}
 
   '@swc/helpers@0.5.23':
     dependencies:
@@ -4190,6 +4270,8 @@ snapshots:
 
   fast-levenshtein@2.0.6: {}
 
+  fast-sha256@1.3.0: {}
+
   fastq@1.20.3:
     dependencies:
       reusify: 1.1.0
@@ -4808,6 +4890,8 @@ snapshots:
 
   possible-typed-array-names@1.1.0: {}
 
+  postal-mime@2.7.6: {}
+
   postcss@8.5.23:
     dependencies:
       nanoid: 3.3.20
@@ -4878,6 +4962,13 @@ snapshots:
       get-proto: 1.0.1
       gopd: 1.2.0
       set-function-name: 2.0.2
+
+  remeda@2.62.2: {}
+
+  resend@6.39.0:
+    dependencies:
+      postal-mime: 2.7.6
+      standardwebhooks: 1.1.1
 
   resolve-from@4.0.0: {}
 
@@ -5021,6 +5112,16 @@ snapshots:
 
   stable-hash@0.0.5: {}
 
+  standardwebhooks@1.0.0:
+    dependencies:
+      '@stablelib/base64': 1.0.1
+      fast-sha256: 1.3.0
+
+  standardwebhooks@1.1.1:
+    dependencies:
+      '@stablelib/base64': 1.0.1
+      fast-sha256: 1.3.0
+
   stop-iteration-iterator@1.1.0:
     dependencies:
       es-errors: 1.3.0
@@ -5093,6 +5194,10 @@ snapshots:
       has-flag: 4.0.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
+
+  svix@1.99.1:
+    dependencies:
+      standardwebhooks: 1.0.0
 
   tailwindcss@4.3.3: {}
 

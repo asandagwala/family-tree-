@@ -7,6 +7,11 @@ export const auth = setupConvexAuthServer({
   refreshSession: api.auth.refreshSession,
   signOut: api.auth.signOut,
   // Every function that creates a session; anything else is refused.
-  signIn: [api.auth.finishSignUpWithUsernamePasskey, api.auth.finishSignInWithUsernamePasskey],
+  signIn: [
+    api.auth.completeSignInWithGoogle,
+    api.auth.signInWithEmailPassword,
+    api.auth.completeSignUpWithEmailPassword,
+    api.auth.completePasswordRecovery,
+  ],
   cookieOptions: { secure: process.env.NODE_ENV === "production" },
 });

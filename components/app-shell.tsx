@@ -113,7 +113,7 @@ function AccountRow() {
   return (
     <div className="flex items-center justify-between gap-2 border-t border-line px-5 py-3 text-xs text-muted">
       <span className="truncate">
-        Signed in as <span className="font-medium text-ink">{me.username ?? "you"}</span>
+        Signed in as <span className="font-medium text-ink">{me.name ?? "you"}</span>
       </span>
       <button type="button" onClick={() => void leave()} className="shrink-0 font-medium hover:text-ink hover:underline">
         Sign out

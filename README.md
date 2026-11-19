@@ -50,24 +50,26 @@ call it).
 
 ## Sign-in and the family code
 
-Everyone signs in with a username and a **passkey** (fingerprint, face or PIN
-on their own device). New accounts then enter the **family code** once to see
-the real archive; anyone signed in can explore the sample family.
+Everyone signs in with their **Google account** or an **email address and
+password** (email accounts confirm their address through a link first). A new
+account then enters the **family code** once, which connects it to the family's
+tree. Until then they can only explore the sample family.
 
-Set the family code on each Convex deployment (it prompts for the value):
+Set these on each Convex deployment (`npx convex env set NAME` prompts for the
+value; add `--prod` for the live site):
 
-```bash
-npx convex env set FAMILY_CODE            # development
-npx convex env set FAMILY_CODE --prod     # live site
-```
+| Name | What it is |
+| --- | --- |
+| `FAMILY_CODE` | The code relatives share to join the tree |
+| `AUTH_GOOGLE_CLIENT_ID`, `AUTH_GOOGLE_CLIENT_SECRET` | A Google Cloud OAuth client (Web application) |
+| `RESEND_API_KEY` | From resend.com, sends confirmation and reset emails |
+| `RESEND_FROM` | e.g. `Imvelaphi <hello@your-domain>` on a domain verified with Resend |
+| `SITE_URL` | Where the app is served, e.g. `https://imvelaphi-family-tree.vercel.app` (defaults to `http://localhost:3000`) |
 
-Passkeys are tied to the site's domain. Local development needs nothing extra.
-For the live site, set once on production:
-
-```bash
-npx convex env set PASSKEY_RP_ID imvelaphi-family-tree.vercel.app --prod
-npx convex env set PASSKEY_ORIGIN https://imvelaphi-family-tree.vercel.app --prod
-```
+In the Google OAuth client, add the redirect URI
+`<your Convex site URL>/oauth/google/callback` (the Convex site URL ends in
+`.convex.site`). Until `RESEND_FROM` uses a verified domain, Resend only
+delivers to the address you signed up to Resend with.
 
 ## Deploying
 

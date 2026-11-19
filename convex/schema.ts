@@ -69,6 +69,8 @@ export default defineSchema({
   // Signed-in accounts (usernames and passkeys live in the Convex Auth components).
   users: defineTable({
     member: v.optional(v.boolean()), // entered the family code
+    name: v.optional(v.string()), // from Google
+    email: v.optional(v.string()), // from Google; email sign-ins keep theirs in the auth component
   }),
 
   // App-wide settings; a single row.

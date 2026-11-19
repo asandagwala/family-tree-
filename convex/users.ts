@@ -1,15 +1,22 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
+import { vGoogleProfile } from "@convex-dev/auth/methods/google/server";
 import { components } from "./_generated/api";
 import { env, internalMutation, mutation, query } from "./_generated/server";
 
-export const createUser = internalMutation({
-  args: {
-    method: v.object({ name: v.literal("usernamePasskey"), profile: v.object({}) }),
+// New accounts start outside the family until they enter the family code.
+export const createUserGoogle = internalMutation({
+  args: { method: v.object({ name: v.literal("google"), profile: vGoogleProfile }) },
+  returns: v.id("users"),
+  handler: async (ctx, { method: { profile } }) => {
+    return await ctx.db.insert("users", { member: false, name: profile.name, email: profile.email });
   },
+});
+
+export const createUserEmail = internalMutation({
+  args: { method: v.object({ name: v.literal("emailPassword"), profile: v.object({}) }) },
   returns: v.id("users"),
   handler: async (ctx) => {
-    // New accounts start outside the family until they enter the family code.
     return await ctx.db.insert("users", { member: false });
   },
 });
@@ -21,8 +28,10 @@ export const me = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return { signedIn: false as const };
     const user = await ctx.db.get("users", userId);
-    const username = await ctx.runQuery(components.authUsername.public.getUsername, { userId });
-    return { signedIn: true as const, member: !!user?.member, username: username ?? null };
+    const email = user?.email ?? (await ctx.runQuery(components.authEmail.verifiedEmails.getPrimaryEmail, { userId }));
+    // Greet by first name when Google gave one, otherwise by email address.
+    const firstName = user?.name?.split(" ")[0];
+    return { signedIn: true as const, member: !!user?.member, name: firstName ?? email ?? null };
   },
 });
 
