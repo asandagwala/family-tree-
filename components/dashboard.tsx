@@ -204,6 +204,9 @@ function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
 
 /* ---------- Stats ---------- */
 
+// Each headline number wears one of the palette's colours.
+const STAT_COLOURS = ["text-ochre-deep", "text-bead-blue-deep", "text-forest", "text-marigold-deep"];
+
 function Stats({ family }: { family: Family }) {
   const stats = useMemo(() => {
     const layout = layoutTree({
@@ -234,7 +237,7 @@ function Stats({ family }: { family: Family }) {
           style={{ animationDelay: `${i * 60}ms` }}
         >
           <p className="text-xs font-medium uppercase tracking-wider text-muted">{s.label}</p>
-          <p className="mt-2 font-display text-5xl font-semibold leading-none text-ink">{s.value}</p>
+          <p className={`mt-2 font-display text-5xl font-semibold leading-none ${STAT_COLOURS[i]}`}>{s.value}</p>
           <p className="mt-2 text-xs text-muted">{s.note}</p>
         </div>
       ))}
@@ -359,7 +362,7 @@ function UpcomingBirthdays({ family, className }: { family: Family; className?: 
                 </span>
                 <span
                   className={`rounded-full px-3 py-1 text-xs font-medium ${
-                    days <= 7 ? "bg-ochre-deep text-white" : "bg-ochre-soft text-ochre-deep"
+                    days <= 7 ? "bg-marigold text-ink" : "bg-marigold-soft text-marigold-deep"
                   }`}
                 >
                   {days === 0 ? "Today" : days === 1 ? "Tomorrow" : `${days} days`}

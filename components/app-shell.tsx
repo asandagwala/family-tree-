@@ -42,7 +42,7 @@ function SidebarNav({ active }: NavProps) {
           key={href}
           href={href}
           className={`flex items-center gap-3 rounded-full px-4 py-2.5 text-sm transition-colors ${
-            active(href) ? "bg-mint text-forest-deep font-medium" : "text-muted hover:bg-paper hover:text-ink"
+            active(href) ? "bg-ochre-soft text-ochre-deep font-medium" : "text-muted hover:bg-paper hover:text-ink"
           }`}
         >
           <Icon size={17} strokeWidth={1.8} />
@@ -61,7 +61,7 @@ function MobileNavLinks({ active }: NavProps) {
           key={href}
           href={href}
           aria-label={label}
-          className={`grid h-10 w-10 place-items-center rounded-full ${active(href) ? "bg-mint text-forest-deep" : "text-muted"}`}
+          className={`grid h-10 w-10 place-items-center rounded-full ${active(href) ? "bg-ochre-soft text-ochre-deep" : "text-muted"}`}
         >
           <Icon size={18} />
         </Link>
@@ -91,9 +91,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           <button
             type="button"
             onClick={() => chat.open()}
-            className="flex w-full items-center gap-3 rounded-full border border-line px-4 py-2.5 text-sm text-ink transition-colors hover:border-sage hover:bg-mint/40"
+            className="flex w-full items-center gap-3 rounded-full border border-line px-4 py-2.5 text-sm text-ink transition-colors hover:border-ochre/50 hover:bg-ochre-soft/50"
           >
-            <AskIcon size={17} className="text-forest" />
+            <AskIcon size={17} className="text-ochre-deep" />
             Ask the family
           </button>
         </div>
@@ -124,7 +124,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           type="button"
           aria-label="Ask the family"
           onClick={() => chat.open()}
-          className="grid h-10 w-10 place-items-center rounded-full text-forest"
+          className="grid h-10 w-10 place-items-center rounded-full text-ochre-deep"
         >
           <AskIcon size={18} />
         </button>

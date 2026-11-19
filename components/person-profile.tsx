@@ -102,7 +102,7 @@ function ProfileBody({ person, family }: { person: Person; family: Family }) {
               <button
                 type="button"
                 onClick={() => setEditor({ kind: "edit", person })}
-                className="absolute bottom-1 right-1 grid h-10 w-10 place-items-center rounded-full bg-forest text-white shadow-lg"
+                className="absolute bottom-1 right-1 grid h-10 w-10 place-items-center rounded-full bg-ochre-deep text-white shadow-lg"
                 aria-label="Add a portrait"
                 title="Add a portrait"
               >
@@ -115,7 +115,7 @@ function ProfileBody({ person, family }: { person: Person; family: Family }) {
               <p className="text-xs uppercase tracking-[0.3em] text-moss">{person.clanName} clan</p>
             )}
             <h1 className="mt-1 font-display text-5xl font-semibold leading-[0.95] sm:text-6xl">
-              {person.firstName} <span className="italic text-forest">{person.lastName}</span>
+              {person.firstName} <span className="italic text-ochre-deep">{person.lastName}</span>
             </h1>
             <p className="mt-3 text-sm text-muted">
               {[lifespan(person), years !== undefined && (person.deathDate ? `lived ${years} years` : `${years} years old`)]
@@ -126,20 +126,20 @@ function ProfileBody({ person, family }: { person: Person; family: Family }) {
               <button
                 type="button"
                 onClick={() => chat.open(`Tell me about ${fullName(person)}.`)}
-                className="inline-flex items-center gap-2 rounded-full bg-forest px-4 py-2 text-sm font-medium text-white hover:bg-forest-deep"
+                className="inline-flex items-center gap-2 rounded-full bg-ochre-deep px-4 py-2 text-sm font-medium text-white hover:brightness-90"
               >
                 <AskIcon size={15} /> Ask about {person.firstName}
               </button>
               <button
                 type="button"
                 onClick={() => setEditor({ kind: "edit", person })}
-                className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-medium hover:border-sage hover:bg-mint/40"
+                className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-medium hover:border-ochre/50 hover:bg-ochre-soft/50"
               >
                 <Pencil size={15} /> Edit details
               </button>
               <Link
                 href="/tree"
-                className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-medium hover:border-sage hover:bg-mint/40"
+                className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-medium hover:border-ochre/50 hover:bg-ochre-soft/50"
               >
                 See in tree
               </Link>

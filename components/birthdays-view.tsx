@@ -86,10 +86,10 @@ function wishesHref(b: Birthday) {
 function NextUp({ birthday: b }: { birthday: Birthday }) {
   const wishes = wishesHref(b);
   return (
-    <section className="mt-8 flex flex-wrap items-center gap-6 rounded-[1.75rem] bg-ochre-soft p-6 sm:p-8">
+    <section className="mt-8 flex flex-wrap items-center gap-6 rounded-[1.75rem] bg-marigold-soft p-6 sm:p-8">
       <Portrait person={b.person} size={96} />
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-ochre-deep">Next birthday · {whenLabel(b.days)}</p>
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-marigold-deep">Next birthday · {whenLabel(b.days)}</p>
         <Link href={`/people/${b.person._id}`} className="mt-1 block font-display text-4xl font-semibold text-ink hover:underline">
           {fullName(b.person)}
         </Link>
@@ -115,7 +115,7 @@ function BirthdayRow({ birthday: b }: { birthday: Birthday }) {
   const wishes = wishesHref(b);
   return (
     <li className="flex items-center gap-4 px-4 py-3">
-      <div className="grid w-12 shrink-0 place-items-center rounded-xl bg-cream py-1.5 text-ochre-deep">
+      <div className="grid w-12 shrink-0 place-items-center rounded-xl bg-marigold-soft py-1.5 text-marigold-deep">
         <span className="font-display text-xl font-semibold leading-none">{b.next.getDate()}</span>
         <span className="text-[10px] font-medium uppercase tracking-wider">
           {b.next.toLocaleDateString("en-ZA", { month: "short" })}

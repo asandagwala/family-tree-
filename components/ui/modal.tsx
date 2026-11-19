@@ -51,10 +51,10 @@ export function Modal(props: {
 }
 
 export const inputCls =
-  "w-full rounded-2xl border border-line bg-card px-4 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-slate-soft focus:ring-4 focus:ring-mint";
+  "w-full rounded-2xl border border-line bg-card px-4 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-ochre focus:ring-4 focus:ring-ochre-soft";
 
 export const btnPrimary =
-  "inline-flex items-center justify-center gap-2 rounded-full bg-forest px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-forest-deep disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-full bg-ochre-deep px-5 py-2.5 text-sm font-medium text-white transition hover:brightness-90 disabled:opacity-50";
 
 export const btnSecondary =
   "inline-flex items-center justify-center gap-2 rounded-full border border-line bg-card px-5 py-2.5 text-sm font-medium text-coal transition-colors hover:border-slate-soft hover:bg-mist/40";

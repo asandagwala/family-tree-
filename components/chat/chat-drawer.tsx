@@ -64,8 +64,8 @@ export function ChatDrawer() {
         <header className="relative overflow-hidden border-b border-line bg-card px-6 pb-7 pt-6 text-ink">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-full bg-mint">
-                <AskIcon size={18} className="text-forest" />
+              <span className="grid h-10 w-10 place-items-center rounded-full bg-ochre-soft">
+                <AskIcon size={18} className="text-ochre-deep" />
               </span>
               <div>
                 <h2 className="font-display text-2xl font-semibold leading-none">Ask the family</h2>
@@ -113,7 +113,7 @@ export function ChatDrawer() {
                     key={s}
                     type="button"
                     onClick={() => void chat.send(s)}
-                    className="rounded-2xl border border-line bg-card px-4 py-3 text-left text-sm text-coal transition-colors hover:border-sage hover:bg-mint/40"
+                    className="rounded-2xl border border-line bg-card px-4 py-3 text-left text-sm text-coal transition-colors hover:border-ochre/50 hover:bg-ochre-soft/50"
                   >
                     {s}
                   </button>
@@ -125,7 +125,7 @@ export function ChatDrawer() {
           {chat.messages.map((m, i) =>
             m.role === "user" ? (
               <div key={i} className="flex justify-end animate-rise">
-                <div className="max-w-[85%] rounded-3xl rounded-br-md bg-forest px-4 py-2.5 text-sm text-white">
+                <div className="max-w-[85%] rounded-3xl rounded-br-md bg-ochre-deep px-4 py-2.5 text-sm text-white">
                   {m.content}
                 </div>
               </div>
@@ -190,7 +190,7 @@ export function ChatDrawer() {
               type="submit"
               disabled={!draft.trim() || chat.pending}
               aria-label="Send"
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-forest text-white transition-opacity disabled:opacity-30"
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ochre-deep text-white transition-opacity disabled:opacity-30"
             >
               <ArrowUp size={17} />
             </button>

@@ -1,31 +1,38 @@
 @import "tailwindcss";
 
-/* Palette: light, airy neutrals carry the interface; charcoal is for text.
-   Green is the accent: the tree, active states, primary actions. */
+/* Palette: warm cream and paper carry the interface, warm black for text.
+   Terracotta (from umbhaco) is the brand colour: primary actions, active states.
+   Beadwork turquoise is for links and data, marigold for celebrations.
+   Green belongs to the family tree. */
 :root {
-  --ink: #121418;
+  --ink: #1c1714;
   --night: #16191e;
   --coal: #252a32;
   --slate: #404f68;
   --slate-soft: #7a859d;
-  --silver: #c4cad4;
-  --mist: #eceef1;
-  --paper: #f6f6f4;
-  --card: #ffffff;
-  --line: #e4e6ea;
-  --muted: #6b7382;
+  --silver: #d4c7b4;
+  --mist: #f0e8db;
+  --paper: #f7f0e4;
+  --card: #fffdf9;
+  --line: #eadfcd;
+  --muted: #6f6258;
   /* green accents (as on the tree) */
   --mint: #daf1de;
   --forest: #235347;
   --forest-deep: #163832;
   --sage: #8eb69b;
   /* Umbhaco: cream cloth, black braid, orange and turquoise stripes */
-  --cream: #f5efe4;
-  --ochre: #dd6b2b;
-  --ochre-deep: #b4501c;
-  --ochre-soft: #fbeadd;
-  --bead-blue: #2a9db3;
-  --bead-blue-soft: #dff2f5;
+  --cream: #f1e5d0;
+  --ochre: #d0592a;
+  --ochre-deep: #a5421a;
+  --ochre-soft: #fbe3d4;
+  --bead-blue: #1f8fa3;
+  --bead-blue-deep: #15707f;
+  --bead-blue-soft: #dcf0f3;
+  /* beadwork marigold, for birthdays and small celebrations */
+  --marigold: #e8a62a;
+  --marigold-soft: #fcefd2;
+  --marigold-deep: #8a5a00;
   --moss: #738a6e;
   --evergreen: #344c3d;
 }
@@ -52,6 +59,10 @@
   --color-ochre-soft: var(--ochre-soft);
   --color-bead-blue: var(--bead-blue);
   --color-bead-blue-soft: var(--bead-blue-soft);
+  --color-bead-blue-deep: var(--bead-blue-deep);
+  --color-marigold: var(--marigold);
+  --color-marigold-soft: var(--marigold-soft);
+  --color-marigold-deep: var(--marigold-deep);
   --color-moss: var(--moss);
   --color-evergreen: var(--evergreen);
   --font-sans: var(--font-geist-sans);
@@ -66,7 +77,7 @@ body {
 }
 
 ::selection {
-  background: var(--mist);
+  background: var(--ochre-soft);
   color: var(--ink);
 }
 

@@ -59,7 +59,8 @@ export function errorMessage(err: unknown) {
  * soft tones, always with near-black initials (well over 4.5:1), chosen from
  * their id so it stays the same everywhere.
  */
-const INITIALS_TONES = ["#daf1de", "#e2e7ef", "#e6eee2", "#d9dfe8", "#ece9e1"];
+// Soft tints of the palette: terracotta, marigold, turquoise, sand, sage.
+const INITIALS_TONES = ["#fbe3d4", "#fcefd2", "#dcf0f3", "#efe3cf", "#e6efe1"];
 export const INITIALS_TEXT = "#121418";
 
 export function initialsTone(id: string) {
