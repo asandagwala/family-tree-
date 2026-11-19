@@ -27,6 +27,11 @@ type Draft = {
   clanName: string;
   occupation: string;
   notes: string;
+  whatsapp: string;
+  instagram: string;
+  facebook: string;
+  tiktok: string;
+  linkedin: string;
 };
 
 function draftFrom(p?: Partial<Person>): Draft {
@@ -41,6 +46,11 @@ function draftFrom(p?: Partial<Person>): Draft {
     clanName: p?.clanName ?? "",
     occupation: p?.occupation ?? "",
     notes: p?.notes ?? "",
+    whatsapp: p?.whatsapp ?? "",
+    instagram: p?.instagram ?? "",
+    facebook: p?.facebook ?? "",
+    tiktok: p?.tiktok ?? "",
+    linkedin: p?.linkedin ?? "",
   };
 }
 
@@ -237,6 +247,34 @@ export function PersonEditor({
             className={`${inputCls} resize-y`}
           />
         </Field>
+
+        <fieldset className="rounded-2xl border border-line p-4">
+          <legend className="px-2 text-xs font-medium uppercase tracking-wider text-muted">Stay in touch (optional)</legend>
+          <p className="mb-3 px-1 text-xs text-muted">Only family members using this archive can see these.</p>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <Field label="WhatsApp number">
+              <input
+                type="tel"
+                value={draft.whatsapp}
+                onChange={(e) => set("whatsapp", e.target.value)}
+                placeholder="+27 82 123 4567"
+                className={inputCls}
+              />
+            </Field>
+            <Field label="Instagram">
+              <input value={draft.instagram} onChange={(e) => set("instagram", e.target.value)} placeholder="@handle" className={inputCls} />
+            </Field>
+            <Field label="Facebook">
+              <input value={draft.facebook} onChange={(e) => set("facebook", e.target.value)} placeholder="Name or profile link" className={inputCls} />
+            </Field>
+            <Field label="TikTok">
+              <input value={draft.tiktok} onChange={(e) => set("tiktok", e.target.value)} placeholder="@handle" className={inputCls} />
+            </Field>
+            <Field label="LinkedIn">
+              <input value={draft.linkedin} onChange={(e) => set("linkedin", e.target.value)} placeholder="Profile link" className={inputCls} />
+            </Field>
+          </div>
+        </fieldset>
 
         {error && <p className="rounded-2xl bg-red-50 px-4 py-2.5 text-sm text-red-800">{error}</p>}
 
