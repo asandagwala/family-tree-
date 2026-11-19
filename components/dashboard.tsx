@@ -192,9 +192,13 @@ function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
         <div className="relative hidden min-h-[440px] lg:block">
           <div className="absolute inset-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/heritage/walking.jpg" alt="" className="duotone h-full w-full object-cover object-[50%_35%]" />
+            <img
+              src="/heritage/rondavels.jpg"
+              alt="Turquoise rondavels with thatched roofs in golden grass"
+              className="h-full w-full object-cover object-[33%_60%]"
+            />
           </div>
-          <div className="absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-cream to-transparent" />
+          <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-cream to-transparent" />
         </div>
       </div>
       <UmbhacoBand height={30} />
