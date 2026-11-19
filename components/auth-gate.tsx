@@ -82,10 +82,11 @@ function Splash() {
 /** Words on the left, the archive photograph on the right, umbhaco hem below. */
 function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="@container flex min-h-full flex-col bg-cream text-ink">
-      <div className="grid flex-1 @3xl:grid-cols-[1.25fr_1fr]">
-        <div className="flex flex-col justify-center px-8 pb-16 pt-10 @xl:px-14 @3xl:pb-24 @5xl:px-20">
-          <div className="mb-8 flex items-center gap-3">
+    // Exactly one screen tall: the words, the photograph and the hem all fit without scrolling.
+    <div className="@container flex h-full flex-col bg-cream text-ink">
+      <div className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] @3xl:grid-cols-[1.25fr_1fr] @3xl:grid-rows-1">
+        <div className="flex min-h-0 flex-col justify-center overflow-y-auto px-6 py-5 @xl:px-14 @3xl:py-6 @5xl:px-20">
+          <div className="mb-4 flex items-center gap-3">
             <LogoMark className="text-forest" />
             <span>
               <span className="block font-display text-2xl font-semibold leading-none">Imvelaphi</span>
@@ -94,12 +95,12 @@ function AuthLayout({ children }: { children: ReactNode }) {
           </div>
           {children}
         </div>
-        <div className="relative order-first h-56 @xl:h-72 @3xl:order-2 @3xl:h-auto">
+        <div className="relative order-first h-20 @xl:h-44 @3xl:order-2 @3xl:h-auto">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/heritage/homestead-colour.jpg"
+            src="/heritage/homestead.webp"
             alt="Rondavels and a kraal on green hills by the sea"
-            className="absolute inset-0 h-full w-full object-cover object-[62%_80%] sepia-[.12] saturate-[.9]"
+            className="absolute inset-0 h-full w-full object-cover object-[62%_80%]"
           />
         </div>
       </div>
@@ -112,7 +113,7 @@ function Heading({ eyebrow, children }: { eyebrow: string; children: ReactNode }
   return (
     <>
       <p className="text-xs uppercase tracking-[0.3em] text-bead-blue-deep">{eyebrow}</p>
-      <h1 className="mt-5 max-w-xl font-display text-5xl font-semibold leading-[1.04] @xl:text-6xl">{children}</h1>
+      <h1 className="mt-3 max-w-xl font-display text-4xl font-semibold leading-[1.04] @xl:text-5xl @5xl:text-6xl">{children}</h1>
     </>
   );
 }
@@ -260,7 +261,7 @@ function SignInScreen() {
         <Heading eyebrow="Check your email">
           We sent you a <span className="italic text-ochre-deep">link</span>
         </Heading>
-        <p className="mt-6 max-w-md text-lg leading-relaxed text-ink/70">
+        <p className="mt-3 max-w-md leading-relaxed text-ink/70 @xl:text-lg">
           Open the email we sent to <strong className="font-medium text-ink">{sent.to}</strong> and click the link{" "}
           {sent.why === "confirm" ? "to confirm your address" : "to choose a new password"}. Open it in this same
           browser.
@@ -271,7 +272,7 @@ function SignInScreen() {
             setSent(null);
             switchTo("signIn");
           }}
-          className="mt-8 self-start text-sm text-muted underline-offset-4 hover:text-ink hover:underline"
+          className="mt-5 self-start text-sm text-muted underline-offset-4 hover:text-ink hover:underline"
         >
           Back to sign in
         </button>
@@ -286,13 +287,13 @@ function SignInScreen() {
       <Heading eyebrow="Imvelaphi · where we come from">
         Welcome to the family <span className="italic text-ochre-deep">archive</span>
       </Heading>
-      <p className="mt-6 max-w-md text-lg leading-relaxed text-ink/70">
+      <p className="mt-3 max-w-md leading-relaxed text-ink/70 @xl:text-lg">
         {mode === "forgot"
           ? "Enter your email address and we'll send you a link to choose a new password."
           : "Sign in with your Google account or your email address."}
       </p>
 
-      <div className="mt-8 max-w-md space-y-3">
+      <div className="mt-5 max-w-md space-y-3">
         {mode !== "forgot" && (
           <>
             <button type="button" onClick={() => void google()} disabled={pending} className={`${btnSecondary} w-full`}>
@@ -365,7 +366,7 @@ function LinkFailed({ eyebrow, message }: { eyebrow: string; message: string }) 
       <Heading eyebrow={eyebrow}>
         That link didn&apos;t <span className="italic text-ochre-deep">work</span>
       </Heading>
-      <div className="mt-8 max-w-md space-y-4">
+      <div className="mt-5 max-w-md space-y-4">
         <ErrorNote>{message}</ErrorNote>
         <button type="button" onClick={() => router.replace("/")} className={btnSecondary}>
           Back to sign in
@@ -416,7 +417,7 @@ function ResetPasswordScreen({ code }: { code: string }) {
       <Heading eyebrow="Reset your password">
         Choose a new <span className="italic text-ochre-deep">password</span>
       </Heading>
-      <form onSubmit={submit} className="mt-8 max-w-md space-y-3">
+      <form onSubmit={submit} className="mt-5 max-w-md space-y-3">
         <input
           type="password"
           value={password}
@@ -482,12 +483,12 @@ function FamilyCodeScreen({ name }: { name: string | null }) {
           Enter the family <span className="italic text-ochre-deep">code</span>
         </Heading>
       )}
-      <p className="mt-6 max-w-md text-lg leading-relaxed text-ink/70">
+      <p className="mt-3 max-w-md leading-relaxed text-ink/70 @xl:text-lg">
         {starting
           ? "Give your family's name. You'll get a family code to share, so relatives can join the same tree."
           : "Each family's archive is private. Ask a relative for your family code: it connects your account to your family's tree, and you only need to enter it once."}
       </p>
-      <form onSubmit={submit} className="mt-8 max-w-md space-y-3">
+      <form onSubmit={submit} className="mt-5 max-w-md space-y-3">
         <input
           value={value}
           onChange={(e) => setValue(e.target.value)}
@@ -506,7 +507,7 @@ function FamilyCodeScreen({ name }: { name: string | null }) {
           {starting ? "Have a family code? Join your family" : "No code yet? Start a new family tree"}
         </button>
       </form>
-      <div className="mt-8 flex max-w-md flex-wrap items-center gap-3 border-t border-ink/10 pt-6">
+      <div className="mt-5 flex max-w-md flex-wrap items-center gap-3 border-t border-ink/10 pt-4">
         <button
           type="button"
           onClick={() =>
