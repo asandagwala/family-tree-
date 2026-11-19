@@ -386,14 +386,14 @@ export const loadSampleFamily = mutation({
       ctx.db.insert("partnerships", orderPair(a, b));
 
     const mzwandile = await add({
-      firstName: "Mzwandile", lastName: "Rubuluza", gender: "male",
-      birthDate: "1934-06-12", deathDate: "2008-09-03", birthPlace: "Lusikisiki",
+      firstName: "Mzwandile", lastName: "Ntshona", gender: "male",
+      birthDate: "1934-06-12", deathDate: "2008-09-03", birthPlace: "Qumbu",
       clanName: "Jola", occupation: "Farmer and herdsman",
-      notes: "Kept cattle on the family land outside Lusikisiki for over fifty years. Known for his stories by the fire and for walking everywhere, even in his seventies.",
+      notes: "Kept cattle on the family land outside Qumbu for over fifty years. Known for his stories by the fire and for walking everywhere, even in his seventies.",
     });
     const nomvula = await add({
-      firstName: "Nomvula", lastName: "Rubuluza", gender: "female",
-      birthDate: "1938-11-27", birthPlace: "Flagstaff", currentPlace: "Lusikisiki",
+      firstName: "Nomvula", lastName: "Ntshona", gender: "female",
+      birthDate: "1938-11-27", birthPlace: "Tsolo", currentPlace: "Qumbu",
       clanName: "Mpondomise", occupation: "Beadworker",
       notes: "A celebrated beadworker. Many of the family's ceremonial collars and headpieces were made by her hand.",
     });
@@ -412,21 +412,21 @@ export const loadSampleFamily = mutation({
     await marry(lwazi, thandeka);
 
     const luthando = await add({
-      firstName: "Luthando", lastName: "Rubuluza", gender: "male",
-      birthDate: "1964-03-30", birthPlace: "Lusikisiki", currentPlace: "Cape Town",
+      firstName: "Luthando", lastName: "Ntshona", gender: "male",
+      birthDate: "1964-03-30", birthPlace: "Qumbu", currentPlace: "Cape Town",
       clanName: "Jola", occupation: "Civil engineer",
       notes: "First in the family to go to university. Moved to Cape Town in 1989.",
     });
     const nosipho = await add({
-      firstName: "Nosipho", lastName: "Rubuluza", gender: "female",
-      birthDate: "1968-08-14", birthPlace: "Lusikisiki", currentPlace: "Mthatha",
+      firstName: "Nosipho", lastName: "Ntshona", gender: "female",
+      birthDate: "1968-08-14", birthPlace: "Qumbu", currentPlace: "Mthatha",
       clanName: "Jola", occupation: "Nurse",
     });
     const ayanda = await add({
-      firstName: "Ayanda", lastName: "Rubuluza", gender: "female",
+      firstName: "Ayanda", lastName: "Ntshona", gender: "female",
       birthDate: "1967-12-09", birthPlace: "Engcobo", currentPlace: "Cape Town",
       clanName: "Tshawe", occupation: "High school teacher",
-      notes: "Born Ayanda Sondlo; took the Rubuluza name on marrying Luthando. Followed her father into teaching.",
+      notes: "Born Ayanda Sondlo; took the Ntshona name on marrying Luthando. Followed her father into teaching.",
     });
     const siyabonga = await add({
       firstName: "Siyabonga", lastName: "Sondlo", gender: "male",
@@ -444,12 +444,12 @@ export const loadSampleFamily = mutation({
     await marry(luthando, ayanda);
 
     const lindiwe = await add({
-      firstName: "Lindiwe", lastName: "Rubuluza", gender: "female",
+      firstName: "Lindiwe", lastName: "Ntshona", gender: "female",
       birthDate: "1993-01-22", birthPlace: "Cape Town", currentPlace: "Johannesburg",
       clanName: "Jola", occupation: "Software engineer",
     });
     const anele = await add({
-      firstName: "Anele", lastName: "Rubuluza", gender: "male",
+      firstName: "Anele", lastName: "Ntshona", gender: "male",
       birthDate: "1997-12-01", birthPlace: "Cape Town", currentPlace: "East London",
       clanName: "Jola", occupation: "Architecture student",
     });
@@ -537,7 +537,8 @@ export const deletePhoto = mutation({
   },
 });
 
-/** Dev helper (not callable from the app): empties the whole tree. Run with
+/** Dev helper (not callable from the app): empties the whole tree and the
+ *  family settings. Run with
  *  `npx convex run family:clearAll`. */
 export const clearAll = internalMutation({
   args: {},
@@ -547,6 +548,7 @@ export const clearAll = internalMutation({
       await ctx.db.delete("gatheringPhotos", ph._id);
     }
     for await (const g of ctx.db.query("gatherings")) await ctx.db.delete("gatherings", g._id);
+    for await (const row of ctx.db.query("settings")) await ctx.db.delete("settings", row._id);
     for (const table of ["parentLinks", "partnerships", "photos", "people"] as const) {
       for await (const doc of ctx.db.query(table)) {
         if (table === "photos" && "storageId" in doc) await ctx.storage.delete(doc.storageId);
