@@ -97,9 +97,9 @@ function AuthLayout({ children }: { children: ReactNode }) {
         <div className="relative order-first h-56 @xl:h-72 @3xl:order-2 @3xl:h-auto">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/heritage/gathering.jpg"
-            alt="Women gathered on the grass beside a thatched rondavel"
-            className="duotone absolute inset-0 h-full w-full object-cover object-[50%_65%]"
+            src="/heritage/kraal-colour.jpg"
+            alt="Family members in blankets and headwraps seated in a circle before a kraal"
+            className="absolute inset-0 h-full w-full object-cover object-[50%_75%] sepia-[.12] saturate-[.9]"
           />
         </div>
       </div>
