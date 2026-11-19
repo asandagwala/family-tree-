@@ -84,8 +84,8 @@ function AuthLayout({ children }: { children: ReactNode }) {
   return (
     // Exactly one screen tall: the words, the photograph and the hem all fit without scrolling.
     <div className="@container flex h-full flex-col bg-cream text-ink">
-      <div className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] @3xl:grid-cols-[1.25fr_1fr] @3xl:grid-rows-1">
-        <div className="flex min-h-0 flex-col justify-center overflow-y-auto px-6 py-5 @xl:px-14 @3xl:py-6 @5xl:px-20">
+      <div className="flex min-h-0 flex-1 flex-col @3xl:flex-row">
+        <div className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto px-6 py-5 @xl:px-14 @3xl:py-6 @5xl:px-20">
           <div className="mb-4 flex items-center gap-3">
             <LogoMark className="text-forest" />
             <span>
@@ -95,12 +95,13 @@ function AuthLayout({ children }: { children: ReactNode }) {
           </div>
           {children}
         </div>
-        <div className="relative order-first h-20 @xl:h-44 @3xl:order-2 @3xl:h-auto">
+        {/* On wide screens the panel takes the portrait's own shape, so the photo is barely enlarged. */}
+        <div className="relative order-first h-20 shrink-0 @xl:h-44 @3xl:order-2 @3xl:aspect-[500/688] @3xl:h-full">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/heritage/homestead.webp"
-            alt="Rondavels and a kraal on green hills by the sea"
-            className="absolute inset-0 h-full w-full object-cover object-[62%_80%]"
+            src="/heritage/beadwork.jpg"
+            alt="A woman wearing beaded collars and a beaded panel"
+            className="absolute inset-0 h-full w-full object-cover object-[50%_45%]"
           />
         </div>
       </div>
