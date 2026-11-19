@@ -1,5 +1,6 @@
-import { Dashboard } from "@/components/dashboard";
+import { Welcome } from "@/components/welcome";
 
+// The front door. The dashboard lives at /overview.
 export default function Home() {
-  return <Dashboard />;
+  return <Welcome />;
 }

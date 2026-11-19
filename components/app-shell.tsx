@@ -10,7 +10,7 @@ import { LogoMark } from "./logo";
 import { AskIcon } from "./ask-icon";
 
 const NAV = [
-  { href: "/", label: "Overview", icon: LayoutGrid },
+  { href: "/overview", label: "Overview", icon: LayoutGrid },
   { href: "/tree", label: "Family tree", icon: Network },
   { href: "/people", label: "People", icon: Users },
   { href: "/album", label: "Album", icon: Images },
