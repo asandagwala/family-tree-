@@ -146,7 +146,7 @@ function ProfileBody({ person, family }: { person: Person; family: Family }) {
             </div>
           </div>
         </div>
-        <UmbhacoBand height={30} />
+        <UmbhacoBand height={24} />
       </section>
 
       {error && <p className="mt-4 rounded-2xl bg-red-50 px-4 py-2.5 text-sm text-red-800">{error}</p>}

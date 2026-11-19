@@ -190,15 +190,9 @@ function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
             <img src="/heritage/walking.jpg" alt="" className="duotone h-full w-full object-cover object-[50%_35%]" />
           </div>
           <div className="absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-cream to-transparent" />
-          <div className="absolute bottom-8 right-8 z-10 w-36 overflow-hidden rounded-full ring-4 ring-cream">
-            <div className="aspect-square">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/heritage/beadwork.jpg" alt="" className="duotone h-full w-full object-cover object-bottom" />
-            </div>
-          </div>
         </div>
       </div>
-      <UmbhacoBand height={46} />
+      <UmbhacoBand height={30} />
     </section>
   );
 }
@@ -462,7 +456,15 @@ function ClanNames({ family }: { family: Family }) {
   }, [family]);
 
   return (
-    <Card title="Iziduko · clan names">
+    <Card
+      title="Iziduko · clan names"
+      action={
+        <span className="block h-20 w-20 shrink-0 overflow-hidden rounded-full ring-4 ring-cream">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/heritage/beadwork.jpg" alt="A beaded collar" className="duotone h-full w-full object-cover object-bottom" />
+        </span>
+      }
+    >
       {clans.length === 0 ? (
         <p className="text-sm text-muted">Record clan names to honour each line of the family.</p>
       ) : (
