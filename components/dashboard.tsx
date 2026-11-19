@@ -29,8 +29,10 @@ export function Dashboard() {
     return <EmptyWelcome onAdd={() => setAdding(true)} adding={adding} family={family} onClose={() => setAdding(false)} />;
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-8 sm:py-8">
+    <div>
+      {/* The banner runs edge to edge; the cards below sit in the page column. */}
       <Hero family={family} onAdd={() => setAdding(true)} />
+      <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-8 sm:py-8">
       <Stats family={family} />
       <div className="grid gap-6 lg:grid-cols-5">
         <BirthsByDecade family={family} className="lg:col-span-3" />
@@ -44,6 +46,7 @@ export function Dashboard() {
         <ClanNames family={family} />
         <StayConnected family={family} />
         <MissingDetails family={family} />
+      </div>
       </div>
       {adding && (
         <PersonEditor mode={{ kind: "new" }} family={family} onClose={() => setAdding(false)} onSaved={(id) => router.push(`/people/${id}`)} />
@@ -74,9 +77,9 @@ function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
   const root = elders[0];
 
   return (
-    <section className="animate-rise relative overflow-hidden rounded-[2rem] bg-cream text-ink">
+    <section className="relative overflow-hidden bg-cream text-ink">
       <div className="grid lg:grid-cols-[1.2fr_1fr]">
-        <div className="relative z-10 flex flex-col justify-between gap-8 p-7 sm:p-10">
+        <div className="relative z-10 flex flex-col justify-between gap-8 px-7 py-10 sm:px-12 lg:py-14 lg:pl-16">
           <div>
             <p className="text-xs uppercase tracking-[0.25em] text-ochre-deep">Imvelaphi · where we come from</p>
             {editingName !== null ? (
@@ -182,7 +185,7 @@ function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
           </div>
         </div>
 
-        <div className="relative hidden min-h-[380px] lg:block">
+        <div className="relative hidden min-h-[440px] lg:block">
           <div className="absolute inset-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/heritage/walking.jpg" alt="" className="duotone h-full w-full object-cover object-[50%_35%]" />

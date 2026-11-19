@@ -18,7 +18,6 @@
   --mint: #daf1de;
   --forest: #235347;
   --forest-deep: #163832;
-  --forest-night: #0b2b26;
   --sage: #8eb69b;
   /* Umbhaco: cream cloth, black braid, orange and turquoise stripes */
   --cream: #f5efe4;
@@ -46,7 +45,6 @@
   --color-mint: var(--mint);
   --color-forest: var(--forest);
   --color-forest-deep: var(--forest-deep);
-  --color-forest-night: var(--forest-night);
   --color-sage: var(--sage);
   --color-cream: var(--cream);
   --color-ochre: var(--ochre);

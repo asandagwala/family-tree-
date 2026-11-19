@@ -92,8 +92,8 @@ export function PeopleDirectory() {
                 href={`/people/${p._id}`}
                 className="group flex h-full flex-col items-center overflow-hidden rounded-[1.75rem] border border-line bg-card text-center transition-all hover:-translate-y-0.5 hover:border-sage hover:shadow-lg"
               >
-                <div className="relative h-16 w-full bg-forest-night">
-                  <DiamondBand color="var(--forest-deep)" height={16} className="absolute inset-x-0 bottom-0" />
+                <div className="relative h-16 w-full bg-forest-deep">
+                  <DiamondBand color="var(--forest)" height={16} className="absolute inset-x-0 bottom-0" />
                 </div>
                 <Portrait person={p} size={84} className="-mt-11 ring-offset-card" />
                 <div className="flex flex-1 flex-col px-4 pb-5 pt-3">
