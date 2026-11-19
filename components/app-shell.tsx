@@ -2,11 +2,12 @@
 
 import { Cake, Images, LayoutGrid, Network, Users } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import { ChatDrawer } from "./chat/chat-drawer";
 import { useChat } from "./chat/chat-context";
 import { LogoMark } from "./logo";
+import { useSampleMode } from "@/lib/sample-mode";
 import { AskIcon } from "./ask-icon";
 
 const NAV = [
@@ -111,7 +112,10 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Main */}
-      <main className="relative min-w-0 flex-1 overflow-y-auto scrollbar-thin pb-20 md:pb-0">{children}</main>
+      <main className="relative min-w-0 flex-1 overflow-y-auto scrollbar-thin pb-20 md:pb-0">
+        <SampleBanner />
+        {children}
+      </main>
 
       {/* Mobile bottom nav */}
       <nav className="fixed inset-x-3 bottom-3 z-30 flex items-center justify-around rounded-full border border-line bg-card px-2 py-2 text-ink shadow-xl md:hidden">
@@ -127,6 +131,33 @@ export function AppShell({ children }: { children: ReactNode }) {
       </nav>
 
       <ChatDrawer />
+    </div>
+  );
+}
+
+/** Shown on every page while exploring the sample family. */
+function SampleBanner() {
+  const { sample, exitSample } = useSampleMode();
+  const chat = useChat();
+  const router = useRouter();
+  if (!sample) return null;
+  return (
+    <div className="sticky top-0 z-20 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-b border-ochre/30 bg-ochre-soft px-4 py-2.5 text-sm text-ink">
+      <span>
+        <strong className="font-semibold">You&apos;re exploring a sample family.</strong> None of these people are part of
+        your family&apos;s archive.
+      </span>
+      <button
+        type="button"
+        onClick={() => {
+          exitSample();
+          chat.reset();
+          router.push("/");
+        }}
+        className="rounded-full bg-ink px-4 py-1.5 text-xs font-medium text-white hover:bg-coal"
+      >
+        Back to my family
+      </button>
     </div>
   );
 }

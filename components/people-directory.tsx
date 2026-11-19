@@ -85,6 +85,8 @@ export function PeopleDirectory() {
             <div key={i} className="h-64 animate-pulse rounded-[1.75rem] bg-mist/60" />
           ))}
         </div>
+      ) : family.list.length === 0 ? (
+        <p className="mt-16 text-center text-muted">No one has been added yet. Start with yourself or the eldest relative you know.</p>
       ) : people.length === 0 ? (
         <p className="mt-16 text-center text-muted">No one matches that search.</p>
       ) : (

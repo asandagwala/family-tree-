@@ -10,6 +10,7 @@ import { fullName, lifespan, year, type Person } from "@/lib/people";
 import { upcomingBirthdays } from "@/lib/birthdays";
 import { contactLinks } from "@/lib/contact";
 import { layoutTree } from "@/lib/tree-layout";
+import { useSampleMode } from "@/lib/sample-mode";
 import { useFamily, type Family } from "@/lib/use-family";
 import { AskIcon } from "./ask-icon";
 import { UmbhacoBand } from "./beadwork";
@@ -68,8 +69,10 @@ function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
   const settings = useQuery(api.family.getSettings);
   const saveFamilyName = useMutation(api.family.setFamilyName);
   const [editingName, setEditingName] = useState<string | null>(null);
+  const { sample } = useSampleMode();
   // The saved family name wins; otherwise guess from the most common surname.
-  const name = settings?.familyName ?? familyName(family.list);
+  // The sample family always goes by its own surname.
+  const name = (!sample && settings?.familyName) || familyName(family.list);
   const elders = family.list
     .filter((p) => year(p.birthDate))
     .sort((a, b) => (a.birthDate ?? "").localeCompare(b.birthDate ?? ""));
@@ -120,18 +123,20 @@ function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
                 ) : (
                   "Our family"
                 )}
-                <button
-                  type="button"
-                  onClick={() => setEditingName(name ?? "")}
-                  className="ml-3 inline-grid h-9 w-9 place-items-center rounded-full border border-line align-middle text-muted opacity-60 transition-opacity hover:bg-card hover:opacity-100 focus:opacity-100 group-hover:opacity-100"
-                  aria-label="Change family name"
-                  title="Change family name"
-                >
-                  <Pencil size={15} />
-                </button>
+                {!sample && (
+                  <button
+                    type="button"
+                    onClick={() => setEditingName(name ?? "")}
+                    className="ml-3 inline-grid h-9 w-9 place-items-center rounded-full border border-line align-middle text-muted opacity-60 transition-opacity hover:bg-card hover:opacity-100 focus:opacity-100 group-hover:opacity-100"
+                    aria-label="Change family name"
+                    title="Change family name"
+                  >
+                    <Pencil size={15} />
+                  </button>
+                )}
               </h1>
             )}
-            {settings && <FamilyClan settings={settings} />}
+            {settings && !sample && <FamilyClan settings={settings} />}
             <p className="mt-4 max-w-md text-sm leading-relaxed text-ink/70">
               {family.list.length} people across the generations
               {root?.birthPlace ? `, with roots in ${root.birthPlace}` : ""}
@@ -525,6 +530,7 @@ function FamilyClan({ settings }: { settings: FamilySettings }) {
 
 function StayConnected({ family }: { family: Family }) {
   const settings = useQuery(api.family.getSettings);
+  const { sample } = useSampleMode();
   const [editing, setEditing] = useState(false);
   const reachable = useMemo(
     () =>
@@ -537,7 +543,12 @@ function StayConnected({ family }: { family: Family }) {
 
   return (
     <Card title="Stay connected">
-      {settings?.whatsappGroupUrl ? (
+      {sample ? (
+        // The WhatsApp group belongs to the real family, not the sample.
+        <p className="rounded-2xl bg-paper p-4 text-sm text-muted">
+          Your family&apos;s WhatsApp group link will show here.
+        </p>
+      ) : settings?.whatsappGroupUrl ? (
         <a
           href={settings.whatsappGroupUrl}
           target="_blank"
@@ -562,7 +573,7 @@ function StayConnected({ family }: { family: Family }) {
           Add the family WhatsApp group link
         </button>
       )}
-      {settings?.whatsappGroupUrl && (
+      {!sample && settings?.whatsappGroupUrl && (
         <button type="button" onClick={() => setEditing(true)} className="mt-2 text-xs text-muted hover:text-ink hover:underline">
           Change group link
         </button>

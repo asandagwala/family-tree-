@@ -3,6 +3,7 @@
 import { useAction } from "convex/react";
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import { api } from "@/convex/_generated/api";
+import { useSampleMode } from "@/lib/sample-mode";
 
 export type ChatMessage = { role: "user" | "assistant"; content: string; failed?: boolean };
 
@@ -21,6 +22,7 @@ const ChatContext = createContext<ChatState | null>(null);
 /** Keeps the conversation alive while you move between pages. */
 export function ChatProvider({ children }: { children: ReactNode }) {
   const ask = useAction(api.assistant.ask);
+  const { sample } = useSampleMode();
   const [isOpen, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [pending, setPending] = useState(false);
@@ -36,6 +38,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         const res = await ask({
           // Failed replies are UI-only; don't send them back as history.
           messages: history.filter((m) => !m.failed).map(({ role, content }) => ({ role, content })),
+          sample,
         });
         setMessages((m) => [...m, { role: "assistant", content: res.text, failed: !res.ok }]);
       } catch {
@@ -47,7 +50,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         setPending(false);
       }
     },
-    [ask, messages, pending],
+    [ask, messages, pending, sample],
   );
 
   const open = useCallback(

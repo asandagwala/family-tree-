@@ -7,6 +7,7 @@ import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { errorMessage, fullName, genderLabel, type Gender, type Person, type PersonId } from "@/lib/people";
 import { uploadImage } from "@/lib/upload";
+import { useSampleMode } from "@/lib/sample-mode";
 import type { Family } from "@/lib/use-family";
 import { btnPrimary, btnSecondary, inputCls, Modal } from "./ui/modal";
 
@@ -66,6 +67,7 @@ export function PersonEditor({
   onSaved?: (id: PersonId) => void;
 }) {
   const createPerson = useMutation(api.family.createPerson);
+  const { sample } = useSampleMode();
   const updatePerson = useMutation(api.family.updatePerson);
   const addParent = useMutation(api.family.addParent);
   const addPartner = useMutation(api.family.addPartner);
@@ -123,7 +125,7 @@ export function PersonEditor({
         id = mode.person._id;
         await updatePerson({ id, ...draft });
       } else {
-        id = await createPerson(draft);
+        id = await createPerson({ ...draft, sample });
         if (relation && of) {
           if (relation.type === "parent") await addParent({ childId: of._id, parentId: id });
           if (relation.type === "child") await addParent({ childId: id, parentId: of._id });

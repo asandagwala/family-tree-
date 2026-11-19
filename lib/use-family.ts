@@ -4,6 +4,7 @@ import { useQuery } from "convex/react";
 import { useMemo } from "react";
 import { api } from "@/convex/_generated/api";
 import type { Person, PersonId } from "./people";
+import { useSampleMode } from "./sample-mode";
 
 export type Family = {
   list: Person[];
@@ -15,9 +16,12 @@ export type Family = {
   partnerships: { personA: PersonId; personB: PersonId }[];
 };
 
-/** The whole tree, with lookup maps. `undefined` while loading. */
-export function useFamily(): Family | undefined {
-  const tree = useQuery(api.family.getTree);
+/** The whole tree, with lookup maps. `undefined` while loading.
+ *  Follows sample mode unless `space` forces the real or sample family. */
+export function useFamily(space?: { sample: boolean }): Family | undefined {
+  const mode = useSampleMode();
+  const sample = space ? space.sample : mode.sample;
+  const tree = useQuery(api.family.getTree, { sample });
   return useMemo(() => {
     if (!tree) return undefined;
     const people = new Map(tree.people.map((p) => [p._id, p]));

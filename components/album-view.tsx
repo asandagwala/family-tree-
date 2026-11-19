@@ -8,13 +8,15 @@ import { useState } from "react";
 import { api } from "@/convex/_generated/api";
 import { gatheringKindLabel } from "@/lib/gatherings";
 import { formatDate, fullName } from "@/lib/people";
+import { useSampleMode } from "@/lib/sample-mode";
 import { useFamily } from "@/lib/use-family";
 import { GatheringEditor } from "./gathering-editor";
 import { Portrait } from "./portrait";
 import { btnPrimary } from "./ui/modal";
 
 export function AlbumView() {
-  const gatherings = useQuery(api.album.listGatherings);
+  const { sample } = useSampleMode();
+  const gatherings = useQuery(api.album.listGatherings, { sample });
   const family = useFamily();
   const router = useRouter();
   const [creating, setCreating] = useState(false);

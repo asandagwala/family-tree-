@@ -7,6 +7,7 @@ import { api } from "@/convex/_generated/api";
 import type { Doc, Id } from "@/convex/_generated/dataModel";
 import { GATHERING_KINDS, gatheringKindLabel, type GatheringKind } from "@/lib/gatherings";
 import { errorMessage, fullName, type PersonId } from "@/lib/people";
+import { useSampleMode } from "@/lib/sample-mode";
 import type { Family } from "@/lib/use-family";
 import { Portrait } from "./portrait";
 import { btnPrimary, btnSecondary, inputCls, Modal } from "./ui/modal";
@@ -32,6 +33,7 @@ export function GatheringEditor({
   onSaved?: (id: Id<"gatherings">) => void;
 }) {
   const create = useMutation(api.album.createGathering);
+  const { sample } = useSampleMode();
   const update = useMutation(api.album.updateGathering);
   const [draft, setDraft] = useState<Draft>({
     title: gathering?.title ?? "",
@@ -65,7 +67,7 @@ export function GatheringEditor({
         await update({ id: gathering._id, ...draft });
         onSaved?.(gathering._id);
       } else {
-        const id = await create(draft);
+        const id = await create({ ...draft, sample });
         onSaved?.(id);
       }
       onClose();

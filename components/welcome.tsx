@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { api } from "@/convex/_generated/api";
 import { errorMessage } from "@/lib/people";
+import { useSampleMode } from "@/lib/sample-mode";
 import { useFamily } from "@/lib/use-family";
 import { UmbhacoBand } from "./beadwork";
 import { PersonEditor } from "./person-editor";
@@ -16,7 +17,8 @@ import { btnPrimary, btnSecondary } from "./ui/modal";
  * An empty tree offers to start it; a tree with people leads into the archive.
  */
 export function Welcome() {
-  const family = useFamily();
+  const family = useFamily({ sample: false });
+  const { enterSample, exitSample } = useSampleMode();
   const settings = useQuery(api.family.getSettings);
   const loadSample = useMutation(api.family.loadSampleFamily);
   const router = useRouter();
@@ -51,17 +53,25 @@ export function Welcome() {
               <div className="h-11 w-56 animate-pulse rounded-full bg-mist" />
             ) : (
               <>
-                <button type="button" onClick={() => setAdding(true)} className={btnPrimary}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    exitSample();
+                    setAdding(true);
+                  }}
+                  className={btnPrimary}
+                >
                   <UserPlus size={16} /> {hasPeople ? "Add a family member" : "Add the first person"}
                 </button>
                 <button
                   type="button"
                   onClick={() =>
-                    hasPeople
-                      ? router.push("/overview")
-                      : loadSample()
-                          .then(() => router.push("/overview"))
-                          .catch((e) => setError(errorMessage(e)))
+                    loadSample()
+                      .then(() => {
+                        enterSample();
+                        router.push("/overview");
+                      })
+                      .catch((e) => setError(errorMessage(e)))
                   }
                   className={btnSecondary}
                 >
