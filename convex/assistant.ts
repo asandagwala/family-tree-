@@ -122,6 +122,9 @@ export const ask = action({
     sample: v.optional(v.boolean()),
   },
   handler: async (ctx, { messages, sample }): Promise<{ ok: boolean; text: string }> => {
+    if (!(await ctx.runQuery(internal.access.check, { sample: !!sample }))) {
+      return { ok: false, text: "Please sign in, and enter the family code, to ask about the family." };
+    }
     const apiKey = env.GEMINI_API_KEY;
     if (!apiKey) return { ok: false, text: NOT_SET_UP };
 

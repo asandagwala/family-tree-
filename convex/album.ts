@@ -3,6 +3,7 @@ import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/s
 import type { Doc, Id } from "./_generated/dataModel";
 import { spaceArg } from "./family";
 import { gatheringKind } from "./schema";
+import { canAccess, gatheringIsSample, personIsSample, requireAccess } from "./access";
 
 const MAX_GATHERINGS = 500;
 const MAX_PHOTOS_PER_GATHERING = 1000;
@@ -55,6 +56,7 @@ async function photosOf(ctx: QueryCtx, gatheringId: Id<"gatherings">, limit: num
 export const listGatherings = query({
   args: spaceArg,
   handler: async (ctx, { sample }) => {
+    if (!(await canAccess(ctx, !!sample))) return [];
     const gatherings = (await ctx.db.query("gatherings").take(MAX_GATHERINGS)).filter(
       (g) => !!g.sample === !!sample,
     );
@@ -81,6 +83,7 @@ export const listGatherings = query({
 export const getGathering = query({
   args: { id: v.id("gatherings") },
   handler: async (ctx, { id }) => {
+    if (!(await canAccess(ctx, await gatheringIsSample(ctx, id)))) return null;
     const g = await ctx.db.get("gatherings", id);
     if (!g) return null;
     const photos = await photosOf(ctx, id, MAX_PHOTOS_PER_GATHERING);
@@ -96,6 +99,7 @@ export const getGathering = query({
 export const gatheringsFor = query({
   args: { personId: v.id("people") },
   handler: async (ctx, { personId }) => {
+    if (!(await canAccess(ctx, await personIsSample(ctx, personId)))) return [];
     const all = await ctx.db.query("gatherings").take(MAX_GATHERINGS);
     const mine = all.filter((g) => g.peopleIds.includes(personId));
     return mine.sort((a, b) => (b.date ?? "").localeCompare(a.date ?? "")).map((g) => ({
@@ -110,13 +114,16 @@ export const gatheringsFor = query({
 
 export const createGathering = mutation({
   args: { ...gatheringFields, ...spaceArg },
-  handler: async (ctx, { sample, ...args }) =>
-    await ctx.db.insert("gatherings", { ...clean(args), ...(sample ? { sample: true } : {}) }),
+  handler: async (ctx, { sample, ...args }) => {
+    await requireAccess(ctx, !!sample);
+    return await ctx.db.insert("gatherings", { ...clean(args), ...(sample ? { sample: true } : {}) });
+  },
 });
 
 export const updateGathering = mutation({
   args: { id: v.id("gatherings"), ...gatheringFields },
   handler: async (ctx, { id, ...rest }) => {
+    await requireAccess(ctx, await gatheringIsSample(ctx, id));
     await requireGathering(ctx, id);
     const fields = clean(rest);
     // Patch with every field so cleared ones are removed; the cover stays.
@@ -135,6 +142,7 @@ export const updateGathering = mutation({
 export const deleteGathering = mutation({
   args: { id: v.id("gatherings") },
   handler: async (ctx, { id }) => {
+    await requireAccess(ctx, await gatheringIsSample(ctx, id));
     for await (const photo of ctx.db
       .query("gatheringPhotos")
       .withIndex("by_gatheringId", (q) => q.eq("gatheringId", id))) {
@@ -149,6 +157,7 @@ export const deleteGathering = mutation({
 export const addGatheringPhoto = mutation({
   args: { gatheringId: v.id("gatherings"), storageId: v.id("_storage"), caption: v.optional(v.string()) },
   handler: async (ctx, { gatheringId, storageId, caption }) => {
+    await requireAccess(ctx, await gatheringIsSample(ctx, gatheringId));
     await requireGathering(ctx, gatheringId);
     const trimmed = caption?.trim();
     return await ctx.db.insert("gatheringPhotos", { gatheringId, storageId, caption: trimmed || undefined });
@@ -158,6 +167,8 @@ export const addGatheringPhoto = mutation({
 export const deleteGatheringPhoto = mutation({
   args: { photoId: v.id("gatheringPhotos") },
   handler: async (ctx, { photoId }) => {
+    const owned = await ctx.db.get("gatheringPhotos", photoId);
+    if (owned) await requireAccess(ctx, await gatheringIsSample(ctx, owned.gatheringId));
     const photo = await ctx.db.get("gatheringPhotos", photoId);
     if (!photo) return null;
     const g = await ctx.db.get("gatherings", photo.gatheringId);
@@ -171,6 +182,7 @@ export const deleteGatheringPhoto = mutation({
 export const setGatheringCover = mutation({
   args: { gatheringId: v.id("gatherings"), storageId: v.id("_storage") },
   handler: async (ctx, { gatheringId, storageId }) => {
+    await requireAccess(ctx, await gatheringIsSample(ctx, gatheringId));
     await requireGathering(ctx, gatheringId);
     await ctx.db.patch("gatherings", gatheringId, { coverId: storageId });
     return null;

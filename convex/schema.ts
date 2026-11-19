@@ -66,6 +66,11 @@ export default defineSchema({
     .index("by_personA_and_personB", ["personA", "personB"])
     .index("by_personB", ["personB"]),
 
+  // Signed-in accounts (usernames and passkeys live in the Convex Auth components).
+  users: defineTable({
+    member: v.optional(v.boolean()), // entered the family code
+  }),
+
   // App-wide settings; a single row.
   settings: defineTable({
     familyName: v.optional(v.string()),
