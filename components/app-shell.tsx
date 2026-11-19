@@ -1,9 +1,13 @@
 "use client";
 
-import { Cake, Images, LayoutGrid, Network, Users } from "lucide-react";
+import { Cake, Images, LayoutGrid, LogOut, Network, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { AuthGate } from "./auth-gate";
 import { ChatDrawer } from "./chat/chat-drawer";
 import { useChat } from "./chat/chat-context";
 import { LogoMark } from "./logo";
@@ -81,7 +85,46 @@ function MobileNavLinks({ active }: NavProps) {
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
+  return (
+    <AuthGate>
+      <Shell>{children}</Shell>
+    </AuthGate>
+  );
+}
+
+/** Signed in as … · Sign out. Leaving also drops sample mode and the chat. */
+function useLeave() {
+  const { signOut } = useAuthActions();
+  const { exitSample } = useSampleMode();
   const chat = useChat();
+  const router = useRouter();
+  return async () => {
+    await signOut();
+    exitSample();
+    chat.reset();
+    router.push("/");
+  };
+}
+
+function AccountRow() {
+  const me = useQuery(api.users.me);
+  const leave = useLeave();
+  if (!me?.signedIn) return null;
+  return (
+    <div className="flex items-center justify-between gap-2 border-t border-line px-5 py-3 text-xs text-muted">
+      <span className="truncate">
+        Signed in as <span className="font-medium text-ink">{me.username ?? "you"}</span>
+      </span>
+      <button type="button" onClick={() => void leave()} className="shrink-0 font-medium hover:text-ink hover:underline">
+        Sign out
+      </button>
+    </div>
+  );
+}
+
+function Shell({ children }: { children: ReactNode }) {
+  const chat = useChat();
+  const leave = useLeave();
 
   return (
     <div className="flex h-full">
@@ -124,6 +167,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </p>
             </div>
           </div>
+          <AccountRow />
         </div>
       </aside>
 
@@ -143,6 +187,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           className="grid h-10 w-10 place-items-center rounded-full text-ochre-deep"
         >
           <AskIcon size={18} />
+        </button>
+              <button
+          type="button"
+          aria-label="Sign out"
+          onClick={() => void leave()}
+          className="grid h-10 w-10 place-items-center rounded-full text-muted"
+        >
+          <LogOut size={18} />
         </button>
       </nav>
 

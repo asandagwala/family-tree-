@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Geist } from "next/font/google";
+import { Suspense } from "react";
 import { AppShell } from "@/components/app-shell";
-import { Providers } from "./providers";
+import { ChatProvider } from "@/components/chat/chat-context";
+import { ConvexAuthNextjsServerProvider } from "@/lib/convexAuth";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -21,9 +23,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${geistSans.variable} ${cormorant.variable} h-full antialiased`}>
       <body className="h-full">
-        <Providers>
-          <AppShell>{children}</AppShell>
-        </Providers>
+        {/* The auth provider reads the session cookie, so it renders per request. */}
+        <Suspense fallback={null}>
+          <ConvexAuthNextjsServerProvider>
+            <ChatProvider>
+              <AppShell>{children}</AppShell>
+            </ChatProvider>
+          </ConvexAuthNextjsServerProvider>
+        </Suspense>
       </body>
     </html>
   );
