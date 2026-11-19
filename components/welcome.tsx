@@ -32,7 +32,7 @@ export function Welcome() {
       <div className="grid flex-1 @3xl:grid-cols-[1.25fr_1fr]">
         {/* Slightly above centre (more space below than above), so the top never feels empty. */}
         <div className="flex flex-col justify-center px-8 pb-16 pt-10 @xl:px-14 @3xl:order-1 @3xl:pb-28 @5xl:px-20">
-          <p className="text-xs uppercase tracking-[0.3em] text-ochre-deep">Imvelaphi · where we come from</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-bead-blue-deep">Imvelaphi · where we come from</p>
           <h1 className="mt-6 max-w-2xl font-display text-5xl font-semibold leading-[1.04] @xl:text-6xl @4xl:text-7xl @6xl:text-8xl">
             {name ? (
               <>

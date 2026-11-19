@@ -92,7 +92,7 @@ function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
 
         <div className="relative z-10 flex flex-col justify-center px-7 py-10 sm:px-12 lg:px-14 lg:py-14">
           <div>
-            <p className="text-xs uppercase tracking-[0.25em] text-ochre-deep">Imvelaphi · where we come from</p>
+            <p className="text-xs uppercase tracking-[0.25em] text-bead-blue-deep">Imvelaphi · where we come from</p>
             {editingName !== null ? (
               <form
                 className="mt-4 flex flex-wrap items-center gap-2"
