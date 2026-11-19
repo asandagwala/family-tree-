@@ -100,9 +100,14 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         <div className="mt-auto">
           <div className="mx-4 mb-5 overflow-hidden rounded-3xl">
-            <div className="duotone-wrap aspect-[4/3]">
+            {/* Portrait frame so the women show full length; shrinks on short screens. */}
+            <div className="duotone-wrap aspect-[461/533] max-h-[42vh]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/heritage/elders.jpg" alt="" className="duotone h-full w-full object-cover object-top" />
+              <img
+                src="/heritage/elders-full.jpg"
+                alt="Three women in traditional dress and headwraps"
+                className="duotone h-full w-full object-cover object-top"
+              />
               <p className="absolute inset-x-0 bottom-0 z-10 p-4 font-display text-lg italic leading-snug text-mist">
                 “Umntu ngumntu ngabantu.”
               </p>
