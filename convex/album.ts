@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
+import { spaceArg } from "./family";
 import { gatheringKind } from "./schema";
 
 const MAX_GATHERINGS = 500;
@@ -52,9 +53,11 @@ async function photosOf(ctx: QueryCtx, gatheringId: Id<"gatherings">, limit: num
 
 /** All gatherings, newest first, each with a cover and a few preview photos. */
 export const listGatherings = query({
-  args: {},
-  handler: async (ctx) => {
-    const gatherings = await ctx.db.query("gatherings").take(MAX_GATHERINGS);
+  args: spaceArg,
+  handler: async (ctx, { sample }) => {
+    const gatherings = (await ctx.db.query("gatherings").take(MAX_GATHERINGS)).filter(
+      (g) => !!g.sample === !!sample,
+    );
     const rows = await Promise.all(
       gatherings.map(async (g) => {
         const photos = await photosOf(ctx, g._id, MAX_PHOTOS_PER_GATHERING);
@@ -106,8 +109,9 @@ export const gatheringsFor = query({
 });
 
 export const createGathering = mutation({
-  args: gatheringFields,
-  handler: async (ctx, args) => await ctx.db.insert("gatherings", clean(args)),
+  args: { ...gatheringFields, ...spaceArg },
+  handler: async (ctx, { sample, ...args }) =>
+    await ctx.db.insert("gatherings", { ...clean(args), ...(sample ? { sample: true } : {}) }),
 });
 
 export const updateGathering = mutation({

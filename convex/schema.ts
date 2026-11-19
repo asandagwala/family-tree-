@@ -46,6 +46,8 @@ export default defineSchema({
   people: defineTable({
     ...personFields,
     photoId: v.optional(v.id("_storage")),
+    // true = part of the sample family people can explore; never shown in the real archive
+    sample: v.optional(v.boolean()),
   }).index("by_lastName_and_firstName", ["lastName", "firstName"]),
 
   // One row per parent → child link. A child has at most two parents.
@@ -82,6 +84,7 @@ export default defineSchema({
     coverId: v.optional(v.id("_storage")),
     // Who was there. Kept small (capped in the mutations).
     peopleIds: v.array(v.id("people")),
+    sample: v.optional(v.boolean()),
   }),
 
   gatheringPhotos: defineTable({

@@ -109,8 +109,9 @@ export const ask = action({
         content: v.string(),
       }),
     ),
+    sample: v.optional(v.boolean()),
   },
-  handler: async (ctx, { messages }): Promise<{ ok: boolean; text: string }> => {
+  handler: async (ctx, { messages, sample }): Promise<{ ok: boolean; text: string }> => {
     const apiKey = env.GEMINI_API_KEY;
     if (!apiKey) return { ok: false, text: NOT_SET_UP };
 
@@ -119,7 +120,7 @@ export const ask = action({
       return { ok: false, text: "Ask me something about the family." };
     }
 
-    const tree = await ctx.runQuery(internal.family.treeForAssistant, {});
+    const tree = await ctx.runQuery(internal.family.treeForAssistant, { sample });
     const today = new Date().toISOString().slice(0, 10);
     const systemInstruction = `${INSTRUCTIONS}
 

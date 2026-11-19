@@ -15,19 +15,28 @@ import { personFields } from "./schema";
 const MAX_PEOPLE = 2000;
 const MAX_LINKS = 4000;
 
-async function loadTree(ctx: QueryCtx) {
-  const [people, parentLinks, partnerships] = await Promise.all([
+/** The real family or the sample family, never both. */
+export const spaceArg = { sample: v.optional(v.boolean()) };
+
+async function loadTree(ctx: QueryCtx, sample: boolean) {
+  const [all, links, pairs] = await Promise.all([
     ctx.db.query("people").take(MAX_PEOPLE),
     ctx.db.query("parentLinks").take(MAX_LINKS),
     ctx.db.query("partnerships").take(MAX_LINKS),
   ]);
-  return { people, parentLinks, partnerships };
+  const people = all.filter((p) => !!p.sample === sample);
+  const ids = new Set<string>(people.map((p) => p._id));
+  return {
+    people,
+    parentLinks: links.filter((l) => ids.has(l.childId) && ids.has(l.parentId)),
+    partnerships: pairs.filter((p) => ids.has(p.personA) && ids.has(p.personB)),
+  };
 }
 
 export const getTree = query({
-  args: {},
-  handler: async (ctx) => {
-    const tree = await loadTree(ctx);
+  args: spaceArg,
+  handler: async (ctx, { sample }) => {
+    const tree = await loadTree(ctx, !!sample);
     const people = await Promise.all(
       tree.people.map(async (p) => ({
         ...p,
@@ -120,9 +129,9 @@ export const renameSurname = internalMutation({
 
 /** The tree as the family assistant sees it. */
 export const treeForAssistant = internalQuery({
-  args: {},
-  handler: async (ctx) => {
-    const tree = await loadTree(ctx);
+  args: spaceArg,
+  handler: async (ctx, { sample }) => {
+    const tree = await loadTree(ctx, !!sample);
     const photoCounts: Record<string, number> = {};
     for (const p of tree.people) {
       const photos = await ctx.db
@@ -134,6 +143,7 @@ export const treeForAssistant = internalQuery({
     const settings = await ctx.db.query("settings").first();
     const gatherings = [];
     for (const g of await ctx.db.query("gatherings").take(200)) {
+      if (!!g.sample !== !!sample) continue;
       const photos = await ctx.db
         .query("gatheringPhotos")
         .withIndex("by_gatheringId", (q) => q.eq("gatheringId", g._id))
@@ -188,10 +198,10 @@ function requireName(firstName: string) {
 }
 
 export const createPerson = mutation({
-  args: personFields,
-  handler: async (ctx, args) => {
+  args: { ...personFields, ...spaceArg },
+  handler: async (ctx, { sample, ...args }) => {
     requireName(args.firstName);
-    const fields = clean(args);
+    const fields = { ...clean(args), ...(sample ? { sample: true } : {}) };
     return await ctx.db.insert("people", fields);
   },
 });
@@ -364,8 +374,9 @@ export const removePartner = mutation({
 export const loadSampleFamily = mutation({
   args: {},
   handler: async (ctx) => {
-    const any = await ctx.db.query("people").first();
-    if (any) throw new ConvexError("The tree already has people in it.");
+    // The sample lives in its own space; load it once and reuse it.
+    const existing = (await ctx.db.query("people").take(MAX_PEOPLE)).some((p) => p.sample);
+    if (existing) return null;
 
     type P = {
       firstName: string;
@@ -379,7 +390,7 @@ export const loadSampleFamily = mutation({
       occupation?: string;
       notes?: string;
     };
-    const add = (p: P) => ctx.db.insert("people", p);
+    const add = (p: P) => ctx.db.insert("people", { ...p, sample: true });
     const link = (parentId: Id<"people">, childId: Id<"people">) =>
       ctx.db.insert("parentLinks", { parentId, childId });
     const marry = (a: Id<"people">, b: Id<"people">) =>
@@ -557,5 +568,28 @@ export const clearAll = internalMutation({
       }
     }
     return null;
+  },
+});
+
+/** One-off (internal): marks everyone currently in the tree as the sample
+ *  family, for deployments where the sample was loaded into the real tree. */
+export const moveAllToSample = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    let people = 0;
+    for await (const p of ctx.db.query("people")) {
+      if (!p.sample) {
+        await ctx.db.patch("people", p._id, { sample: true });
+        people++;
+      }
+    }
+    let gatherings = 0;
+    for await (const g of ctx.db.query("gatherings")) {
+      if (!g.sample) {
+        await ctx.db.patch("gatherings", g._id, { sample: true });
+        gatherings++;
+      }
+    }
+    return { people, gatherings };
   },
 });
