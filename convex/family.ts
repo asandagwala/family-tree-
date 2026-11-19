@@ -90,6 +90,21 @@ export const updateSettings = mutation({
   },
 });
 
+/** Dev helper (internal): renames a place in birthplaces and homes. */
+export const renamePlace = internalMutation({
+  args: { from: v.string(), to: v.string() },
+  handler: async (ctx, { from, to }) => {
+    for await (const p of ctx.db.query("people")) {
+      const patch: { birthPlace?: string; currentPlace?: string; notes?: string } = {};
+      if (p.birthPlace === from) patch.birthPlace = to;
+      if (p.currentPlace === from) patch.currentPlace = to;
+      if (p.notes?.includes(from)) patch.notes = p.notes.split(from).join(to);
+      if (Object.keys(patch).length) await ctx.db.patch("people", p._id, patch);
+    }
+    return null;
+  },
+});
+
 /** Dev helper (internal): renames a surname across the tree. */
 export const renameSurname = internalMutation({
   args: { from: v.string(), to: v.string() },
@@ -134,8 +149,9 @@ export const treeForAssistant = internalQuery({
       });
     }
     // Contact details (phone numbers, social handles) are deliberately not sent to the assistant.
+    const CONTACT_KEYS = new Set(["whatsapp", "instagram", "facebook", "tiktok", "linkedin"]);
     const people = tree.people.map(
-      ({ whatsapp: _w, instagram: _i, facebook: _f, tiktok: _t, linkedin: _l, ...rest }) => rest,
+      (p) => Object.fromEntries(Object.entries(p).filter(([k]) => !CONTACT_KEYS.has(k))) as typeof p,
     );
     return {
       ...tree,
@@ -371,13 +387,13 @@ export const loadSampleFamily = mutation({
 
     const mzwandile = await add({
       firstName: "Mzwandile", lastName: "Rubuluza", gender: "male",
-      birthDate: "1934-06-12", deathDate: "2008-09-03", birthPlace: "Qumbu",
+      birthDate: "1934-06-12", deathDate: "2008-09-03", birthPlace: "Lusikisiki",
       clanName: "Jola", occupation: "Farmer and herdsman",
-      notes: "Kept cattle on the family land outside Qumbu for over fifty years. Known for his stories by the fire and for walking everywhere, even in his seventies.",
+      notes: "Kept cattle on the family land outside Lusikisiki for over fifty years. Known for his stories by the fire and for walking everywhere, even in his seventies.",
     });
     const nomvula = await add({
       firstName: "Nomvula", lastName: "Rubuluza", gender: "female",
-      birthDate: "1938-11-27", birthPlace: "Tsolo", currentPlace: "Qumbu",
+      birthDate: "1938-11-27", birthPlace: "Flagstaff", currentPlace: "Lusikisiki",
       clanName: "Mpondomise", occupation: "Beadworker",
       notes: "A celebrated beadworker. Many of the family's ceremonial collars and headpieces were made by her hand.",
     });
@@ -397,13 +413,13 @@ export const loadSampleFamily = mutation({
 
     const luthando = await add({
       firstName: "Luthando", lastName: "Rubuluza", gender: "male",
-      birthDate: "1964-03-30", birthPlace: "Qumbu", currentPlace: "Cape Town",
+      birthDate: "1964-03-30", birthPlace: "Lusikisiki", currentPlace: "Cape Town",
       clanName: "Jola", occupation: "Civil engineer",
       notes: "First in the family to go to university. Moved to Cape Town in 1989.",
     });
     const nosipho = await add({
       firstName: "Nosipho", lastName: "Rubuluza", gender: "female",
-      birthDate: "1968-08-14", birthPlace: "Qumbu", currentPlace: "Mthatha",
+      birthDate: "1968-08-14", birthPlace: "Lusikisiki", currentPlace: "Mthatha",
       clanName: "Jola", occupation: "Nurse",
     });
     const ayanda = await add({

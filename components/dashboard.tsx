@@ -1,17 +1,20 @@
 "use client";
 
 import { useMutation, useQuery } from "convex/react";
-import { ArrowRight, ArrowUp, Cake, Check, MapPin, Network, Pencil, UserPlus, X } from "lucide-react";
+import { ArrowRight, ArrowUp, Check, MapPin, MessageCircle, Network, Pencil, Plus, UserPlus, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { api } from "@/convex/_generated/api";
 import { errorMessage, fullName, lifespan, year, type Person } from "@/lib/people";
+import { upcomingBirthdays } from "@/lib/birthdays";
+import { contactLinks } from "@/lib/contact";
 import { layoutTree } from "@/lib/tree-layout";
 import { useFamily, type Family } from "@/lib/use-family";
 import { AskIcon } from "./ask-icon";
 import { UmbhacoBand } from "./beadwork";
 import { useChat } from "./chat/chat-context";
+import { FamilyDetailsEditor, type FamilySettings } from "./family-details-editor";
 import { PersonEditor } from "./person-editor";
 import { Portrait } from "./portrait";
 import { btnPrimary, btnSecondary } from "./ui/modal";
@@ -37,8 +40,9 @@ export function Dashboard() {
         <FeaturedStory family={family} className="lg:col-span-2" />
         <Roots family={family} />
       </div>
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-3">
         <ClanNames family={family} />
+        <StayConnected family={family} />
         <MissingDetails family={family} />
       </div>
       {adding && (
@@ -125,6 +129,7 @@ function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
                 </button>
               </h1>
             )}
+            {settings && <FamilyClan settings={settings} />}
             <p className="mt-4 max-w-md text-sm leading-relaxed text-ink/70">
               {family.list.length} people across the generations
               {root?.birthPlace ? `, with roots reaching back to ${root.birthPlace}` : ""}
@@ -325,29 +330,23 @@ function BirthsByDecade({ family, className }: { family: Family; className?: str
 /* ---------- Birthdays ---------- */
 
 function UpcomingBirthdays({ family, className }: { family: Family; className?: string }) {
-  const upcoming = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return family.list
-      .filter((p) => !p.deathDate && /^\d{4}-\d{2}-\d{2}$/.test(p.birthDate ?? ""))
-      .map((p) => {
-        const [y, m, d] = p.birthDate!.split("-").map(Number);
-        let next = new Date(today.getFullYear(), m - 1, d);
-        if (next < today) next = new Date(today.getFullYear() + 1, m - 1, d);
-        const days = Math.round((next.getTime() - today.getTime()) / 86_400_000);
-        return { p, days, turning: next.getFullYear() - y, next };
-      })
-      .sort((a, b) => a.days - b.days)
-      .slice(0, 4);
-  }, [family]);
+  const upcoming = useMemo(() => upcomingBirthdays(family.list).slice(0, 4), [family]);
 
   return (
-    <Card title="Coming birthdays" action={<Cake size={20} className="text-ochre" />} className={className}>
+    <Card
+      title="Coming birthdays"
+      action={
+        <Link href="/birthdays" className="inline-flex items-center gap-1 text-sm font-medium text-ochre-deep hover:underline">
+          All birthdays <ArrowRight size={14} />
+        </Link>
+      }
+      className={className}
+    >
       {upcoming.length === 0 ? (
         <p className="text-sm text-muted">Add full birth dates (like 1985-04-12) to be reminded of birthdays.</p>
       ) : (
         <ul className="space-y-3">
-          {upcoming.map(({ p, days, turning, next }) => (
+          {upcoming.map(({ person: p, days, turning, next }) => (
             <li key={p._id}>
               <Link href={`/people/${p._id}`} className="flex items-center gap-3 rounded-2xl p-1.5 transition-colors hover:bg-cream">
                 <Portrait person={p} size={44} />
@@ -481,6 +480,121 @@ function ClanNames({ family }: { family: Family }) {
           ))}
         </div>
       )}
+    </Card>
+  );
+}
+
+/* ---------- Family isiduko ---------- */
+
+function FamilyClan({ settings }: { settings: FamilySettings }) {
+  const [editing, setEditing] = useState(false);
+  return (
+    <div className="mt-4">
+      {settings.clanName ? (
+        <button type="button" onClick={() => setEditing(true)} className="group text-left" title="Edit our isiduko">
+          <span className="block text-xs uppercase tracking-[0.2em] text-muted">Isiduko</span>
+          <span className="mt-0.5 flex items-center gap-2 font-display text-3xl font-semibold text-ink">
+            {settings.clanName}
+            <Pencil size={13} className="text-muted opacity-0 transition-opacity group-hover:opacity-100" />
+          </span>
+          {settings.clanPraise && (
+            <span className="mt-1 line-clamp-2 block max-w-md font-display text-lg italic leading-snug text-ink/70">
+              {settings.clanPraise}
+            </span>
+          )}
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setEditing(true)}
+          className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-ochre/50 px-3.5 py-1.5 text-xs font-medium text-ochre-deep hover:bg-ochre-soft"
+        >
+          <Plus size={13} /> Add our isiduko and izithakazelo
+        </button>
+      )}
+      {editing && <FamilyDetailsEditor settings={settings} onClose={() => setEditing(false)} />}
+    </div>
+  );
+}
+
+/* ---------- Stay connected ---------- */
+
+function StayConnected({ family }: { family: Family }) {
+  const settings = useQuery(api.family.getSettings);
+  const [editing, setEditing] = useState(false);
+  const reachable = useMemo(
+    () =>
+      family.list
+        .filter((p) => !p.deathDate)
+        .map((p) => ({ p, links: contactLinks(p) }))
+        .filter((r) => r.links.length > 0),
+    [family],
+  );
+
+  return (
+    <Card title="Stay connected">
+      {settings?.whatsappGroupUrl ? (
+        <a
+          href={settings.whatsappGroupUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 rounded-2xl bg-forest p-4 text-white transition-colors hover:bg-forest-deep"
+        >
+          <MessageCircle size={22} />
+          <span className="flex-1">
+            <span className="block font-medium">Join the family WhatsApp group</span>
+            <span className="block text-xs text-white/75">Opens WhatsApp</span>
+          </span>
+          <ArrowRight size={16} />
+        </a>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setEditing(true)}
+          disabled={!settings}
+          className="flex w-full items-center gap-3 rounded-2xl border border-dashed border-silver p-4 text-left text-sm text-muted hover:border-ochre hover:text-ink"
+        >
+          <MessageCircle size={20} className="text-forest" />
+          Add the family WhatsApp group link
+        </button>
+      )}
+      {settings?.whatsappGroupUrl && (
+        <button type="button" onClick={() => setEditing(true)} className="mt-2 text-xs text-muted hover:text-ink hover:underline">
+          Change group link
+        </button>
+      )}
+
+      <p className="mt-5 text-xs font-medium uppercase tracking-wider text-muted">Find each other</p>
+      {reachable.length === 0 ? (
+        <p className="mt-2 text-sm text-muted">
+          Add WhatsApp numbers and social handles on each person&apos;s profile so family can reach them.
+        </p>
+      ) : (
+        <ul className="mt-2 divide-y divide-line">
+          {reachable.slice(0, 6).map(({ p, links }) => (
+            <li key={p._id} className="flex items-center gap-3 py-2">
+              <Link href={`/people/${p._id}`} className="flex min-w-0 flex-1 items-center gap-3">
+                <Portrait person={p} size={32} ring={false} />
+                <span className="truncate text-sm font-medium">{p.firstName}</span>
+              </Link>
+              <span className="flex flex-wrap justify-end gap-1">
+                {links.map((l) => (
+                  <a
+                    key={l.key}
+                    href={l.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-full bg-paper px-2.5 py-1 text-[11px] font-medium text-ink hover:bg-mist"
+                  >
+                    {l.label}
+                  </a>
+                ))}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {editing && settings && <FamilyDetailsEditor settings={settings} onClose={() => setEditing(false)} />}
     </Card>
   );
 }
