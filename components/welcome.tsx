@@ -1,8 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "convex/react";
-import { ArrowRight, UserPlus } from "lucide-react";
-import Link from "next/link";
+import { UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { api } from "@/convex/_generated/api";
@@ -50,26 +49,19 @@ export function Welcome() {
           <div className="mt-10 flex flex-wrap gap-3">
             {family === undefined ? (
               <div className="h-11 w-56 animate-pulse rounded-full bg-mist" />
-            ) : hasPeople ? (
-              <>
-                <Link href="/overview" className={btnPrimary}>
-                  Enter the family archive <ArrowRight size={16} />
-                </Link>
-                <button type="button" onClick={() => setAdding(true)} className={btnSecondary}>
-                  <UserPlus size={16} /> Add a family member
-                </button>
-              </>
             ) : (
               <>
                 <button type="button" onClick={() => setAdding(true)} className={btnPrimary}>
-                  <UserPlus size={16} /> Add the first person
+                  <UserPlus size={16} /> {hasPeople ? "Add a family member" : "Add the first person"}
                 </button>
                 <button
                   type="button"
                   onClick={() =>
-                    loadSample()
-                      .then(() => router.push("/overview"))
-                      .catch((e) => setError(errorMessage(e)))
+                    hasPeople
+                      ? router.push("/overview")
+                      : loadSample()
+                          .then(() => router.push("/overview"))
+                          .catch((e) => setError(errorMessage(e)))
                   }
                   className={btnSecondary}
                 >

@@ -386,14 +386,14 @@ export const loadSampleFamily = mutation({
       ctx.db.insert("partnerships", orderPair(a, b));
 
     const mzwandile = await add({
-      firstName: "Mzwandile", lastName: "Ntshona", gender: "male",
-      birthDate: "1934-06-12", deathDate: "2008-09-03", birthPlace: "Qumbu",
+      firstName: "Mzwandile", lastName: "Rubuluza", gender: "male",
+      birthDate: "1934-06-12", deathDate: "2008-09-03", birthPlace: "Lusikisiki",
       clanName: "Jola", occupation: "Farmer and herdsman",
-      notes: "Kept cattle on the family land outside Qumbu for over fifty years. Known for his stories by the fire and for walking everywhere, even in his seventies.",
+      notes: "Kept cattle on the family land outside Lusikisiki for over fifty years. Known for his stories by the fire and for walking everywhere, even in his seventies.",
     });
     const nomvula = await add({
-      firstName: "Nomvula", lastName: "Ntshona", gender: "female",
-      birthDate: "1938-11-27", birthPlace: "Tsolo", currentPlace: "Qumbu",
+      firstName: "Nomvula", lastName: "Rubuluza", gender: "female",
+      birthDate: "1938-11-27", birthPlace: "Flagstaff", currentPlace: "Lusikisiki",
       clanName: "Mpondomise", occupation: "Beadworker",
       notes: "A celebrated beadworker. Many of the family's ceremonial collars and headpieces were made by her hand.",
     });
@@ -412,21 +412,21 @@ export const loadSampleFamily = mutation({
     await marry(lwazi, thandeka);
 
     const luthando = await add({
-      firstName: "Luthando", lastName: "Ntshona", gender: "male",
-      birthDate: "1964-03-30", birthPlace: "Qumbu", currentPlace: "Cape Town",
+      firstName: "Luthando", lastName: "Rubuluza", gender: "male",
+      birthDate: "1964-03-30", birthPlace: "Lusikisiki", currentPlace: "Cape Town",
       clanName: "Jola", occupation: "Civil engineer",
       notes: "First in the family to go to university. Moved to Cape Town in 1989.",
     });
     const nosipho = await add({
-      firstName: "Nosipho", lastName: "Ntshona", gender: "female",
-      birthDate: "1968-08-14", birthPlace: "Qumbu", currentPlace: "Mthatha",
+      firstName: "Nosipho", lastName: "Rubuluza", gender: "female",
+      birthDate: "1968-08-14", birthPlace: "Lusikisiki", currentPlace: "Mthatha",
       clanName: "Jola", occupation: "Nurse",
     });
     const ayanda = await add({
-      firstName: "Ayanda", lastName: "Ntshona", gender: "female",
+      firstName: "Ayanda", lastName: "Rubuluza", gender: "female",
       birthDate: "1967-12-09", birthPlace: "Engcobo", currentPlace: "Cape Town",
       clanName: "Tshawe", occupation: "High school teacher",
-      notes: "Born Ayanda Sondlo; took the Ntshona name on marrying Luthando. Followed her father into teaching.",
+      notes: "Born Ayanda Sondlo; took the Rubuluza name on marrying Luthando. Followed her father into teaching.",
     });
     const siyabonga = await add({
       firstName: "Siyabonga", lastName: "Sondlo", gender: "male",
@@ -444,12 +444,12 @@ export const loadSampleFamily = mutation({
     await marry(luthando, ayanda);
 
     const lindiwe = await add({
-      firstName: "Lindiwe", lastName: "Ntshona", gender: "female",
+      firstName: "Lindiwe", lastName: "Rubuluza", gender: "female",
       birthDate: "1993-01-22", birthPlace: "Cape Town", currentPlace: "Johannesburg",
       clanName: "Jola", occupation: "Software engineer",
     });
     const anele = await add({
-      firstName: "Anele", lastName: "Ntshona", gender: "male",
+      firstName: "Anele", lastName: "Rubuluza", gender: "male",
       birthDate: "1997-12-01", birthPlace: "Cape Town", currentPlace: "East London",
       clanName: "Jola", occupation: "Architecture student",
     });
