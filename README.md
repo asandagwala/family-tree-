@@ -4,7 +4,7 @@
 rich profiles with photographs, a dashboard of the family at a glance, and an
 assistant that answers questions from what the family has recorded.
 
-Built with Next.js 16, React 19, Tailwind CSS 4, Convex, and Claude.
+Built with Next.js 16, React 19, Tailwind CSS 4, Convex, and Google Gemini.
 
 ## What's inside
 
@@ -32,14 +32,15 @@ pnpm dev            # in a second terminal, then open http://localhost:3000
 
 ### Switching on the assistant
 
-The assistant uses Claude (`claude-opus-5-5`). Give the Convex backend an
-Anthropic API key:
+The assistant uses Google Gemini. Give the Convex backend your Google AI
+Studio key (it prompts for the value, so it stays out of your shell history):
 
 ```bash
-npx convex env set ANTHROPIC_API_KEY <your key>
+npx convex env set GEMINI_API_KEY
 ```
 
-Without a key the chat still opens and explains how to switch it on.
+Without a key the chat still opens and explains how to switch it on. To pin a
+specific model, also set `GEMINI_MODEL` (e.g. `gemini-flash-latest`).
 
 ### Sample data
 
@@ -53,7 +54,7 @@ call it).
 | --- | --- |
 | `convex/schema.ts` | `people`, `parentLinks`, `partnerships`, `photos` |
 | `convex/family.ts` | Tree queries, relationship rules, photo storage |
-| `convex/assistant.ts` | The assistant: tree → prompt → Claude |
+| `convex/assistant.ts` | The assistant: tree → prompt → Gemini |
 | `lib/tree-layout.ts` | Generation layout and branch geometry |
 | `components/dashboard.tsx` | Overview page |
 | `components/tree-view.tsx` | Interactive tree |

@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI, type Content } from "@google/genai";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
@@ -85,6 +85,13 @@ function describeTree(tree: {
   return `${heading} records (${tree.people.length} people):\n${lines.join("\n")}${album}`;
 }
 
+// Tried in order: if one is busy (429/503) or unavailable to this key (404), the next is used.
+// Set GEMINI_MODEL in Convex to pin one.
+const DEFAULT_MODELS = ["gemini-flash-latest", "gemini-3.1-flash-lite", "gemini-flash-lite-latest"];
+
+const NOT_SET_UP =
+  "The family assistant isn't switched on yet. Add your Google AI Studio key with `npx convex env set GEMINI_API_KEY` and ask again.";
+
 export const ask = action({
   args: {
     messages: v.array(
@@ -95,12 +102,9 @@ export const ask = action({
     ),
   },
   handler: async (ctx, { messages }): Promise<{ ok: boolean; text: string }> => {
-    if (!env.ANTHROPIC_API_KEY) {
-      return {
-        ok: false,
-        text: "The family assistant isn't switched on yet. Add an Anthropic API key with `npx convex env set ANTHROPIC_API_KEY <your key>` and ask again.",
-      };
-    }
+    const apiKey = env.GEMINI_API_KEY;
+    if (!apiKey) return { ok: false, text: NOT_SET_UP };
+
     const recent = messages.slice(-20);
     if (recent.length === 0 || recent[recent.length - 1].role !== "user") {
       return { ok: false, text: "Ask me something about the family." };
@@ -108,44 +112,47 @@ export const ask = action({
 
     const tree = await ctx.runQuery(internal.family.treeForAssistant, {});
     const today = new Date().toISOString().slice(0, 10);
-    const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
+    const systemInstruction = `${INSTRUCTIONS}
 
-    try {
-      const response = await client.beta.messages.create({
-        model: "claude-opus-5-5",
-        max_tokens: 16000,
-        betas: ["server-side-fallback-2026-07-01"],
-        fallbacks: "default",
-        output_config: { effort: "low" },
-        cache_control: { type: "ephemeral" },
-        system: [
-          { type: "text", text: INSTRUCTIONS },
-          { type: "text", text: describeTree(tree) },
-          { type: "text", text: `Today's date: ${today}.` },
-        ],
-        messages: recent,
-      });
+${describeTree(tree)}
 
-      if (response.stop_reason === "refusal") {
-        return { ok: false, text: "I can't help with that one. Try asking about someone in the family." };
+Today's date: ${today}.`;
+    // Gemini calls the assistant "model", and a conversation must start with the user.
+    const firstUser = recent.findIndex((m) => m.role === "user");
+    const contents: Content[] = recent.slice(firstUser).map((m) => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }],
+    }));
+
+    const ai = new GoogleGenAI({ apiKey });
+    const models = env.GEMINI_MODEL ? [env.GEMINI_MODEL] : DEFAULT_MODELS;
+    let lastError: unknown;
+    for (const model of models) {
+      try {
+        const response = await ai.models.generateContent({
+          model,
+          contents,
+          config: { systemInstruction, temperature: 0.3 },
+        });
+        const text = (response.text ?? "").trim();
+        if (!text) {
+          return { ok: false, text: "I couldn't answer that one. Try asking about someone in the family." };
+        }
+        return { ok: true, text };
+      } catch (error) {
+        lastError = error;
+        const status = (error as { status?: number }).status;
+        if (status === 400 || status === 401 || status === 403) {
+          console.error("Gemini rejected the request", status, error);
+          return {
+            ok: false,
+            text: "The assistant's key was rejected. Check GEMINI_API_KEY in your Convex settings.",
+          };
+        }
+        // 404 (model not available to this key), 429 (busy) or 5xx: try the next model.
       }
-      const text = response.content
-        .flatMap((b) => (b.type === "text" ? [b.text] : []))
-        .join("")
-        .trim();
-      return { ok: true, text: text || "I couldn't find an answer in the family records." };
-    } catch (error) {
-      if (error instanceof Anthropic.AuthenticationError) {
-        return { ok: false, text: "The assistant's API key was rejected. Check ANTHROPIC_API_KEY in Convex." };
-      }
-      if (error instanceof Anthropic.RateLimitError) {
-        return { ok: false, text: "The assistant is busy right now. Please try again in a moment." };
-      }
-      if (error instanceof Anthropic.APIError) {
-        console.error("Claude API error", error.status, error.message);
-        return { ok: false, text: "The assistant ran into a problem. Please try again." };
-      }
-      throw error;
     }
+    console.error("All Gemini models failed", lastError);
+    return { ok: false, text: "The assistant is busy right now. Please try again in a moment." };
   },
 });
