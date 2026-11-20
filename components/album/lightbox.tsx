@@ -27,9 +27,19 @@ export function Lightbox(props: {
     <div className="fixed inset-0 z-50 grid place-items-center bg-ink/90 p-6" onClick={onClose}>
       {urls[index] && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={urls[index]!} alt="" className="max-h-full max-w-full rounded-3xl object-contain shadow-2xl" onClick={(e) => e.stopPropagation()} />
+        <img
+          src={urls[index]!}
+          alt=""
+          className="max-h-full max-w-full rounded-3xl object-contain shadow-2xl"
+          onClick={(e) => e.stopPropagation()}
+        />
       )}
-      <button type="button" onClick={onClose} aria-label="Close" className="absolute right-6 top-6 grid h-11 w-11 place-items-center rounded-full bg-mist/10 text-mist hover:bg-mist/20">
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close"
+        className="absolute right-6 top-6 grid h-11 w-11 place-items-center rounded-full bg-mist/10 text-mist hover:bg-mist/20"
+      >
         <X size={20} />
       </button>
       {urls.length > 1 && (

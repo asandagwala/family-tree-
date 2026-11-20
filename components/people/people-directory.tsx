@@ -86,7 +86,9 @@ export function PeopleDirectory() {
           ))}
         </div>
       ) : family.list.length === 0 ? (
-        <p className="mt-16 text-center text-muted">No one has been added yet. Start with yourself or the eldest relative you know.</p>
+        <p className="mt-16 text-center text-muted">
+          No one has been added yet. Start with yourself or the eldest relative you know.
+        </p>
       ) : people.length === 0 ? (
         <p className="mt-16 text-center text-muted">No one matches that search.</p>
       ) : (
@@ -118,7 +120,12 @@ export function PeopleDirectory() {
       )}
 
       {adding && family && (
-        <PersonEditor mode={{ kind: "new" }} family={family} onClose={() => setAdding(false)} onSaved={(id) => router.push(`/people/${id}`)} />
+        <PersonEditor
+          mode={{ kind: "new" }}
+          family={family}
+          onClose={() => setAdding(false)}
+          onSaved={(id) => router.push(`/people/${id}`)}
+        />
       )}
     </div>
   );

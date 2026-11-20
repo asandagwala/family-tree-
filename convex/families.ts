@@ -42,7 +42,8 @@ export const joinFamily = mutation({
             .withIndex("by_code", (q) => q.eq("code", typed))
             .unique()
         : null;
-    if (!family) return { ok: false as const, error: "We couldn't find a family with that code. Check it and try again." };
+    if (!family)
+      return { ok: false as const, error: "We couldn't find a family with that code. Check it and try again." };
     await ctx.db.patch("users", userId, { familyId: family._id });
     return { ok: true as const };
   },

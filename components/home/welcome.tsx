@@ -96,7 +96,12 @@ export function Welcome() {
       </div>
       <UmbhacoBand height={30} />
       {adding && family && (
-        <PersonEditor mode={{ kind: "new" }} family={family} onClose={() => setAdding(false)} onSaved={(id) => router.push(`/people/${id}`)} />
+        <PersonEditor
+          mode={{ kind: "new" }}
+          family={family}
+          onClose={() => setAdding(false)}
+          onSaved={(id) => router.push(`/people/${id}`)}
+        />
       )}
     </div>
   );

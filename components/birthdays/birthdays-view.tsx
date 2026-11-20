@@ -64,7 +64,10 @@ export function BirthdaysView() {
           <ul className="mt-4 flex flex-wrap gap-2">
             {unknown.map((p) => (
               <li key={p._id}>
-                <Link href={`/people/${p._id}`} className="flex items-center gap-2 rounded-full border border-line bg-card py-1 pl-1 pr-4 text-sm hover:border-ochre">
+                <Link
+                  href={`/people/${p._id}`}
+                  className="flex items-center gap-2 rounded-full border border-line bg-card py-1 pl-1 pr-4 text-sm hover:border-ochre"
+                >
                   <Portrait person={p} size={28} ring={false} />
                   {fullName(p)}
                 </Link>
@@ -89,8 +92,13 @@ function NextUp({ birthday: b }: { birthday: Birthday }) {
     <section className="mt-8 flex flex-wrap items-center gap-6 rounded-[1.75rem] bg-marigold-soft p-6 sm:p-8">
       <Portrait person={b.person} size={96} />
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-marigold-deep">Next birthday · {whenLabel(b.days)}</p>
-        <Link href={`/people/${b.person._id}`} className="mt-1 block font-display text-4xl font-semibold text-ink hover:underline">
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-marigold-deep">
+          Next birthday · {whenLabel(b.days)}
+        </p>
+        <Link
+          href={`/people/${b.person._id}`}
+          className="mt-1 block font-display text-4xl font-semibold text-ink hover:underline"
+        >
           {fullName(b.person)}
         </Link>
         <p className="mt-1 text-ink/70">

@@ -93,9 +93,7 @@ export const listGatherings = query({
       gatherings.map(async (g) => {
         const photos = await photosOf(ctx, g._id, MAX_PHOTOS_PER_GATHERING);
         const coverStorage = g.coverId ?? photos[0]?.storageId;
-        const previews = await Promise.all(
-          photos.slice(0, PREVIEW_PHOTOS).map((p) => ctx.storage.getUrl(p.storageId)),
-        );
+        const previews = await Promise.all(photos.slice(0, PREVIEW_PHOTOS).map((p) => ctx.storage.getUrl(p.storageId)));
         return {
           ...g,
           photoCount: photos.length,
@@ -132,13 +130,15 @@ export const gatheringsFor = query({
     if (!space) return [];
     const all = await gatheringsIn(ctx, space, MAX_GATHERINGS);
     const mine = all.filter((g) => g.peopleIds.includes(personId));
-    return mine.sort((a, b) => (b.date ?? "").localeCompare(a.date ?? "")).map((g) => ({
-      _id: g._id,
-      title: g.title,
-      kind: g.kind,
-      date: g.date,
-      place: g.place,
-    }));
+    return mine
+      .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""))
+      .map((g) => ({
+        _id: g._id,
+        title: g.title,
+        kind: g.kind,
+        date: g.date,
+        place: g.place,
+      }));
   },
 });
 

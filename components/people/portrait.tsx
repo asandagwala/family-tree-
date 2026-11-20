@@ -18,21 +18,23 @@ export function Portrait({
   return (
     <span
       className={`relative inline-grid shrink-0 place-items-center overflow-hidden rounded-full ${
-        ring ? "ring-2 ring-offset-2 ring-offset-card " + (deceased ? "ring-silver" : mono ? "ring-ink" : "ring-sage") : ""
+        ring
+          ? "ring-2 ring-offset-2 ring-offset-card " + (deceased ? "ring-silver" : mono ? "ring-ink" : "ring-sage")
+          : ""
       } ${className}`}
       style={{ width: size, height: size }}
     >
       {person.photoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element -- Convex storage URLs are dynamic
-        <img
-          src={person.photoUrl}
-          alt=""
-          className={`h-full w-full object-cover ${deceased ? "grayscale" : ""}`}
-        />
+        <img src={person.photoUrl} alt="" className={`h-full w-full object-cover ${deceased ? "grayscale" : ""}`} />
       ) : (
         <span
           className="grid h-full w-full place-items-center font-display font-semibold tracking-wide"
-          style={{ fontSize: size * 0.38, background: mono ? initialsMonoTone(person._id) : initialsTone(person._id), color: INITIALS_TEXT }}
+          style={{
+            fontSize: size * 0.38,
+            background: mono ? initialsMonoTone(person._id) : initialsTone(person._id),
+            color: INITIALS_TEXT,
+          }}
         >
           {initials(person)}
         </span>

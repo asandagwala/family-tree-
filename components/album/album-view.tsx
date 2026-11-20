@@ -108,7 +108,11 @@ export function AlbumView() {
       )}
 
       {creating && family && (
-        <GatheringEditor family={family} onClose={() => setCreating(false)} onSaved={(id) => router.push(`/album/${id}`)} />
+        <GatheringEditor
+          family={family}
+          onClose={() => setCreating(false)}
+          onSaved={(id) => router.push(`/album/${id}`)}
+        />
       )}
     </div>
   );

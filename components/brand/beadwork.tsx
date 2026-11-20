@@ -23,7 +23,14 @@ export function BeadworkBand({ height = 20, className = "" }: { height?: number;
   const w = COLS * bead;
   const id = `beads-${height}`;
   return (
-    <svg aria-hidden className={className} width="100%" height={height} preserveAspectRatio="none" style={{ display: "block" }}>
+    <svg
+      aria-hidden
+      className={className}
+      width="100%"
+      height={height}
+      preserveAspectRatio="none"
+      style={{ display: "block" }}
+    >
       <defs>
         <pattern id={id} width={w} height={height} patternUnits="userSpaceOnUse">
           <rect width={w} height={height} fill="#f4f1ea" />
@@ -146,7 +153,15 @@ export function BeadNet({ className = "", cell = 22 }: { className?: string; cel
  * A quiet tone-on-tone band of diamonds (an outlined diamond around a small
  * solid one), used as the header strip on People cards.
  */
-export function DiamondBand({ color, height = 16, className = "" }: { color: string; height?: number; className?: string }) {
+export function DiamondBand({
+  color,
+  height = 16,
+  className = "",
+}: {
+  color: string;
+  height?: number;
+  className?: string;
+}) {
   const id = `diamond-band-${height}-${color.replace(/[^a-z0-9]/gi, "")}`;
   const h = height;
   return (
@@ -159,7 +174,10 @@ export function DiamondBand({ color, height = 16, className = "" }: { color: str
             stroke={color}
             strokeWidth={h / 14}
           />
-          <path d={`M${h / 2} ${h * 0.32} L${h * 0.68} ${h / 2} L${h / 2} ${h * 0.68} L${h * 0.32} ${h / 2} Z`} fill={color} />
+          <path
+            d={`M${h / 2} ${h * 0.32} L${h * 0.68} ${h / 2} L${h / 2} ${h * 0.68} L${h * 0.32} ${h / 2} Z`}
+            fill={color}
+          />
         </pattern>
       </defs>
       <rect width="100%" height="100%" fill={`url(#${id})`} />

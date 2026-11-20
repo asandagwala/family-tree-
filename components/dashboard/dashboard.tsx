@@ -34,22 +34,27 @@ export function Dashboard() {
       {/* The banner runs edge to edge; the cards below sit in the page column. */}
       <Hero family={family} onAdd={() => setAdding(true)} />
       <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-8 sm:py-8">
-      <div className="grid gap-6 lg:grid-cols-5">
-        <BirthsByDecade family={family} className="lg:col-span-3" />
-        <UpcomingBirthdays family={family} className="lg:col-span-2" />
-      </div>
-      <div className="grid gap-6 lg:grid-cols-3">
-        <FeaturedStory family={family} className="lg:col-span-2" />
-        <Roots family={family} />
-      </div>
-      <div className="grid gap-6 lg:grid-cols-3">
-        <ClanNames family={family} />
-        <StayConnected family={family} />
-        <MissingDetails family={family} />
-      </div>
+        <div className="grid gap-6 lg:grid-cols-5">
+          <BirthsByDecade family={family} className="lg:col-span-3" />
+          <UpcomingBirthdays family={family} className="lg:col-span-2" />
+        </div>
+        <div className="grid gap-6 lg:grid-cols-3">
+          <FeaturedStory family={family} className="lg:col-span-2" />
+          <Roots family={family} />
+        </div>
+        <div className="grid gap-6 lg:grid-cols-3">
+          <ClanNames family={family} />
+          <StayConnected family={family} />
+          <MissingDetails family={family} />
+        </div>
       </div>
       {adding && (
-        <PersonEditor mode={{ kind: "new" }} family={family} onClose={() => setAdding(false)} onSaved={(id) => router.push(`/people/${id}`)} />
+        <PersonEditor
+          mode={{ kind: "new" }}
+          family={family}
+          onClose={() => setAdding(false)}
+          onSaved={(id) => router.push(`/people/${id}`)}
+        />
       )}
     </div>
   );
@@ -115,10 +120,19 @@ function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
                   placeholder="Family name"
                   className="min-w-0 flex-1 rounded-2xl border border-line bg-card px-4 py-2 font-display text-4xl font-semibold text-ink outline-none focus:border-ochre"
                 />
-                <button type="submit" className="grid h-11 w-11 place-items-center rounded-full bg-ochre-deep text-white" aria-label="Save family name">
+                <button
+                  type="submit"
+                  className="grid h-11 w-11 place-items-center rounded-full bg-ochre-deep text-white"
+                  aria-label="Save family name"
+                >
                   <Check size={18} />
                 </button>
-                <button type="button" onClick={() => setEditingName(null)} className="grid h-11 w-11 place-items-center rounded-full border border-line text-muted" aria-label="Cancel">
+                <button
+                  type="button"
+                  onClick={() => setEditingName(null)}
+                  className="grid h-11 w-11 place-items-center rounded-full border border-line text-muted"
+                  aria-label="Cancel"
+                >
                   <X size={18} />
                 </button>
               </form>
@@ -150,7 +164,9 @@ function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
             <p className="mt-4 max-w-md text-sm leading-relaxed text-ink/70">
               {family.list.length} people across the generations
               {root?.birthPlace ? `, with roots in ${root.birthPlace}` : ""}
-              {root ? `${root.birthPlace ? "," : ""} going back to ${fullName(root)}, born ${year(root.birthDate)}.` : "."}
+              {root
+                ? `${root.birthPlace ? "," : ""} going back to ${fullName(root)}, born ${year(root.birthDate)}.`
+                : "."}
             </p>
           </div>
 
@@ -172,7 +188,11 @@ function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
                 className="min-w-0 flex-1 bg-transparent py-2 text-sm outline-none placeholder:text-muted/80"
                 aria-label="Ask the family assistant"
               />
-              <button type="submit" aria-label="Ask" className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ochre-deep text-white transition-colors hover:bg-ochre">
+              <button
+                type="submit"
+                aria-label="Ask"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ochre-deep text-white transition-colors hover:bg-ochre"
+              >
                 <ArrowUp size={16} />
               </button>
             </form>
@@ -189,10 +209,17 @@ function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
               ))}
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link href="/tree" className="inline-flex items-center gap-2 rounded-full bg-ochre-deep px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-ochre">
+              <Link
+                href="/tree"
+                className="inline-flex items-center gap-2 rounded-full bg-ochre-deep px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-ochre"
+              >
                 <Network size={16} /> Explore the tree
               </Link>
-              <button type="button" onClick={onAdd} className="inline-flex items-center gap-2 rounded-full border border-ink/20 bg-card px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:border-ink/40">
+              <button
+                type="button"
+                onClick={onAdd}
+                className="inline-flex items-center gap-2 rounded-full border border-ink/20 bg-card px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:border-ink/40"
+              >
                 <UserPlus size={16} /> Add a relative
               </button>
             </div>
@@ -221,7 +248,10 @@ function StatsRow({ family }: { family: Family }) {
     const gens = new Set([...layout.nodes.values()].map((n) => n.gen)).size;
     const living = family.list.filter((p) => !p.deathDate).length;
     const places = new Set(
-      family.list.flatMap((p) => [p.birthPlace, p.currentPlace]).filter(Boolean).map((s) => s!.toLowerCase()),
+      family.list
+        .flatMap((p) => [p.birthPlace, p.currentPlace])
+        .filter(Boolean)
+        .map((s) => s!.toLowerCase()),
     ).size;
     return [
       { label: "Family members", value: family.list.length },
@@ -245,7 +275,17 @@ function StatsRow({ family }: { family: Family }) {
 
 /* ---------- Births by decade ---------- */
 
-function Card({ title, action, children, className = "" }: { title: string; action?: React.ReactNode; children: React.ReactNode; className?: string }) {
+function Card({
+  title,
+  action,
+  children,
+  className = "",
+}: {
+  title: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <section className={`animate-rise min-w-0 rounded-[1.75rem] border border-line bg-card p-6 ${className}`}>
       <div className="mb-5 flex items-center justify-between gap-3">
@@ -289,7 +329,12 @@ function BirthsByDecade({ family, className }: { family: Family; className?: str
         <div>
           <div className="relative flex items-end gap-2 border-b border-line" style={{ height: H }}>
             {[0.5, 1].map((f) => (
-              <span key={f} aria-hidden className="absolute inset-x-0 border-t border-dashed border-line" style={{ bottom: H * f - 1 }} />
+              <span
+                key={f}
+                aria-hidden
+                className="absolute inset-x-0 border-t border-dashed border-line"
+                style={{ bottom: H * f - 1 }}
+              />
             ))}
             {data.map((d, i) => (
               <div
@@ -338,7 +383,10 @@ function UpcomingBirthdays({ family, className }: { family: Family; className?: 
     <Card
       title="Coming birthdays"
       action={
-        <Link href="/birthdays" className="inline-flex items-center gap-1 text-sm font-medium text-ochre-deep hover:underline">
+        <Link
+          href="/birthdays"
+          className="inline-flex items-center gap-1 text-sm font-medium text-ochre-deep hover:underline"
+        >
           All birthdays <ArrowRight size={14} />
         </Link>
       }
@@ -350,7 +398,10 @@ function UpcomingBirthdays({ family, className }: { family: Family; className?: 
         <ul className="space-y-3">
           {upcoming.map(({ person: p, days, turning, next }) => (
             <li key={p._id}>
-              <Link href={`/people/${p._id}`} className="flex items-center gap-3 rounded-2xl p-1.5 transition-colors hover:bg-cream">
+              <Link
+                href={`/people/${p._id}`}
+                className="flex items-center gap-3 rounded-2xl p-1.5 transition-colors hover:bg-cream"
+              >
                 <Portrait person={p} size={44} />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-medium">{fullName(p)}</span>
@@ -393,7 +444,9 @@ function FeaturedStory({ family, className }: { family: Family; className?: stri
         <p className="text-xs uppercase tracking-[0.25em] text-ochre">From the archive</p>
         {pick ? (
           <>
-            <blockquote className="mt-3 max-w-2xl font-display text-2xl italic leading-snug sm:text-3xl">“{pick.notes}”</blockquote>
+            <blockquote className="mt-3 max-w-2xl font-display text-2xl italic leading-snug sm:text-3xl">
+              “{pick.notes}”
+            </blockquote>
             <div className="mt-5 flex flex-wrap items-center gap-4">
               <Link href={`/people/${pick._id}`} className="flex items-center gap-3">
                 <Portrait person={pick} size={40} ring={false} />
@@ -412,7 +465,9 @@ function FeaturedStory({ family, className }: { family: Family; className?: stri
             </div>
           </>
         ) : (
-          <p className="mt-3 max-w-xl font-display text-2xl italic leading-snug">Stories you add to people&apos;s profiles will appear here.</p>
+          <p className="mt-3 max-w-xl font-display text-2xl italic leading-snug">
+            Stories you add to people&apos;s profiles will appear here.
+          </p>
         )}
       </div>
     </section>
@@ -467,7 +522,11 @@ function ClanNames({ family }: { family: Family }) {
       action={
         <span className="block h-20 w-20 shrink-0 overflow-hidden rounded-full ring-4 ring-cream">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/heritage/beadwork.jpg" alt="A beaded collar" className="duotone h-full w-full object-cover object-bottom" />
+          <img
+            src="/heritage/beadwork.jpg"
+            alt="A beaded collar"
+            className="duotone h-full w-full object-cover object-bottom"
+          />
         </span>
       }
     >
@@ -480,7 +539,12 @@ function ClanNames({ family }: { family: Family }) {
               <span className="w-36 shrink-0 truncate font-display text-2xl font-semibold text-ink">{clan}</span>
               <div className="flex -space-x-2">
                 {members.slice(0, 6).map((p) => (
-                  <Link key={p._id} href={`/people/${p._id}`} title={fullName(p)} className="rounded-full ring-2 ring-card">
+                  <Link
+                    key={p._id}
+                    href={`/people/${p._id}`}
+                    title={fullName(p)}
+                    className="rounded-full ring-2 ring-card"
+                  >
                     <Portrait person={p} size={34} ring={false} />
                   </Link>
                 ))}
@@ -575,7 +639,11 @@ function StayConnected({ family }: { family: Family }) {
         </button>
       )}
       {!sample && settings?.whatsappGroupUrl && (
-        <button type="button" onClick={() => setEditing(true)} className="mt-2 text-xs text-muted hover:text-ink hover:underline">
+        <button
+          type="button"
+          onClick={() => setEditing(true)}
+          className="mt-2 text-xs text-muted hover:text-ink hover:underline"
+        >
           Change group link
         </button>
       )}
@@ -641,7 +709,10 @@ function MissingDetails({ family }: { family: Family }) {
     <Card
       title="Help complete the story"
       action={
-        <Link href="/people" className="inline-flex items-center gap-1 text-sm font-medium text-ochre-deep hover:underline">
+        <Link
+          href="/people"
+          className="inline-flex items-center gap-1 text-sm font-medium text-ochre-deep hover:underline"
+        >
           All people <ArrowRight size={14} />
         </Link>
       }
@@ -652,7 +723,10 @@ function MissingDetails({ family }: { family: Family }) {
         <ul className="divide-y divide-line">
           {gaps.map(({ p, missing }) => (
             <li key={p._id}>
-              <Link href={`/people/${p._id}`} className="flex items-center gap-3 py-2.5 transition-colors hover:text-ochre-deep">
+              <Link
+                href={`/people/${p._id}`}
+                className="flex items-center gap-3 py-2.5 transition-colors hover:text-ochre-deep"
+              >
                 <Portrait person={p} size={36} ring={false} />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-medium">{fullName(p)}</span>

@@ -44,10 +44,20 @@ export function FamilyDetailsEditor({ settings, onClose }: { settings: FamilySet
     >
       <form onSubmit={submit} className="space-y-5">
         <Field label="Our isiduko (clan name)">
-          <input value={clanName} onChange={(e) => setClanName(e.target.value)} placeholder="e.g. Jola" className={inputCls} />
+          <input
+            value={clanName}
+            onChange={(e) => setClanName(e.target.value)}
+            placeholder="e.g. Jola"
+            className={inputCls}
+          />
         </Field>
         <Field label="Izithakazelo" hint="The clan praises, as the family recites them">
-          <textarea rows={3} value={clanPraise} onChange={(e) => setClanPraise(e.target.value)} className={`${inputCls} resize-y`} />
+          <textarea
+            rows={3}
+            value={clanPraise}
+            onChange={(e) => setClanPraise(e.target.value)}
+            className={`${inputCls} resize-y`}
+          />
         </Field>
         <Field label="Family WhatsApp group" hint="In WhatsApp: group info, then Invite via link">
           <input

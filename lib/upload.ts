@@ -3,10 +3,7 @@ import type { Id } from "@/convex/_generated/dataModel";
 export const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
 
 /** Uploads an image to Convex storage and returns its storage id. */
-export async function uploadImage(
-  file: File,
-  generateUploadUrl: () => Promise<string>,
-): Promise<Id<"_storage">> {
+export async function uploadImage(file: File, generateUploadUrl: () => Promise<string>): Promise<Id<"_storage">> {
   if (!file.type.startsWith("image/")) throw new Error("Please choose an image file.");
   if (file.size > MAX_PHOTO_BYTES) throw new Error("Photos must be smaller than 10 MB.");
   const url = await generateUploadUrl();

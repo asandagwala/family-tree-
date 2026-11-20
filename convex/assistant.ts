@@ -53,7 +53,10 @@ export const ask = action({
     for (const name of ["askAssistantPerMinute", "askAssistant"] as const) {
       const { ok, retryAfter } = await rateLimiter.limit(ctx, name, { key: userId! });
       if (!ok) {
-        return { ok: false, text: `You've asked a lot of questions. Please wait ${waitText(retryAfter ?? 0)} and ask again.` };
+        return {
+          ok: false,
+          text: `You've asked a lot of questions. Please wait ${waitText(retryAfter ?? 0)} and ask again.`,
+        };
       }
     }
 

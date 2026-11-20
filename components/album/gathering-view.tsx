@@ -92,9 +92,12 @@ export function GatheringView() {
             <p className="text-xs uppercase tracking-[0.25em] text-ochre-deep">{gatheringKindLabel[gathering.kind]}</p>
             <h1 className="mt-2 font-display text-5xl font-semibold leading-[0.95] text-ink">{gathering.title}</h1>
             <p className="mt-3 text-sm text-muted">
-              {[formatDate(gathering.date), gathering.place].filter(Boolean).join(" · ") || "Date and place not yet recorded"}
+              {[formatDate(gathering.date), gathering.place].filter(Boolean).join(" · ") ||
+                "Date and place not yet recorded"}
             </p>
-            {gathering.story && <p className="mt-5 max-w-lg font-display text-xl leading-relaxed text-ink/90">{gathering.story}</p>}
+            {gathering.story && (
+              <p className="mt-5 max-w-lg font-display text-xl leading-relaxed text-ink/90">{gathering.story}</p>
+            )}
           </div>
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={() => fileInput.current?.click()} className={btnPrimary}>
@@ -103,7 +106,11 @@ export function GatheringView() {
             <button type="button" onClick={() => setEditing(true)} className={btnSecondary}>
               <Pencil size={15} /> Edit
             </button>
-            <button type="button" onClick={() => chat.open(`Tell me about ${gathering.title}.`)} className={btnSecondary}>
+            <button
+              type="button"
+              onClick={() => chat.open(`Tell me about ${gathering.title}.`)}
+              className={btnSecondary}
+            >
               <AskIcon size={16} /> Ask about it
             </button>
           </div>
@@ -116,7 +123,14 @@ export function GatheringView() {
         </div>
       </section>
 
-      <input ref={fileInput} type="file" accept="image/*" multiple className="hidden" onChange={(e) => void upload(e.target.files)} />
+      <input
+        ref={fileInput}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={(e) => void upload(e.target.files)}
+      />
       {error && <p className="mt-4 rounded-2xl bg-red-50 px-4 py-2.5 text-sm text-red-800">{error}</p>}
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_18rem]">
@@ -132,7 +146,9 @@ export function GatheringView() {
             >
               <ImagePlus size={28} className="text-ochre" strokeWidth={1.5} />
               <span className="mt-3 font-display text-2xl">Add the first photos</span>
-              <span className="mt-1 text-xs text-muted">Click to choose several at once, or drop them anywhere on this page</span>
+              <span className="mt-1 text-xs text-muted">
+                Click to choose several at once, or drop them anywhere on this page
+              </span>
             </button>
           ) : (
             <ul className="columns-2 gap-3 sm:columns-3 [&>li]:mb-3">
@@ -167,7 +183,10 @@ export function GatheringView() {
                 </li>
               ))}
               {Array.from({ length: uploading }).map((_, i) => (
-                <li key={`up-${i}`} className="grid aspect-square animate-pulse place-items-center rounded-2xl bg-cream text-xs text-muted">
+                <li
+                  key={`up-${i}`}
+                  className="grid aspect-square animate-pulse place-items-center rounded-2xl bg-cream text-xs text-muted"
+                >
                   Uploading…
                 </li>
               ))}
@@ -180,7 +199,11 @@ export function GatheringView() {
           {guests.length === 0 ? (
             <p className="mt-3 text-sm text-muted">
               No one tagged yet.{" "}
-              <button type="button" onClick={() => setEditing(true)} className="font-medium text-ochre-deep hover:underline">
+              <button
+                type="button"
+                onClick={() => setEditing(true)}
+                className="font-medium text-ochre-deep hover:underline"
+              >
                 Add people
               </button>
             </p>
@@ -219,8 +242,8 @@ export function GatheringView() {
       {confirmDelete && (
         <Modal title={`Delete ${gathering.title}?`} onClose={() => setConfirmDelete(false)}>
           <p className="text-sm text-muted">
-            This permanently deletes the gathering and its {gathering.photos.length} photos. The people stay in the tree.
-            This can&apos;t be undone.
+            This permanently deletes the gathering and its {gathering.photos.length} photos. The people stay in the
+            tree. This can&apos;t be undone.
           </p>
           <div className="mt-6 flex gap-3">
             <button

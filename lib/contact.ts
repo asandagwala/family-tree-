@@ -26,7 +26,9 @@ export function whatsappHref(number: string) {
 }
 
 /** The ways to reach someone, as links, in a fixed order. */
-export function contactLinks(p: Pick<Person, "whatsapp" | "instagram" | "facebook" | "tiktok" | "linkedin">): ContactLink[] {
+export function contactLinks(
+  p: Pick<Person, "whatsapp" | "instagram" | "facebook" | "tiktok" | "linkedin">,
+): ContactLink[] {
   const out: ContactLink[] = [];
   if (p.whatsapp) {
     const href = whatsappHref(p.whatsapp);
@@ -35,22 +37,42 @@ export function contactLinks(p: Pick<Person, "whatsapp" | "instagram" | "faceboo
   if (p.instagram) {
     const h = strip(p.instagram);
     if (!isUrl(h) || onPlatform(h, ["instagram.com"]))
-      out.push({ key: "instagram", label: "Instagram", detail: isUrl(h) ? "Profile" : `@${h}`, href: isUrl(h) ? h : `https://instagram.com/${encodeURIComponent(h)}` });
+      out.push({
+        key: "instagram",
+        label: "Instagram",
+        detail: isUrl(h) ? "Profile" : `@${h}`,
+        href: isUrl(h) ? h : `https://instagram.com/${encodeURIComponent(h)}`,
+      });
   }
   if (p.facebook) {
     const h = p.facebook.trim();
     if (!isUrl(h) || onPlatform(h, ["facebook.com", "fb.com", "fb.me"]))
-      out.push({ key: "facebook", label: "Facebook", detail: isUrl(h) ? "Profile" : h, href: isUrl(h) ? h : `https://facebook.com/${encodeURIComponent(h)}` });
+      out.push({
+        key: "facebook",
+        label: "Facebook",
+        detail: isUrl(h) ? "Profile" : h,
+        href: isUrl(h) ? h : `https://facebook.com/${encodeURIComponent(h)}`,
+      });
   }
   if (p.tiktok) {
     const h = strip(p.tiktok);
     if (!isUrl(h) || onPlatform(h, ["tiktok.com"]))
-      out.push({ key: "tiktok", label: "TikTok", detail: isUrl(h) ? "Profile" : `@${h}`, href: isUrl(h) ? h : `https://www.tiktok.com/@${encodeURIComponent(h)}` });
+      out.push({
+        key: "tiktok",
+        label: "TikTok",
+        detail: isUrl(h) ? "Profile" : `@${h}`,
+        href: isUrl(h) ? h : `https://www.tiktok.com/@${encodeURIComponent(h)}`,
+      });
   }
   if (p.linkedin) {
     const h = p.linkedin.trim();
     if (!isUrl(h) || onPlatform(h, ["linkedin.com"]))
-      out.push({ key: "linkedin", label: "LinkedIn", detail: isUrl(h) ? "Profile" : h, href: isUrl(h) ? h : `https://www.linkedin.com/in/${encodeURIComponent(strip(h))}` });
+      out.push({
+        key: "linkedin",
+        label: "LinkedIn",
+        detail: isUrl(h) ? "Profile" : h,
+        href: isUrl(h) ? h : `https://www.linkedin.com/in/${encodeURIComponent(strip(h))}`,
+      });
   }
   return out;
 }

@@ -33,7 +33,12 @@ export async function loadTree(ctx: QueryCtx, space: Space) {
   // so every link is read exactly once.
   const [links, pairs] = await Promise.all([
     Promise.all(
-      people.map((p) => ctx.db.query("parentLinks").withIndex("by_childId", (q) => q.eq("childId", p._id)).take(2)),
+      people.map((p) =>
+        ctx.db
+          .query("parentLinks")
+          .withIndex("by_childId", (q) => q.eq("childId", p._id))
+          .take(2),
+      ),
     ),
     Promise.all(
       people.map((p) =>

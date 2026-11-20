@@ -37,7 +37,12 @@ export function TreeView() {
           </button>
         </div>
         {adding && (
-          <PersonEditor mode={{ kind: "new" }} family={family} onClose={() => setAdding(false)} onSaved={(id) => router.push(`/people/${id}`)} />
+          <PersonEditor
+            mode={{ kind: "new" }}
+            family={family}
+            onClose={() => setAdding(false)}
+            onSaved={(id) => router.push(`/people/${id}`)}
+          />
         )}
       </div>
     );
@@ -60,7 +65,9 @@ function TreeCanvas({ family }: { family: Family }) {
   const [view, setView] = useState<View>({ x: 0, y: 0, k: 1 });
   const [selected, setSelected] = useState<PersonId | null>(null);
   const [query, setQuery] = useState("");
-  const drag = useRef<{ px: number; py: number; vx: number; vy: number; moved: boolean; id: PersonId | null } | null>(null);
+  const drag = useRef<{ px: number; py: number; vx: number; vy: number; moved: boolean; id: PersonId | null } | null>(
+    null,
+  );
 
   const gens = useMemo(() => {
     const ys = new Map<number, number>();
@@ -75,7 +82,10 @@ function TreeCanvas({ family }: { family: Family }) {
     const { minY, maxX, maxY } = layout.bounds;
     const minX = layout.bounds.minX - LABEL_SPACE; // keep generation labels in view
     const pad = 60;
-    const k = Math.min(Math.max(Math.min(width / (maxX - minX + pad * 2), height / (maxY - minY + pad * 2)), MIN_K), 1.1);
+    const k = Math.min(
+      Math.max(Math.min(width / (maxX - minX + pad * 2), height / (maxY - minY + pad * 2)), MIN_K),
+      1.1,
+    );
     setView({ k, x: width / 2 - ((minX + maxX) / 2) * k, y: height / 2 - ((minY + maxY) / 2) * k + 20 });
   }, [layout]);
 
@@ -136,7 +146,10 @@ function TreeCanvas({ family }: { family: Family }) {
   return (
     <div className="relative h-full min-h-[600px] overflow-hidden bg-paper">
       {/* soft radial light behind the tree */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_30%,var(--mint)_0%,transparent_60%)] opacity-70" />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_30%,var(--mint)_0%,transparent_60%)] opacity-70"
+      />
 
       <svg
         ref={svgRef}
@@ -243,8 +256,20 @@ function TreeCanvas({ family }: { family: Family }) {
                 aria-selected={isSel}
                 aria-label={fullName(p)}
               >
-                <circle cx={CARD_W / 2} cy={r} r={r + (isSel ? 9 : 6)} fill={isSel ? "var(--forest)" : "var(--paper)"} />
-                <circle cx={CARD_W / 2} cy={r} r={r + 3} fill="none" stroke={deceased ? "var(--silver)" : "var(--sage)"} strokeWidth={2} />
+                <circle
+                  cx={CARD_W / 2}
+                  cy={r}
+                  r={r + (isSel ? 9 : 6)}
+                  fill={isSel ? "var(--forest)" : "var(--paper)"}
+                />
+                <circle
+                  cx={CARD_W / 2}
+                  cy={r}
+                  r={r + 3}
+                  fill="none"
+                  stroke={deceased ? "var(--silver)" : "var(--sage)"}
+                  strokeWidth={2}
+                />
                 {p.photoUrl ? (
                   <image
                     href={p.photoUrl}

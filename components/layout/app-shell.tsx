@@ -47,7 +47,9 @@ function SidebarNav({ active }: NavProps) {
           key={href}
           href={href}
           className={`group relative flex items-center gap-3 overflow-hidden rounded-xl px-4 pb-3 pt-2.5 text-sm transition-colors ${
-            active(href) ? "bg-bead-blue-soft font-medium text-ink" : "text-muted hover:bg-bead-blue-soft/60 hover:text-ink"
+            active(href)
+              ? "bg-bead-blue-soft font-medium text-ink"
+              : "text-muted hover:bg-bead-blue-soft/60 hover:text-ink"
           }`}
         >
           <Icon size={17} strokeWidth={1.8} />
@@ -115,7 +117,11 @@ function AccountRow() {
       <span className="truncate">
         Signed in as <span className="font-medium text-ink">{me.name ?? "you"}</span>
       </span>
-      <button type="button" onClick={() => void leave()} className="shrink-0 font-medium hover:text-ink hover:underline">
+      <button
+        type="button"
+        onClick={() => void leave()}
+        className="shrink-0 font-medium hover:text-ink hover:underline"
+      >
         Sign out
       </button>
     </div>

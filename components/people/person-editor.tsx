@@ -14,8 +14,7 @@ import { btnPrimary, btnSecondary, inputCls, Modal } from "@/components/ui/modal
 export type Relation = "parent" | "partner" | "child";
 
 export type EditorMode =
-  | { kind: "new"; relation?: { type: Relation; of: PersonId } }
-  | { kind: "edit"; person: Person };
+  { kind: "new"; relation?: { type: Relation; of: PersonId } } | { kind: "edit"; person: Person };
 
 type Draft = {
   firstName: string;
@@ -251,7 +250,9 @@ export function PersonEditor({
         </Field>
 
         <fieldset className="rounded-2xl border border-line p-4">
-          <legend className="px-2 text-xs font-medium uppercase tracking-wider text-muted">Stay in touch (optional)</legend>
+          <legend className="px-2 text-xs font-medium uppercase tracking-wider text-muted">
+            Stay in touch (optional)
+          </legend>
           <p className="mb-3 px-1 text-xs text-muted">Only family members using this archive can see these.</p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="WhatsApp number">
@@ -264,16 +265,36 @@ export function PersonEditor({
               />
             </Field>
             <Field label="Instagram">
-              <input value={draft.instagram} onChange={(e) => set("instagram", e.target.value)} placeholder="@handle" className={inputCls} />
+              <input
+                value={draft.instagram}
+                onChange={(e) => set("instagram", e.target.value)}
+                placeholder="@handle"
+                className={inputCls}
+              />
             </Field>
             <Field label="Facebook">
-              <input value={draft.facebook} onChange={(e) => set("facebook", e.target.value)} placeholder="Name or profile link" className={inputCls} />
+              <input
+                value={draft.facebook}
+                onChange={(e) => set("facebook", e.target.value)}
+                placeholder="Name or profile link"
+                className={inputCls}
+              />
             </Field>
             <Field label="TikTok">
-              <input value={draft.tiktok} onChange={(e) => set("tiktok", e.target.value)} placeholder="@handle" className={inputCls} />
+              <input
+                value={draft.tiktok}
+                onChange={(e) => set("tiktok", e.target.value)}
+                placeholder="@handle"
+                className={inputCls}
+              />
             </Field>
             <Field label="LinkedIn">
-              <input value={draft.linkedin} onChange={(e) => set("linkedin", e.target.value)} placeholder="Profile link" className={inputCls} />
+              <input
+                value={draft.linkedin}
+                onChange={(e) => set("linkedin", e.target.value)}
+                placeholder="Profile link"
+                className={inputCls}
+              />
             </Field>
           </div>
         </fieldset>

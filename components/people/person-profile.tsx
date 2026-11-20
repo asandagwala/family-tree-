@@ -19,7 +19,16 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { api } from "@/convex/_generated/api";
-import { age, errorMessage, formatDate, fullName, genderLabel, lifespan, type Person, type PersonId } from "@/lib/people";
+import {
+  age,
+  errorMessage,
+  formatDate,
+  fullName,
+  genderLabel,
+  lifespan,
+  type Person,
+  type PersonId,
+} from "@/lib/people";
 import { contactLinks } from "@/lib/contact";
 import { gatheringKindLabel } from "@/lib/gatherings";
 import { uploadImage } from "@/lib/upload";
@@ -75,7 +84,11 @@ function ProfileBody({ person, family }: { person: Person; family: Family }) {
   const years = age(person);
 
   const facts: { icon: typeof MapPin; label: string; value?: string }[] = [
-    { icon: Star, label: "Born", value: [formatDate(person.birthDate), person.birthPlace].filter(Boolean).join(" · ") || undefined },
+    {
+      icon: Star,
+      label: "Born",
+      value: [formatDate(person.birthDate), person.birthPlace].filter(Boolean).join(" · ") || undefined,
+    },
     { icon: Star, label: "Passed away", value: formatDate(person.deathDate) },
     { icon: Home, label: "Lives in", value: person.deathDate ? undefined : person.currentPlace },
     { icon: Briefcase, label: "Occupation", value: person.occupation },
@@ -111,14 +124,15 @@ function ProfileBody({ person, family }: { person: Person; family: Family }) {
             )}
           </div>
           <div className="min-w-0 flex-1">
-            {person.clanName && (
-              <p className="text-xs uppercase tracking-[0.3em] text-moss">{person.clanName} clan</p>
-            )}
+            {person.clanName && <p className="text-xs uppercase tracking-[0.3em] text-moss">{person.clanName} clan</p>}
             <h1 className="mt-1 font-display text-5xl font-semibold leading-[0.95] sm:text-6xl">
               {person.firstName} <span className="italic text-ochre-deep">{person.lastName}</span>
             </h1>
             <p className="mt-3 text-sm text-muted">
-              {[lifespan(person), years !== undefined && (person.deathDate ? `lived ${years} years` : `${years} years old`)]
+              {[
+                lifespan(person),
+                years !== undefined && (person.deathDate ? `lived ${years} years` : `${years} years old`),
+              ]
                 .filter(Boolean)
                 .join(" · ") || "Dates not yet recorded"}
             </p>
@@ -157,12 +171,18 @@ function ProfileBody({ person, family }: { person: Person; family: Family }) {
           <section className="animate-rise rounded-[1.75rem] border border-line bg-card p-7">
             <h2 className="font-display text-2xl font-semibold text-night">Their story</h2>
             {person.notes ? (
-              <p className="mt-3 whitespace-pre-wrap font-display text-xl leading-relaxed text-night/90">{person.notes}</p>
+              <p className="mt-3 whitespace-pre-wrap font-display text-xl leading-relaxed text-night/90">
+                {person.notes}
+              </p>
             ) : (
               <div className="mt-3 rounded-2xl border border-dashed border-silver p-5 text-sm text-muted">
                 No story recorded yet. What do you remember about {person.firstName}? Their sayings, their work, the
                 places they loved.
-                <button type="button" onClick={() => setEditor({ kind: "edit", person })} className={`${btnGhost} mt-2 -ml-3 block`}>
+                <button
+                  type="button"
+                  onClick={() => setEditor({ kind: "edit", person })}
+                  className={`${btnGhost} mt-2 -ml-3 block`}
+                >
                   <Plus size={14} className="inline" /> Write their story
                 </button>
               </div>
@@ -186,45 +206,49 @@ function ProfileBody({ person, family }: { person: Person; family: Family }) {
 
         {/* Family */}
         <div className="space-y-6">
-        <Connect person={person} onEdit={() => setEditor({ kind: "edit", person })} />
-        <section className="animate-rise h-fit rounded-[1.75rem] border border-line bg-card p-7">
-          <h2 className="font-display text-2xl font-semibold text-night">Family</h2>
-          <RelativeGroup
-            title="Parents"
-            ids={parents}
-            family={family}
-            onNew={parents.length < 2 ? () => setEditor({ kind: "new", relation: { type: "parent", of: person._id } }) : undefined}
-            onLink={parents.length < 2 ? () => setLinking("parent") : undefined}
-            onUnlink={(id) => unlink("parent", id)}
-          />
-          <RelativeGroup
-            title="Partners"
-            ids={partners}
-            family={family}
-            onNew={() => setEditor({ kind: "new", relation: { type: "partner", of: person._id } })}
-            onLink={() => setLinking("partner")}
-            onUnlink={(id) => unlink("partner", id)}
-          />
-          <RelativeGroup
-            title="Children"
-            ids={children}
-            family={family}
-            onNew={() => setEditor({ kind: "new", relation: { type: "child", of: person._id } })}
-            onLink={() => setLinking("child")}
-            onUnlink={(id) => unlink("child", id)}
-          />
-          {siblings.length > 0 && <RelativeGroup title="Siblings" ids={siblings} family={family} />}
+          <Connect person={person} onEdit={() => setEditor({ kind: "edit", person })} />
+          <section className="animate-rise h-fit rounded-[1.75rem] border border-line bg-card p-7">
+            <h2 className="font-display text-2xl font-semibold text-night">Family</h2>
+            <RelativeGroup
+              title="Parents"
+              ids={parents}
+              family={family}
+              onNew={
+                parents.length < 2
+                  ? () => setEditor({ kind: "new", relation: { type: "parent", of: person._id } })
+                  : undefined
+              }
+              onLink={parents.length < 2 ? () => setLinking("parent") : undefined}
+              onUnlink={(id) => unlink("parent", id)}
+            />
+            <RelativeGroup
+              title="Partners"
+              ids={partners}
+              family={family}
+              onNew={() => setEditor({ kind: "new", relation: { type: "partner", of: person._id } })}
+              onLink={() => setLinking("partner")}
+              onUnlink={(id) => unlink("partner", id)}
+            />
+            <RelativeGroup
+              title="Children"
+              ids={children}
+              family={family}
+              onNew={() => setEditor({ kind: "new", relation: { type: "child", of: person._id } })}
+              onLink={() => setLinking("child")}
+              onUnlink={(id) => unlink("child", id)}
+            />
+            {siblings.length > 0 && <RelativeGroup title="Siblings" ids={siblings} family={family} />}
 
-          <div className="mt-8 border-t border-line pt-5">
-            <button
-              type="button"
-              onClick={() => setConfirmDelete(true)}
-              className="inline-flex items-center gap-2 text-sm text-red-700 hover:underline"
-            >
-              <Trash2 size={14} /> Remove {person.firstName} from the tree
-            </button>
-          </div>
-        </section>
+            <div className="mt-8 border-t border-line pt-5">
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(true)}
+                className="inline-flex items-center gap-2 text-sm text-red-700 hover:underline"
+              >
+                <Trash2 size={14} /> Remove {person.firstName} from the tree
+              </button>
+            </div>
+          </section>
         </div>
       </div>
 
@@ -250,8 +274,8 @@ function ProfileBody({ person, family }: { person: Person; family: Family }) {
       {confirmDelete && (
         <Modal title={`Remove ${fullName(person)}?`} onClose={() => setConfirmDelete(false)}>
           <p className="text-sm text-muted">
-            This permanently deletes {person.firstName}&apos;s profile, photos and family links. Their relatives stay in the
-            tree. This can&apos;t be undone.
+            This permanently deletes {person.firstName}&apos;s profile, photos and family links. Their relatives stay in
+            the tree. This can&apos;t be undone.
           </p>
           <div className="mt-6 flex gap-3">
             <button
@@ -303,7 +327,12 @@ function RelativeGroup(props: {
         <h3 className="text-xs font-medium uppercase tracking-wider text-slate-soft">{props.title}</h3>
         <div className="flex gap-1">
           {props.onLink && (
-            <button type="button" onClick={props.onLink} className={`${btnGhost} px-2 text-xs`} title="Link someone already in the tree">
+            <button
+              type="button"
+              onClick={props.onLink}
+              className={`${btnGhost} px-2 text-xs`}
+              title="Link someone already in the tree"
+            >
               <Link2 size={13} /> Link
             </button>
           )}
@@ -363,7 +392,9 @@ function LinkExisting(props: {
   const { relation, person, family } = props;
   const already = new Set([
     person._id,
-    ...(relation === "parent" ? family.parentsOf : relation === "child" ? family.childrenOf : family.partnersOf).get(person._id) ?? [],
+    ...((relation === "parent" ? family.parentsOf : relation === "child" ? family.childrenOf : family.partnersOf).get(
+      person._id,
+    ) ?? []),
   ]);
   const options = family.list
     .filter((p) => !already.has(p._id))
@@ -383,7 +414,11 @@ function LinkExisting(props: {
   }
 
   return (
-    <Modal title={`Link a ${relation}`} subtitle={`Choose someone already in the tree to be ${person.firstName}'s ${relation}.`} onClose={props.onClose}>
+    <Modal
+      title={`Link a ${relation}`}
+      subtitle={`Choose someone already in the tree to be ${person.firstName}'s ${relation}.`}
+      onClose={props.onClose}
+    >
       <input
         autoFocus
         value={q}
@@ -394,7 +429,11 @@ function LinkExisting(props: {
       <ul className="mt-4 max-h-80 space-y-1 overflow-y-auto">
         {options.map((p) => (
           <li key={p._id}>
-            <button type="button" onClick={() => choose(p._id)} className="flex w-full items-center gap-3 rounded-2xl p-2 text-left hover:bg-mist/50">
+            <button
+              type="button"
+              onClick={() => choose(p._id)}
+              className="flex w-full items-center gap-3 rounded-2xl p-2 text-left hover:bg-mist/50"
+            >
               <Portrait person={p} size={38} ring={false} />
               <span className="flex-1 text-sm font-medium">{fullName(p)}</span>
               <span className="text-xs text-muted">{lifespan(p)}</span>
@@ -483,7 +522,11 @@ function Gallery({ person }: { person: Person }) {
               <button type="button" onClick={() => setOpen(i)} className="h-full w-full" aria-label="View photo">
                 {ph.url && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={ph.url} alt={ph.caption ?? ""} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <img
+                    src={ph.url}
+                    alt={ph.caption ?? ""}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
                 )}
               </button>
               <div className="absolute inset-x-2 bottom-2 flex justify-end gap-1.5 opacity-0 transition-opacity group-hover:opacity-100">
@@ -509,7 +552,10 @@ function Gallery({ person }: { person: Person }) {
             </li>
           ))}
           {Array.from({ length: uploading }).map((_, i) => (
-            <li key={`up-${i}`} className="grid aspect-square animate-pulse place-items-center rounded-3xl bg-mist text-xs text-slate">
+            <li
+              key={`up-${i}`}
+              className="grid aspect-square animate-pulse place-items-center rounded-3xl bg-mist text-xs text-slate"
+            >
               Uploading…
             </li>
           ))}
@@ -529,7 +575,6 @@ function Gallery({ person }: { person: Person }) {
   );
 }
 
-
 /* ---------- Gatherings they were at ---------- */
 
 function PersonGatherings({ person }: { person: Person }) {
@@ -541,7 +586,10 @@ function PersonGatherings({ person }: { person: Person }) {
       <ul className="mt-4 divide-y divide-line">
         {gatherings.map((g) => (
           <li key={g._id}>
-            <Link href={`/album/${g._id}`} className="flex items-baseline justify-between gap-4 py-3 hover:text-ochre-deep">
+            <Link
+              href={`/album/${g._id}`}
+              className="flex items-baseline justify-between gap-4 py-3 hover:text-ochre-deep"
+            >
               <span className="font-medium">{g.title}</span>
               <span className="shrink-0 text-xs text-muted">
                 {[gatheringKindLabel[g.kind], g.date && formatDate(g.date)].filter(Boolean).join(" · ")}
@@ -553,7 +601,6 @@ function PersonGatherings({ person }: { person: Person }) {
     </section>
   );
 }
-
 
 /* ---------- Ways to reach them ---------- */
 

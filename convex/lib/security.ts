@@ -99,7 +99,15 @@ export function isSafeProfileLink(value: string, hosts: string[]) {
 // ---------- Uploads ----------
 
 const MAX_IMAGE_BYTES = 15 * 1024 * 1024;
-const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "image/heic", "image/heif", "image/avif"]);
+const IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/heic",
+  "image/heif",
+  "image/avif",
+]);
 
 /**
  * Accept an uploaded file only if it is a photo of a sensible size. Anything

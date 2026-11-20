@@ -98,7 +98,11 @@ export function GatheringEditor({
             />
           </Field>
           <Field label="Kind">
-            <select value={draft.kind} onChange={(e) => set("kind", e.target.value as GatheringKind)} className={inputCls}>
+            <select
+              value={draft.kind}
+              onChange={(e) => set("kind", e.target.value as GatheringKind)}
+              className={inputCls}
+            >
               {GATHERING_KINDS.map((k) => (
                 <option key={k} value={k}>
                   {gatheringKindLabel[k]}
@@ -107,14 +111,29 @@ export function GatheringEditor({
             </select>
           </Field>
           <Field label="When" hint="A year or a full date">
-            <input value={draft.date} onChange={(e) => set("date", e.target.value)} placeholder="1992 or 1992-12-19" className={inputCls} />
+            <input
+              value={draft.date}
+              onChange={(e) => set("date", e.target.value)}
+              placeholder="1992 or 1992-12-19"
+              className={inputCls}
+            />
           </Field>
           <Field label="Where">
-            <input value={draft.place} onChange={(e) => set("place", e.target.value)} placeholder="Village, town or venue" className={inputCls} />
+            <input
+              value={draft.place}
+              onChange={(e) => set("place", e.target.value)}
+              placeholder="Village, town or venue"
+              className={inputCls}
+            />
           </Field>
         </div>
         <Field label="The story" hint="What happened, who spoke, what people still talk about">
-          <textarea rows={3} value={draft.story} onChange={(e) => set("story", e.target.value)} className={`${inputCls} resize-y`} />
+          <textarea
+            rows={3}
+            value={draft.story}
+            onChange={(e) => set("story", e.target.value)}
+            className={`${inputCls} resize-y`}
+          />
         </Field>
 
         <div>

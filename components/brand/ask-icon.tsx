@@ -2,7 +2,15 @@
  * "Ask the family": a speech bubble holding two beads (ochre and turquoise),
  * a conversation rather than a machine.
  */
-export function AskIcon({ size = 18, className = "", beads = true }: { size?: number; className?: string; beads?: boolean }) {
+export function AskIcon({
+  size = 18,
+  className = "",
+  beads = true,
+}: {
+  size?: number;
+  className?: string;
+  beads?: boolean;
+}) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden className={className}>
       <path

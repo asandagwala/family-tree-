@@ -83,7 +83,11 @@ export function layoutTree(input: LayoutInput): Layout {
   const avg = (xs: number[]) => xs.reduce((s, x) => s + x, 0) / xs.length;
 
   // Start every row packed from zero.
-  for (const g of gens) place(rows.get(g)!, rows.get(g)!.map(() => NaN));
+  for (const g of gens)
+    place(
+      rows.get(g)!,
+      rows.get(g)!.map(() => NaN),
+    );
 
   // Alternate down/up sweeps: order by and move toward relatives.
   for (let sweep = 0; sweep < 6; sweep++) {
@@ -92,9 +96,7 @@ export function layoutTree(input: LayoutInput): Layout {
     for (const g of seq) {
       const row = rows.get(g)!;
       const desired = row.map((u) => {
-        const rel = u.members.flatMap((m) =>
-          down ? parentsOf.get(m)! : childrenOf.get(m)!,
-        );
+        const rel = u.members.flatMap((m) => (down ? parentsOf.get(m)! : childrenOf.get(m)!));
         return rel.length ? avg(rel.map(centerOf)) - u.width / 2 : NaN;
       });
       // Reorder by desired position, keeping current order for ties/unknowns.

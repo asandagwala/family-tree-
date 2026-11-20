@@ -26,7 +26,9 @@ export const renamePlace = internalMutation({
 export const renameSurname = internalMutation({
   args: { from: v.string(), to: v.string() },
   handler: async (ctx, { from, to }) => {
-    for await (const p of ctx.db.query("people").withIndex("by_lastName_and_firstName", (q) => q.eq("lastName", from))) {
+    for await (const p of ctx.db
+      .query("people")
+      .withIndex("by_lastName_and_firstName", (q) => q.eq("lastName", from))) {
       await ctx.db.patch("people", p._id, { lastName: to });
     }
     return null;
