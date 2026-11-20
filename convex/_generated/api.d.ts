@@ -14,6 +14,7 @@ import type * as assistant from "../assistant.js";
 import type * as auth from "../auth.js";
 import type * as family from "../family.js";
 import type * as migrations from "../migrations.js";
+import type * as security from "../security.js";
 import type * as users from "../users.js";
 
 import type {
@@ -29,6 +30,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   family: typeof family;
   migrations: typeof migrations;
+  security: typeof security;
   users: typeof users;
 }>;
 
@@ -64,4 +66,5 @@ export declare const components: {
   authEmail: import("@convex-dev/auth/components/email/_generated/component.js").ComponentApi<"authEmail">;
   authPassword: import("@convex-dev/auth/components/password/_generated/component.js").ComponentApi<"authPassword">;
   resend: import("@convex-dev/resend/_generated/component.js").ComponentApi<"resend">;
+  rateLimiter: import("@convex-dev/rate-limiter/_generated/component.js").ComponentApi<"rateLimiter">;
 };
