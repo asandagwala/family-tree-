@@ -125,6 +125,22 @@ Container queries (`@container`, `@3xl:`) let screens adapt to their space.
 Fonts are Cormorant Garamond (headings) and Geist (text), loaded by
 `next/font`, so no request leaves the site for them.
 
+## Accessibility
+
+- Every page has a title, landmarks (`main`, `nav`) and headings in order; the
+  page language is set.
+- Images have descriptions; icon buttons have names; the closed chat drawer
+  is `inert`, so keyboard users don't tab into it.
+- Form fields use `LabeledInput` (`components/ui/labeled-input.tsx`): the
+  label stays visible inside the box instead of a placeholder that disappears.
+- The family tree works by keyboard: Tab moves through people generation by
+  generation (with a ring and the view following), Enter opens their summary
+  and moves focus into it, Escape closes it.
+- Each couple's lines in the tree have their own colour (`coupleColours` in
+  `lib/tree-layout.ts`); one person's relationships never share a colour.
+- Text colours meet WCAG AA contrast (4.5:1 for small text).
+- `prefers-reduced-motion` turns animations and transitions off.
+
 ## Code style
 
 - `pnpm lint` (ESLint) and `pnpm format` (Prettier, 120 columns) keep the code tidy.

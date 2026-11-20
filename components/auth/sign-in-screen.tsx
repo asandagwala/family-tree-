@@ -12,10 +12,11 @@ import { useState, type FormEvent } from "react";
 import { api } from "@/convex/_generated/api";
 import { errorMessage } from "@/lib/people";
 import { useSampleMode } from "@/lib/sample-mode";
-import { btnPrimary, btnSecondary, inputCls } from "@/components/ui/modal";
+import { btnPrimary, btnSecondary } from "@/components/ui/modal";
 import { AuthLayout, ErrorNote, Heading } from "./auth-layout";
 import { authMessage } from "./auth-errors";
 import { PasswordInput } from "./password-input";
+import { LabeledInput } from "@/components/ui/labeled-input";
 
 /** The front door for visitors: Google, email and password, or a look at the sample family. */
 
@@ -152,16 +153,14 @@ export function SignInScreen() {
         )}
 
         <form onSubmit={submit} className="space-y-3">
-          <input
+          <LabeledInput
+            label="Email address"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="username"
             required
             disabled={pending}
-            aria-label="Email address"
-            placeholder="Email address"
-            className={inputCls}
           />
           {mode !== "forgot" && (
             <PasswordInput

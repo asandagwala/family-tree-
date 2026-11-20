@@ -7,8 +7,9 @@ import { useState, type FormEvent } from "react";
 import { api } from "@/convex/_generated/api";
 import { errorMessage } from "@/lib/people";
 import { useSampleMode } from "@/lib/sample-mode";
-import { btnPrimary, btnSecondary, inputCls } from "@/components/ui/modal";
+import { btnPrimary, btnSecondary } from "@/components/ui/modal";
 import { AuthLayout, ErrorNote, Heading } from "./auth-layout";
+import { LabeledInput } from "@/components/ui/labeled-input";
 
 /** After signing in: join a family's tree with its code, or start a new one. */
 export function FamilyCodeScreen({ name }: { name: string | null }) {
@@ -68,15 +69,13 @@ export function FamilyCodeScreen({ name }: { name: string | null }) {
           : "Each family's archive is private. Ask a relative for your family code: it connects your account to your family's tree, and you only need to enter it once."}
       </p>
       <form onSubmit={submit} className="mt-4 max-w-md space-y-3">
-        <input
+        <LabeledInput
+          label={starting ? "Family name, e.g. Rubuluza" : "Family code"}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           required
           autoComplete="off"
           autoCapitalize={starting ? "words" : "characters"}
-          aria-label={starting ? "Family name" : "Family code"}
-          placeholder={starting ? "Family name, e.g. Rubuluza" : "Family code"}
-          className={inputCls}
         />
         <button type="submit" disabled={busy} className={`${btnPrimary} w-full`}>
           {starting ? (busy ? "Starting…" : "Start the family tree") : busy ? "Checking…" : "Join the family"}
