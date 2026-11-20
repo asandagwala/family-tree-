@@ -19,11 +19,19 @@ export type LayoutInput = {
 
 export type NodePos = { id: string; x: number; y: number; gen: number };
 
+/**
+ * A line in the tree. `group` names the couple (or single parent) it belongs
+ * to: the partner bond and the lines down to that couple's children share it,
+ * so the tree can colour each couple's lines alike.
+ */
 export type Edge =
-  | { kind: "partner"; x1: number; x2: number; y: number }
-  | { kind: "trunk"; d: string }
-  | { kind: "branch"; d: string }
-  | { kind: "fork"; x: number; y: number };
+  | { kind: "partner"; group: string; x1: number; x2: number; y: number }
+  | { kind: "trunk"; group: string; d: string }
+  | { kind: "branch"; group: string; d: string }
+  | { kind: "fork"; group: string; x: number; y: number };
+
+/** The group of a couple or single parent: their ids, sorted, joined. */
+export const coupleKey = (ids: string[]) => [...ids].sort().join("|");
 
 export type Layout = {
   nodes: Map<string, NodePos>;
@@ -141,6 +149,7 @@ export function layoutTree(input: LayoutInput): Layout {
       const a = nodes.get(u.members[i])!;
       edges.push({
         kind: "partner",
+        group: coupleKey([u.members[i], u.members[i + 1]]),
         x1: a.x + CARD_W / 2 + portraitMid + 6,
         x2: a.x + CARD_W + PARTNER_GAP + CARD_W / 2 - portraitMid - 6,
         y: a.y + portraitMid,
@@ -154,11 +163,11 @@ export function layoutTree(input: LayoutInput): Layout {
   for (const id of input.ids) {
     const ps = parentsOf.get(id)!;
     if (ps.length === 0) continue;
-    const key = [...ps].sort().join("|");
+    const key = coupleKey(ps);
     if (!families.has(key)) families.set(key, { parents: [...ps], children: [] });
     families.get(key)!.children.push(id);
   }
-  for (const { parents, children } of families.values()) {
+  for (const [group, { parents, children }] of families) {
     const pNodes = parents.map((p) => nodes.get(p)!);
     const adjacentCouple =
       pNodes.length === 2 &&
@@ -171,19 +180,20 @@ export function layoutTree(input: LayoutInput): Layout {
       ox = (pNodes[0].x + pNodes[1].x + CARD_W) / 2;
       oy = pNodes[0].y + portraitMid;
     } else {
-      // Not a recorded couple: start between them, below their names.
+      // Parents who aren't side by side: their lines meet between them, a
+      // little below the names so they don't run through anyone's name.
       ox = pNodes.reduce((s, n) => s + n.x + CARD_W / 2, 0) / pNodes.length;
-      oy = Math.max(...pNodes.map((n) => n.y)) + CARD_H - 4;
+      oy = Math.max(...pNodes.map((n) => n.y)) + CARD_H + 10;
       for (const n of pNodes) {
         if (pNodes.length > 1) {
           const nx = n.x + CARD_W / 2;
-          edges.push({ kind: "branch", d: `M${nx},${n.y + CARD_H - 4}Q${nx},${oy} ${ox},${oy}` });
+          edges.push({ kind: "branch", group, d: `M${nx},${n.y + CARD_H - 4}Q${nx},${oy} ${ox},${oy}` });
         }
       }
     }
     const childTop = Math.min(...children.map((c) => nodes.get(c)!.y));
     const forkY = oy + (childTop - oy) * (adjacentCouple ? 0.55 : 0.4);
-    edges.push({ kind: "trunk", d: `M${ox},${oy}V${forkY}` });
+    edges.push({ kind: "trunk", group, d: `M${ox},${oy}V${forkY}` });
     for (const c of children) {
       const n = nodes.get(c)!;
       const cx = n.x + CARD_W / 2;
@@ -191,10 +201,11 @@ export function layoutTree(input: LayoutInput): Layout {
       const dy = cy - forkY;
       edges.push({
         kind: "branch",
+        group,
         d: `M${ox},${forkY}C${ox},${forkY + dy * 0.55} ${cx},${forkY + dy * 0.35} ${cx},${cy}`,
       });
     }
-    edges.push({ kind: "fork", x: ox, y: forkY });
+    edges.push({ kind: "fork", group, x: ox, y: forkY });
   }
   const uniqueEdges = edges;
 
@@ -339,4 +350,54 @@ function initialOrder(
   for (const id of ids) if (parentsOf.get(id)!.length === 0) visit(id);
   for (const id of ids) visit(id);
   return out;
+}
+
+/**
+ * Each couple's lines get their own colour, so with several partners it stays
+ * clear whose children are whose. Earthy tones from the site's palette, all
+ * dark enough to stand out on the paper background.
+ */
+export const COUPLE_COLOURS = [
+  "#235347", // forest
+  "#a5421a", // terracotta
+  "#15707f", // bead blue
+  "#8a5a00", // marigold
+  "#7a3b69", // plum
+  "#404f68", // slate
+  "#9c3d54", // rose
+  "#2f7a5f", // sage green
+];
+
+/**
+ * Give every couple a colour, left to right, never reusing a colour another
+ * couple of the same person already has, so someone with several partners
+ * shows each relationship in a different colour.
+ */
+export function coupleColours(edges: Edge[]) {
+  const xOf = new Map<string, number>();
+  for (const e of edges) {
+    const x = e.kind === "partner" ? e.x1 : e.kind === "fork" ? e.x : undefined;
+    if (x !== undefined && !xOf.has(e.group)) xOf.set(e.group, x);
+    if (!xOf.has(e.group)) xOf.set(e.group, Number.MAX_SAFE_INTEGER);
+  }
+  const groups = [...xOf.keys()].sort((a, b) => xOf.get(a)! - xOf.get(b)!);
+  const colourOf = new Map<string, string>();
+  let last = -1;
+  for (const g of groups) {
+    const people = g.split("|");
+    const taken = new Set(
+      [...colourOf].filter(([other]) => other.split("|").some((id) => people.includes(id))).map(([, c]) => c),
+    );
+    let pick = (last + 1) % COUPLE_COLOURS.length;
+    for (let i = 0; i < COUPLE_COLOURS.length; i++) {
+      const c = (last + 1 + i) % COUPLE_COLOURS.length;
+      if (!taken.has(COUPLE_COLOURS[c])) {
+        pick = c;
+        break;
+      }
+    }
+    colourOf.set(g, COUPLE_COLOURS[pick]);
+    last = pick;
+  }
+  return colourOf;
 }

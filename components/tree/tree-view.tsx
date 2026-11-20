@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fullName, initialsTone, INITIALS_TEXT, lifespan, type PersonId } from "@/lib/people";
-import { CARD_H, CARD_W, PORTRAIT, layoutTree, type Layout } from "@/lib/tree-layout";
+import { CARD_H, CARD_W, PORTRAIT, coupleColours, layoutTree, type Layout } from "@/lib/tree-layout";
 import { useFamily, type Family } from "@/lib/use-family";
 import { useChat } from "@/components/chat/chat-context";
 import { PersonEditor } from "@/components/people/person-editor";
@@ -61,6 +61,7 @@ function TreeCanvas({ family }: { family: Family }) {
       }),
     [family],
   );
+  const colours = useMemo(() => coupleColours(layout.edges), [layout]);
   const svgRef = useRef<SVGSVGElement>(null);
   const [view, setView] = useState<View>({ x: 0, y: 0, k: 1 });
   const [selected, setSelected] = useState<PersonId | null>(null);
@@ -242,16 +243,17 @@ function TreeCanvas({ family }: { family: Family }) {
           {/* Branches */}
           <g fill="none" strokeLinecap="round">
             {layout.edges.map((e, i) => {
-              if (e.kind === "trunk") return <path key={i} d={e.d} stroke="var(--evergreen)" strokeWidth={4} />;
-              if (e.kind === "branch") return <path key={i} d={e.d} stroke="var(--moss)" strokeWidth={2} />;
+              const colour = colours.get(e.group) ?? "var(--evergreen)";
+              if (e.kind === "trunk") return <path key={i} d={e.d} stroke={colour} strokeWidth={4} />;
+              if (e.kind === "branch") return <path key={i} d={e.d} stroke={colour} strokeWidth={2} />;
               if (e.kind === "partner")
                 return (
                   <g key={i}>
-                    <line x1={e.x1} x2={e.x2} y1={e.y} y2={e.y} stroke="var(--evergreen)" strokeWidth={2} />
+                    <line x1={e.x1} x2={e.x2} y1={e.y} y2={e.y} stroke={colour} strokeWidth={2} />
                     <path
                       d={`M${(e.x1 + e.x2) / 2} ${e.y - 6} l6 6 l-6 6 l-6 -6 Z`}
                       fill="var(--paper)"
-                      stroke="var(--evergreen)"
+                      stroke={colour}
                       strokeWidth={2}
                     />
                   </g>
@@ -260,7 +262,7 @@ function TreeCanvas({ family }: { family: Family }) {
                 <path
                   key={i}
                   d={`M${e.x} ${e.y - 7} l7 7 l-7 7 l-7 -7 Z`}
-                  fill="var(--sage)"
+                  fill={colour}
                   stroke="var(--paper)"
                   strokeWidth={2.5}
                 />
