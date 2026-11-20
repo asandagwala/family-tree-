@@ -64,6 +64,17 @@ function TreeCanvas({ family }: { family: Family }) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [view, setView] = useState<View>({ x: 0, y: 0, k: 1 });
   const [selected, setSelected] = useState<PersonId | null>(null);
+  // Who has keyboard focus, so a ring can show it (SVG groups draw no outline of their own).
+  const [keyboardFocus, setKeyboardFocus] = useState<PersonId | null>(null);
+  // After choosing someone with the keyboard, focus moves to their summary's first link.
+  const profileLink = useRef<HTMLAnchorElement>(null);
+  const focusSummary = useRef(false);
+  useEffect(() => {
+    if (selected && focusSummary.current) {
+      focusSummary.current = false;
+      profileLink.current?.focus();
+    }
+  }, [selected]);
   const [query, setQuery] = useState("");
   const drag = useRef<{ px: number; py: number; vx: number; vy: number; moved: boolean; id: PersonId | null } | null>(
     null,
@@ -111,6 +122,24 @@ function TreeCanvas({ family }: { family: Family }) {
       fit();
     }
   }, [fit]);
+
+  /** Slide the view so a person is in the middle, without changing the zoom or selection. */
+  const panTo = useCallback(
+    (id: PersonId) => {
+      const el = svgRef.current;
+      const n = layout.nodes.get(id);
+      if (!el || !n) return;
+      const { width, height } = el.getBoundingClientRect();
+      setView((v) => ({ ...v, x: width / 2 - (n.x + CARD_W / 2) * v.k, y: height / 2 - (n.y + CARD_H / 2) * v.k }));
+    },
+    [layout],
+  );
+
+  // Keyboard order: generation by generation, left to right.
+  const orderedNodes = useMemo(
+    () => [...layout.nodes.values()].sort((a, b) => a.gen - b.gen || a.x - b.x),
+    [layout],
+  );
 
   const zoomAt = useCallback((factor: number, cx: number, cy: number) => {
     setView((v) => {
@@ -240,7 +269,7 @@ function TreeCanvas({ family }: { family: Family }) {
           </g>
 
           {/* People */}
-          {[...layout.nodes.values()].map((n) => {
+          {orderedNodes.map((n) => {
             const p = family.people.get(n.id as PersonId);
             if (!p) return null;
             const isSel = n.id === selected;
@@ -251,11 +280,38 @@ function TreeCanvas({ family }: { family: Family }) {
                 key={n.id}
                 data-person={n.id}
                 transform={`translate(${n.x},${n.y})`}
-                className="cursor-pointer"
+                className="cursor-pointer outline-none"
                 role="treeitem"
+                tabIndex={0}
                 aria-selected={isSel}
-                aria-label={fullName(p)}
+                aria-label={[fullName(p), lifespan(p)].filter(Boolean).join(", ")}
+                onFocus={(e) => {
+                  if (!e.currentTarget.matches(":focus-visible")) return;
+                  setKeyboardFocus(n.id as PersonId);
+                  panTo(n.id as PersonId);
+                }}
+                onBlur={() => setKeyboardFocus(null)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    focusSummary.current = true;
+                    setSelected(n.id as PersonId);
+                  } else if (e.key === "Escape") {
+                    setSelected(null);
+                  }
+                }}
               >
+                {keyboardFocus === n.id && (
+                  <circle
+                    cx={CARD_W / 2}
+                    cy={r}
+                    r={r + 14}
+                    fill="none"
+                    stroke="var(--ochre-deep)"
+                    strokeWidth={3}
+                    strokeDasharray="6 4"
+                  />
+                )}
                 <circle
                   cx={CARD_W / 2}
                   cy={r}
@@ -321,7 +377,7 @@ function TreeCanvas({ family }: { family: Family }) {
       <div className="pointer-events-none absolute inset-x-0 top-0 flex flex-wrap items-start justify-between gap-4 p-5 sm:p-7">
         <div className="pointer-events-auto">
           <h1 className="font-display text-4xl font-semibold leading-none text-forest-deep">Family tree</h1>
-          <p className="mt-1.5 text-sm text-muted">Drag to explore · scroll to zoom · tap someone to see more</p>
+          <p className="mt-1.5 text-sm text-muted">Drag to explore · scroll to zoom · tap someone to see more · or use Tab and Enter</p>
         </div>
         <div className="pointer-events-auto relative w-full max-w-xs">
           <Search size={16} className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-muted" />
@@ -357,7 +413,11 @@ function TreeCanvas({ family }: { family: Family }) {
 
       {/* Selected person card */}
       {sel && (
-        <div className="animate-rise absolute bottom-24 left-4 right-4 max-w-sm rounded-[1.75rem] border border-line bg-card p-5 shadow-2xl sm:bottom-6 sm:left-6 sm:right-auto">
+        <div
+          role="region"
+          aria-label={`About ${fullName(sel)}`}
+          className="animate-rise absolute bottom-24 left-4 right-4 max-w-sm rounded-[1.75rem] border border-line bg-card p-5 shadow-2xl sm:bottom-6 sm:left-6 sm:right-auto"
+        >
           <div className="flex items-center gap-4">
             <Portrait person={sel} size={64} />
             <div className="min-w-0">
@@ -369,7 +429,7 @@ function TreeCanvas({ family }: { family: Family }) {
           </div>
           {sel.notes && <p className="mt-3 line-clamp-2 text-sm text-coal/80">{sel.notes}</p>}
           <div className="mt-4 flex gap-2">
-            <Link href={`/people/${sel._id}`} className={`${btnPrimary} flex-1`}>
+            <Link ref={profileLink} href={`/people/${sel._id}`} className={`${btnPrimary} flex-1`}>
               Open profile <ArrowRight size={15} />
             </Link>
             <button
