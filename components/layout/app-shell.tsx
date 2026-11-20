@@ -1,9 +1,9 @@
 "use client";
 
-import { Cake, Images, LayoutGrid, LogOut, Network, Users } from "lucide-react";
+import { LogOut } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { Suspense, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { type ReactNode } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -13,78 +13,8 @@ import { useChat } from "@/components/chat/chat-context";
 import { LogoMark } from "@/components/brand/logo";
 import { useSampleMode } from "@/lib/sample-mode";
 import { AskIcon } from "@/components/brand/ask-icon";
-import { UmbhacoTrim } from "@/components/brand/beadwork";
-
-const NAV = [
-  { href: "/overview", label: "Overview", icon: LayoutGrid },
-  { href: "/tree", label: "Family tree", icon: Network },
-  { href: "/people", label: "People", icon: Users },
-  { href: "/album", label: "Album", icon: Images },
-  { href: "/birthdays", label: "Birthdays", icon: Cake },
-];
-
-type NavProps = { active: (href: string) => boolean };
-
-/** Reads the URL, so it renders inside Suspense (Next prerenders the shell). */
-function WithActive({ render }: { render: (p: NavProps) => ReactNode }) {
-  const pathname = usePathname();
-  return <>{render({ active: (href) => (href === "/" ? pathname === "/" : pathname.startsWith(href)) })}</>;
-}
-
-function ActiveAware({ render }: { render: (p: NavProps) => ReactNode }) {
-  return (
-    <Suspense fallback={render({ active: () => false })}>
-      <WithActive render={render} />
-    </Suspense>
-  );
-}
-
-function SidebarNav({ active }: NavProps) {
-  return (
-    <nav className="flex flex-col gap-1 px-3">
-      {NAV.map(({ href, label, icon: Icon }) => (
-        <Link
-          key={href}
-          href={href}
-          className={`group relative flex items-center gap-3 overflow-hidden rounded-xl px-4 pb-3 pt-2.5 text-sm transition-colors ${
-            active(href)
-              ? "bg-bead-blue-soft font-medium text-ink"
-              : "text-muted hover:bg-bead-blue-soft/60 hover:text-ink"
-          }`}
-        >
-          <Icon size={17} strokeWidth={1.8} />
-          {label}
-          {/* umbhaco trim: always on for the current page, slides in on hover */}
-          <span
-            aria-hidden
-            className={`pointer-events-none absolute inset-x-0 bottom-0 transition-all duration-200 ${
-              active(href) ? "opacity-100" : "translate-y-1 opacity-0 group-hover:translate-y-0 group-hover:opacity-100"
-            }`}
-          >
-            <UmbhacoTrim />
-          </span>
-        </Link>
-      ))}
-    </nav>
-  );
-}
-
-function MobileNavLinks({ active }: NavProps) {
-  return (
-    <>
-      {NAV.map(({ href, label, icon: Icon }) => (
-        <Link
-          key={href}
-          href={href}
-          aria-label={label}
-          className={`grid h-10 w-10 place-items-center rounded-full ${active(href) ? "bg-bead-blue-soft text-ink" : "text-muted"}`}
-        >
-          <Icon size={18} />
-        </Link>
-      ))}
-    </>
-  );
-}
+import { ActiveAware, MobileNavLinks, SidebarNav } from "./nav";
+import { SampleBanner } from "./sample-banner";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -208,36 +138,6 @@ function Shell({ children }: { children: ReactNode }) {
       </nav>
 
       <ChatDrawer />
-    </div>
-  );
-}
-
-/** Shown on every page while exploring the sample family. */
-function SampleBanner() {
-  const { sample, exitSample } = useSampleMode();
-  const chat = useChat();
-  const router = useRouter();
-  const { isAuthenticated } = useConvexAuth();
-  if (!sample) return null;
-  return (
-    <div className="sticky top-0 z-20 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-b border-ochre/30 bg-ochre-soft px-4 py-2.5 text-sm text-ink">
-      <span>
-        <strong className="font-semibold">You&apos;re exploring a sample family.</strong>{" "}
-        {isAuthenticated
-          ? "None of these people are part of your family's archive."
-          : "These people are made up. Sign in to start your own family's tree."}
-      </span>
-      <button
-        type="button"
-        onClick={() => {
-          exitSample();
-          chat.reset();
-          router.push("/");
-        }}
-        className="rounded-full bg-ink px-4 py-1.5 text-xs font-medium text-white hover:bg-coal"
-      >
-        {isAuthenticated ? "Back to my family" : "Sign in"}
-      </button>
     </div>
   );
 }
