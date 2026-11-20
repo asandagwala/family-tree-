@@ -175,6 +175,7 @@ export function ChatDrawer() {
             <textarea
               ref={input}
               rows={1}
+              aria-label="Your question about the family"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => {

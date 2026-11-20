@@ -21,7 +21,7 @@ export function FeaturedStory({ family, className }: { family: Family; className
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/50 to-transparent" />
       </div>
       <div className="relative z-10 flex h-full min-h-72 flex-col justify-end p-7 sm:p-9">
-        <p className="text-xs uppercase tracking-[0.25em] text-ochre">From the archive</p>
+        <p className="text-xs uppercase tracking-[0.25em] text-ochre-deep">From the archive</p>
         {pick ? (
           <>
             <blockquote className="mt-3 max-w-2xl font-display text-2xl italic leading-snug sm:text-3xl">
