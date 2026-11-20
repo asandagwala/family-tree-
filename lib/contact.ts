@@ -5,6 +5,17 @@ export type ContactLink = { key: string; label: string; detail: string; href: st
 const strip = (s: string) => s.trim().replace(/^@/, "");
 const isUrl = (s: string) => /^https?:\/\//i.test(s.trim());
 
+/** An https link on the platform itself; anything else (another site, a look-alike) is not used as a link. */
+function onPlatform(s: string, hosts: string[]) {
+  try {
+    const url = new URL(s.trim());
+    const host = url.hostname.toLowerCase();
+    return url.protocol === "https:" && hosts.some((h) => host === h || host.endsWith(`.${h}`));
+  } catch {
+    return false;
+  }
+}
+
 /** WhatsApp link from a phone number; a local SA number (0821234567) becomes +27. */
 export function whatsappHref(number: string) {
   let digits = number.replace(/[^\d+]/g, "");
@@ -23,19 +34,23 @@ export function contactLinks(p: Pick<Person, "whatsapp" | "instagram" | "faceboo
   }
   if (p.instagram) {
     const h = strip(p.instagram);
-    out.push({ key: "instagram", label: "Instagram", detail: `@${h}`, href: isUrl(h) ? h : `https://instagram.com/${h}` });
+    if (!isUrl(h) || onPlatform(h, ["instagram.com"]))
+      out.push({ key: "instagram", label: "Instagram", detail: isUrl(h) ? "Profile" : `@${h}`, href: isUrl(h) ? h : `https://instagram.com/${encodeURIComponent(h)}` });
   }
   if (p.facebook) {
     const h = p.facebook.trim();
-    out.push({ key: "facebook", label: "Facebook", detail: isUrl(h) ? "Profile" : h, href: isUrl(h) ? h : `https://facebook.com/${encodeURIComponent(h)}` });
+    if (!isUrl(h) || onPlatform(h, ["facebook.com", "fb.com", "fb.me"]))
+      out.push({ key: "facebook", label: "Facebook", detail: isUrl(h) ? "Profile" : h, href: isUrl(h) ? h : `https://facebook.com/${encodeURIComponent(h)}` });
   }
   if (p.tiktok) {
     const h = strip(p.tiktok);
-    out.push({ key: "tiktok", label: "TikTok", detail: `@${h}`, href: isUrl(h) ? h : `https://www.tiktok.com/@${h}` });
+    if (!isUrl(h) || onPlatform(h, ["tiktok.com"]))
+      out.push({ key: "tiktok", label: "TikTok", detail: isUrl(h) ? "Profile" : `@${h}`, href: isUrl(h) ? h : `https://www.tiktok.com/@${encodeURIComponent(h)}` });
   }
   if (p.linkedin) {
     const h = p.linkedin.trim();
-    out.push({ key: "linkedin", label: "LinkedIn", detail: isUrl(h) ? "Profile" : h, href: isUrl(h) ? h : `https://www.linkedin.com/in/${encodeURIComponent(strip(h))}` });
+    if (!isUrl(h) || onPlatform(h, ["linkedin.com"]))
+      out.push({ key: "linkedin", label: "LinkedIn", detail: isUrl(h) ? "Profile" : h, href: isUrl(h) ? h : `https://www.linkedin.com/in/${encodeURIComponent(strip(h))}` });
   }
   return out;
 }

@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import { action, env, internalAction } from "./_generated/server";
+import { MAX_LENGTH, rateLimiter, waitText } from "./security";
 
 const INSTRUCTIONS = `You are the family historian for a private family tree app. Family members ask you questions about their relatives, and you answer from the family records below.
 
@@ -129,9 +130,20 @@ export const ask = action({
     const apiKey = env.GEMINI_API_KEY;
     if (!apiKey) return { ok: false, text: NOT_SET_UP };
 
-    const recent = messages.slice(-20);
+    // Keep the conversation small: every word sent costs a Gemini call.
+    const recent = messages.slice(-20).map((m) => ({ ...m, content: m.content.slice(0, 4000) }));
     if (recent.length === 0 || recent[recent.length - 1].role !== "user") {
       return { ok: false, text: "Ask me something about the family." };
+    }
+    if (messages[messages.length - 1].content.length > MAX_LENGTH.question) {
+      return { ok: false, text: `That question is too long. Please keep it under ${MAX_LENGTH.question} characters.` };
+    }
+    const userId = await ctx.runQuery(internal.access.currentUserId, {});
+    for (const name of ["askAssistantPerMinute", "askAssistant"] as const) {
+      const { ok, retryAfter } = await rateLimiter.limit(ctx, name, { key: userId! });
+      if (!ok) {
+        return { ok: false, text: `You've asked a lot of questions. Please wait ${waitText(retryAfter ?? 0)} and ask again.` };
+      }
     }
 
     const tree = await ctx.runQuery(internal.family.treeForAssistant, { space });

@@ -19,6 +19,8 @@ import {
   vSpace,
   type Space,
 } from "./access";
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { checkLength, checkPersonFields, limitOrThrow, MAX_LENGTH, requireImage } from "./security";
 
 // A family tree is shown as a whole, so the whole tree is loaded at once,
 // capped so a runaway table can't blow the query limits.
@@ -114,6 +116,7 @@ export const setFamilyName = mutation({
   handler: async (ctx, { familyName }) => {
     const familyId = await requireFamily(ctx);
     const name = familyName.trim();
+    checkLength(name, MAX_LENGTH.name, "family name");
     if (!name) throw new ConvexError("Give the family a name.");
     await ctx.db.patch("families", familyId, { name });
     return null;
@@ -135,6 +138,9 @@ export const updateSettings = mutation({
       const trimmed = value.trim();
       patch[key] = trimmed === "" ? undefined : trimmed;
     }
+    checkLength(patch.clanName, MAX_LENGTH.name, "clan name");
+    checkLength(patch.clanPraise, MAX_LENGTH.story, "izithakazelo");
+    checkLength(patch.whatsappGroupUrl, MAX_LENGTH.link, "group link");
     const url = patch.whatsappGroupUrl;
     if (url && !/^https:\/\/(chat\.whatsapp\.com|wa\.me)\//.test(url)) {
       throw new ConvexError("Paste the group's invite link. It starts with https://chat.whatsapp.com/");
@@ -246,6 +252,7 @@ export const createPerson = mutation({
   handler: async (ctx, { sample, ...args }) => {
     const space = await requireAccess(ctx, !!sample);
     requireName(args.firstName);
+    checkPersonFields(args);
     const fields = { ...clean(args), ...spaceFields(space) };
     return await ctx.db.insert("people", fields);
   },
@@ -256,6 +263,7 @@ export const updatePerson = mutation({
   handler: async (ctx, { id, ...rest }) => {
     await requirePersonAccess(ctx, id);
     requireName(rest.firstName);
+    checkPersonFields(rest);
     const fields = clean(rest);
     // Patch every editable field so cleared ones are removed, while the
     // profile photo is left alone.
@@ -554,6 +562,8 @@ export const generateUploadUrl = mutation({
   args: {},
   handler: async (ctx) => {
     await requireAccess(ctx, true); // any signed-in person may upload; saving checks the space
+    const userId = await getAuthUserId(ctx);
+    await limitOrThrow(ctx, "upload", userId!, "uploads");
     return await ctx.storage.generateUploadUrl();
   },
 });
@@ -563,6 +573,7 @@ export const setProfilePhoto = mutation({
   handler: async (ctx, { personId, storageId }) => {
     await requirePersonAccess(ctx, personId);
     const person = await requirePerson(ctx, personId);
+    if (storageId) await requireImage(ctx, storageId);
     if (person.photoId && person.photoId !== storageId) {
       // Keep the old portrait if it also lives in the gallery.
       const inGallery = await ctx.db
@@ -602,6 +613,8 @@ export const addPhoto = mutation({
   handler: async (ctx, { personId, storageId, caption }) => {
     await requirePersonAccess(ctx, personId);
     await requirePerson(ctx, personId);
+    await requireImage(ctx, storageId);
+    checkLength(caption?.trim(), MAX_LENGTH.caption, "caption");
     const trimmed = caption?.trim();
     return await ctx.db.insert("photos", {
       personId,

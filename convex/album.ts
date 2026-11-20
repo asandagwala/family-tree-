@@ -13,6 +13,7 @@ import {
   spaceFields,
   type Space,
 } from "./access";
+import { checkLength, MAX_LENGTH, requireImage } from "./security";
 
 const MAX_GATHERINGS = 500;
 const MAX_PHOTOS_PER_GATHERING = 1000;
@@ -38,6 +39,10 @@ function clean(fields: {
 }) {
   const title = fields.title.trim();
   if (!title) throw new ConvexError("Give the gathering a name.");
+  checkLength(title, MAX_LENGTH.title, "gathering's name");
+  checkLength(fields.date?.trim(), MAX_LENGTH.date, "date");
+  checkLength(fields.place?.trim(), MAX_LENGTH.place, "place");
+  checkLength(fields.story?.trim(), MAX_LENGTH.story, "story");
   const opt = (s?: string) => (s && s.trim() ? s.trim() : undefined);
   const peopleIds = [...new Set(fields.peopleIds)];
   if (peopleIds.length > MAX_PEOPLE_PER_GATHERING) {
@@ -181,7 +186,9 @@ export const addGatheringPhoto = mutation({
   handler: async (ctx, { gatheringId, storageId, caption }) => {
     await requireGatheringAccess(ctx, gatheringId);
     await requireGathering(ctx, gatheringId);
+    await requireImage(ctx, storageId);
     const trimmed = caption?.trim();
+    checkLength(trimmed, MAX_LENGTH.caption, "caption");
     return await ctx.db.insert("gatheringPhotos", { gatheringId, storageId, caption: trimmed || undefined });
   },
 });
@@ -206,6 +213,14 @@ export const setGatheringCover = mutation({
   handler: async (ctx, { gatheringId, storageId }) => {
     await requireGatheringAccess(ctx, gatheringId);
     await requireGathering(ctx, gatheringId);
+    // The cover must be one of this gathering's own photos.
+    const own = await ctx.db
+      .query("gatheringPhotos")
+      .withIndex("by_gatheringId", (q) => q.eq("gatheringId", gatheringId))
+      .take(MAX_PHOTOS_PER_GATHERING);
+    if (!own.some((p) => p.storageId === storageId)) {
+      throw new ConvexError("Choose the cover from this gathering's photos.");
+    }
     await ctx.db.patch("gatherings", gatheringId, { coverId: storageId });
     return null;
   },

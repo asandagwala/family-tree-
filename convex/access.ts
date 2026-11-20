@@ -88,3 +88,10 @@ export const check = internalQuery({
   returns: v.union(vSpace, v.null()),
   handler: async (ctx, { sample }) => await writableSpace(ctx, sample),
 });
+
+/** The signed-in user's id, for actions (which can't call getAuthUserId with their context). */
+export const currentUserId = internalQuery({
+  args: {},
+  returns: v.union(v.id("users"), v.null()),
+  handler: async (ctx) => await getAuthUserId(ctx),
+});

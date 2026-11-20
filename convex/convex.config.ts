@@ -5,6 +5,7 @@ import authGoogle from "@convex-dev/auth/components/google/convex.config.js";
 import authEmail from "@convex-dev/auth/components/email/convex.config.js";
 import authPassword from "@convex-dev/auth/components/password/convex.config.js";
 import resend from "@convex-dev/resend/convex.config.js";
+import rateLimiter from "@convex-dev/rate-limiter/convex.config.js";
 
 // Set secrets with `npx convex env set NAME` (it prompts for the value):
 // - GEMINI_API_KEY (Google AI Studio) powers the family assistant; GEMINI_MODEL
@@ -31,5 +32,6 @@ app.use(authGoogle, {
 app.use(authEmail);
 app.use(authPassword);
 app.use(resend);
+app.use(rateLimiter);
 
 export default app;

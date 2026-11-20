@@ -521,8 +521,15 @@ function FamilyCodeScreen({ name }: { name: string | null }) {
     setBusy(true);
     setError(null);
     try {
-      if (starting) await startFamily({ familyName: value });
-      else await joinFamily({ code: value });
+      if (starting) {
+        await startFamily({ familyName: value });
+      } else {
+        const result = await joinFamily({ code: value });
+        if (!result.ok) {
+          setError(result.error);
+          return;
+        }
+      }
       router.push("/");
     } catch (err) {
       setError(errorMessage(err));
