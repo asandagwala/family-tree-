@@ -13,6 +13,7 @@ import {
 import { useOauth, useSignInWithGoogle, type OauthFlowError } from "@convex-dev/auth/methods/google/react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { Authenticated, AuthLoading, Unauthenticated, useMutation, useQuery } from "convex/react";
+import { Eye, EyeOff } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { api } from "@/convex/_generated/api";
@@ -116,7 +117,7 @@ function Heading({ eyebrow, children }: { eyebrow: string; children: ReactNode }
   return (
     <>
       <p className="text-xs uppercase tracking-[0.3em] text-bead-blue-deep">{eyebrow}</p>
-      <h1 className="mt-3 max-w-xl font-display text-4xl font-semibold leading-[1.04] @xl:text-5xl @5xl:text-6xl">{children}</h1>
+      <h1 className="mt-3 max-w-xl font-display text-[clamp(2.25rem,min(6.5vh,10vw),3.75rem)] font-semibold leading-[1.04]">{children}</h1>
     </>
   );
 }
@@ -151,9 +152,10 @@ const TRY_AGAIN = "Something went wrong. Please try again.";
 /** A plain-language message for every way signing in can fail. */
 function authMessage(e: AuthError): string {
   switch (e.error) {
-    case "INVALID_CREDENTIALS":
     case "USER_NOT_FOUND":
-      return "That email and password don't match. Check them, or create an account.";
+      return "There's no email account for that address yet. Tap “Create an account” below, or use Continue with Google if that's how you joined.";
+    case "INVALID_CREDENTIALS":
+      return "That password isn't right. Try again, or tap “Forgot password?”.";
     case "RATE_LIMITED":
       return `Too many tries. Wait ${Math.max(1, Math.ceil(e.retryAfterMs / 60000))} minute(s) and try again.`;
     case "INVALID_EMAIL":
@@ -207,6 +209,49 @@ function GoogleMark() {
         d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.7-6c-2.2 1.5-5 2.3-8.2 2.3-6.2 0-11.5-4.1-13.4-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"
       />
     </svg>
+  );
+}
+
+/** A password field with an eye button to show or hide what was typed. */
+function PasswordInput({
+  value,
+  onChange,
+  autoComplete,
+  disabled,
+  label,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  autoComplete: string;
+  disabled: boolean;
+  label: string;
+}) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <div className="relative">
+      <input
+        type={visible ? "text" : "password"}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        autoComplete={autoComplete}
+        autoCapitalize="none"
+        spellCheck={false}
+        required
+        disabled={disabled}
+        aria-label={label}
+        placeholder={label}
+        className={`${inputCls} pr-12`}
+      />
+      <button
+        type="button"
+        onClick={() => setVisible(!visible)}
+        aria-label={visible ? "Hide password" : "Show password"}
+        aria-pressed={visible}
+        className="absolute inset-y-0 right-0 grid w-12 place-items-center rounded-r-2xl text-muted hover:text-ink"
+      >
+        {visible ? <EyeOff size={18} /> : <Eye size={18} />}
+      </button>
+    </div>
   );
 }
 
@@ -333,16 +378,12 @@ function SignInScreen() {
             className={inputCls}
           />
           {mode !== "forgot" && (
-            <input
-              type="password"
+            <PasswordInput
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={setPassword}
               autoComplete={mode === "signUp" ? "new-password" : "current-password"}
-              required
               disabled={pending}
-              aria-label="Password"
-              placeholder="Password"
-              className={inputCls}
+              label="Password"
             />
           )}
           <button type="submit" disabled={pending} className={`${btnPrimary} w-full`}>
@@ -440,16 +481,12 @@ function ResetPasswordScreen({ code }: { code: string }) {
         Choose a new <span className="italic text-ochre-deep">password</span>
       </Heading>
       <form onSubmit={submit} className="mt-4 max-w-md space-y-3">
-        <input
-          type="password"
+        <PasswordInput
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={setPassword}
           autoComplete="new-password"
-          required
           disabled={pending}
-          aria-label="New password"
-          placeholder="New password"
-          className={inputCls}
+          label="New password"
         />
         <button type="submit" disabled={pending} className={`${btnPrimary} w-full`}>
           {pending ? "Saving…" : "Save and sign in"}
