@@ -1,5 +1,10 @@
 import { internalMutation } from "./_generated/server";
-import { newFamilyCode } from "./users";
+import { newFamilyCode } from "./lib/familyCodes";
+
+/**
+ * One-off data migrations, run by hand from the CLI when a deployment's data
+ * needs to move to a new shape. Internal: the app can't call them.
+ */
 
 /**
  * One-off (internal): before families, a deployment held one family. This
@@ -50,5 +55,28 @@ export const intoFamilies = internalMutation({
       gatherings: gatherings.length,
       members: members.filter((u) => u.member).length,
     };
+  },
+});
+
+/** One-off (internal): marks everyone currently in the tree as the sample
+ *  family, for deployments where the sample was loaded into the real tree. */
+export const moveAllToSample = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    let people = 0;
+    for await (const p of ctx.db.query("people")) {
+      if (!p.sample) {
+        await ctx.db.patch("people", p._id, { sample: true });
+        people++;
+      }
+    }
+    let gatherings = 0;
+    for await (const g of ctx.db.query("gatherings")) {
+      if (!g.sample) {
+        await ctx.db.patch("gatherings", g._id, { sample: true });
+        gatherings++;
+      }
+    }
+    return { people, gatherings };
   },
 });

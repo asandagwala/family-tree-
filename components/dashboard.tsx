@@ -66,8 +66,8 @@ function familyName(list: Person[]) {
 function Hero({ family, onAdd }: { family: Family; onAdd: () => void }) {
   const chat = useChat();
   const [q, setQ] = useState("");
-  const settings = useQuery(api.family.getSettings);
-  const saveFamilyName = useMutation(api.family.setFamilyName);
+  const settings = useQuery(api.families.getSettings);
+  const saveFamilyName = useMutation(api.families.setFamilyName);
   const [editingName, setEditingName] = useState<string | null>(null);
   const { sample } = useSampleMode();
   // The saved family name wins; otherwise guess from the most common surname.
@@ -530,7 +530,7 @@ function FamilyClan({ settings }: { settings: FamilySettings }) {
 /* ---------- Stay connected ---------- */
 
 function StayConnected({ family }: { family: Family }) {
-  const settings = useQuery(api.family.getSettings);
+  const settings = useQuery(api.families.getSettings);
   const { sample } = useSampleMode();
   const [editing, setEditing] = useState(false);
   const reachable = useMemo(

@@ -1,7 +1,6 @@
 import { ConvexError, v } from "convex/values";
-import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
-import { gatheringsIn, spaceArg } from "./family";
+import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import { gatheringKind } from "./schema";
 import {
   canAccess,
@@ -10,10 +9,17 @@ import {
   inSpace,
   requireAccess,
   requireGatheringAccess,
+  spaceArg,
   spaceFields,
   type Space,
-} from "./access";
-import { checkLength, MAX_LENGTH, requireImage } from "./security";
+} from "./lib/access";
+import { checkLength, MAX_LENGTH, requireImage } from "./lib/security";
+import { gatheringsIn } from "./lib/tree";
+
+/**
+ * The family album: gatherings (weddings, umemulo, funerals, reunions...) with
+ * their photos and who was there.
+ */
 
 const MAX_GATHERINGS = 500;
 const MAX_PHOTOS_PER_GATHERING = 1000;

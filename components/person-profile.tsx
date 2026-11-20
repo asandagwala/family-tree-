@@ -60,9 +60,9 @@ export function PersonProfile() {
 function ProfileBody({ person, family }: { person: Person; family: Family }) {
   const chat = useChat();
   const router = useRouter();
-  const deletePerson = useMutation(api.family.deletePerson);
-  const removeParent = useMutation(api.family.removeParent);
-  const removePartner = useMutation(api.family.removePartner);
+  const deletePerson = useMutation(api.people.deletePerson);
+  const removeParent = useMutation(api.people.removeParent);
+  const removePartner = useMutation(api.people.removePartner);
   const [editor, setEditor] = useState<EditorMode | null>(null);
   const [linking, setLinking] = useState<Relation | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -357,8 +357,8 @@ function LinkExisting(props: {
   onClose: () => void;
   onError: (m: string) => void;
 }) {
-  const addParent = useMutation(api.family.addParent);
-  const addPartner = useMutation(api.family.addPartner);
+  const addParent = useMutation(api.people.addParent);
+  const addPartner = useMutation(api.people.addPartner);
   const [q, setQ] = useState("");
   const { relation, person, family } = props;
   const already = new Set([
@@ -410,11 +410,11 @@ function LinkExisting(props: {
 /* ---------- Gallery ---------- */
 
 function Gallery({ person }: { person: Person }) {
-  const photos = useQuery(api.family.listPhotos, { personId: person._id });
-  const generateUploadUrl = useMutation(api.family.generateUploadUrl);
-  const addPhoto = useMutation(api.family.addPhoto);
-  const deletePhoto = useMutation(api.family.deletePhoto);
-  const setProfilePhoto = useMutation(api.family.setProfilePhoto);
+  const photos = useQuery(api.photos.listPhotos, { personId: person._id });
+  const generateUploadUrl = useMutation(api.photos.generateUploadUrl);
+  const addPhoto = useMutation(api.photos.addPhoto);
+  const deletePhoto = useMutation(api.photos.deletePhoto);
+  const setProfilePhoto = useMutation(api.photos.setProfilePhoto);
   const fileInput = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(0);
   const [error, setError] = useState<string | null>(null);

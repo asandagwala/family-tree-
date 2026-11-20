@@ -20,8 +20,8 @@ import { btnPrimary, btnSecondary } from "./ui/modal";
 export function Welcome() {
   const family = useFamily({ sample: false });
   const { enterSample, exitSample } = useSampleMode();
-  const settings = useQuery(api.family.getSettings);
-  const loadSample = useMutation(api.family.loadSampleFamily);
+  const settings = useQuery(api.families.getSettings);
+  const loadSample = useMutation(api.sample.loadSampleFamily);
   const router = useRouter();
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);

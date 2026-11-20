@@ -21,7 +21,7 @@ export type Family = {
 export function useFamily(space?: { sample: boolean }): Family | undefined {
   const mode = useSampleMode();
   const sample = space ? space.sample : mode.sample;
-  const tree = useQuery(api.family.getTree, { sample });
+  const tree = useQuery(api.tree.getTree, { sample });
   return useMemo(() => {
     if (!tree) return undefined;
     const people = new Map(tree.people.map((p) => [p._id, p]));

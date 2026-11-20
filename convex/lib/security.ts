@@ -1,8 +1,8 @@
 import { HOUR, MINUTE, RateLimiter } from "@convex-dev/rate-limiter";
 import { ConvexError } from "convex/values";
-import { components } from "./_generated/api";
-import type { Id } from "./_generated/dataModel";
-import type { ActionCtx, MutationCtx } from "./_generated/server";
+import { components } from "../_generated/api";
+import type { Id } from "../_generated/dataModel";
+import type { ActionCtx, MutationCtx } from "../_generated/server";
 
 // ---------- Sizes ----------
 

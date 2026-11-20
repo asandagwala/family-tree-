@@ -66,13 +66,13 @@ export function PersonEditor({
   onClose: () => void;
   onSaved?: (id: PersonId) => void;
 }) {
-  const createPerson = useMutation(api.family.createPerson);
+  const createPerson = useMutation(api.people.createPerson);
   const { sample } = useSampleMode();
-  const updatePerson = useMutation(api.family.updatePerson);
-  const addParent = useMutation(api.family.addParent);
-  const addPartner = useMutation(api.family.addPartner);
-  const generateUploadUrl = useMutation(api.family.generateUploadUrl);
-  const setProfilePhoto = useMutation(api.family.setProfilePhoto);
+  const updatePerson = useMutation(api.people.updatePerson);
+  const addParent = useMutation(api.people.addParent);
+  const addPartner = useMutation(api.people.addPartner);
+  const generateUploadUrl = useMutation(api.photos.generateUploadUrl);
+  const setProfilePhoto = useMutation(api.photos.setProfilePhoto);
 
   const relation = mode.kind === "new" ? mode.relation : undefined;
   const of = relation ? family.people.get(relation.of) : undefined;

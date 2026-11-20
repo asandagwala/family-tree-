@@ -25,7 +25,7 @@ export function GatheringView() {
   const family = useFamily();
   const chat = useChat();
   const router = useRouter();
-  const generateUploadUrl = useMutation(api.family.generateUploadUrl);
+  const generateUploadUrl = useMutation(api.photos.generateUploadUrl);
   const addPhoto = useMutation(api.album.addGatheringPhoto);
   const deletePhoto = useMutation(api.album.deleteGatheringPhoto);
   const setCover = useMutation(api.album.setGatheringCover);

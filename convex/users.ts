@@ -1,11 +1,18 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { ConvexError, v } from "convex/values";
 import { vGoogleProfile } from "@convex-dev/auth/methods/google/server";
+import { v } from "convex/values";
 import { components } from "./_generated/api";
-import { internalMutation, mutation, query, type MutationCtx } from "./_generated/server";
-import { checkLength, limitOrThrow, MAX_LENGTH, rateLimiter, waitText } from "./security";
+import { internalMutation, internalQuery, query } from "./_generated/server";
+import { vSpace, writableSpace } from "./lib/access";
 
-// New accounts start outside any family until they join or start one.
+/**
+ * Accounts. Signing in itself is handled by Convex Auth (see auth.ts); these
+ * are the app's own records of who is signed in and which family they joined.
+ */
+
+// ---------- Called by Convex Auth when someone signs in for the first time ----------
+
+/** New accounts start outside any family until they join or start one. */
 export const createUserGoogle = internalMutation({
   args: { method: v.object({ name: v.literal("google"), profile: vGoogleProfile }) },
   returns: v.id("users"),
@@ -22,7 +29,9 @@ export const createUserEmail = internalMutation({
   },
 });
 
-/** Who is signed in, and which family they belong to. */
+// ---------- For the app ----------
+
+/** Who is signed in, whether they have joined a family, and what to call them. */
 export const me = query({
   args: {},
   handler: async (ctx) => {
@@ -36,82 +45,21 @@ export const me = query({
   },
 });
 
-// No 0/O, 1/I/L: easy to read out over the phone.
-const CODE_ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
-const CODE_LENGTH = 8; // 31^8 codes: far too many to guess
+// ---------- For actions, which can't read the database themselves ----------
 
-/** Upper case, without spaces, so "rubuluza-7kq4 mx2p" finds RUBULUZA-7KQ4MX2P. */
-function normalizeCode(code: string) {
-  return code.toUpperCase().replace(/\s+/g, "");
-}
-
-function randomPart() {
-  const bytes = new Uint8Array(CODE_LENGTH);
-  crypto.getRandomValues(bytes);
-  return [...bytes].map((b) => CODE_ALPHABET[b % CODE_ALPHABET.length]).join("");
-}
-
-/** A new, unused family code that starts with the family name. */
-export async function newFamilyCode(ctx: MutationCtx, familyName: string) {
-  const prefix =
-    familyName
-      .normalize("NFKD")
-      .replace(/[^A-Za-z]/g, "")
-      .toUpperCase()
-      .slice(0, 12) || "FAMILY";
-  for (;;) {
-    const code = `${prefix}-${randomPart()}`;
-    const taken = await ctx.db
-      .query("families")
-      .withIndex("by_code", (q) => q.eq("code", code))
-      .unique();
-    if (!taken) return code;
-  }
-}
-
-async function requireUser(ctx: MutationCtx) {
-  const userId = await getAuthUserId(ctx);
-  if (!userId) throw new ConvexError("Please sign in first.");
-  return userId;
-}
-
-/** Join an existing family's tree with its family code. */
-export const joinFamily = mutation({
-  args: { code: v.string() },
-  // A wrong code is returned rather than thrown: a thrown error would also undo
-  // the rate limiter's count, letting someone guess codes without limit.
-  returns: v.union(v.object({ ok: v.literal(true) }), v.object({ ok: v.literal(false), error: v.string() })),
-  handler: async (ctx, { code }) => {
-    const userId = await requireUser(ctx);
-    const { ok, retryAfter } = await rateLimiter.limit(ctx, "joinFamilyAttempt", { key: userId });
-    if (!ok) {
-      return { ok: false as const, error: `Too many tries. Please wait ${waitText(retryAfter ?? 0)} and try again.` };
-    }
-    const typed = normalizeCode(code);
-    const family =
-      typed.length > 0 && typed.length <= MAX_LENGTH.code
-        ? await ctx.db
-            .query("families")
-            .withIndex("by_code", (q) => q.eq("code", typed))
-            .unique()
-        : null;
-    if (!family) return { ok: false as const, error: "We couldn't find a family with that code. Check it and try again." };
-    await ctx.db.patch("users", userId, { familyId: family._id });
-    return { ok: true as const };
-  },
+/** The signed-in user's id, or null. */
+export const currentUserId = internalQuery({
+  args: {},
+  returns: v.union(v.id("users"), v.null()),
+  handler: async (ctx) => await getAuthUserId(ctx),
 });
 
-/** Start a new family tree; the caller gets its family code to share. */
-export const startFamily = mutation({
-  args: { familyName: v.string() },
-  handler: async (ctx, { familyName }) => {
-    const userId = await requireUser(ctx);
-    const name = familyName.trim();
-    if (!name) throw new ConvexError("Enter the family name, e.g. Rubuluza.");
-    checkLength(name, MAX_LENGTH.name, "family name");
-    await limitOrThrow(ctx, "startFamily", userId, "new family trees today");
-    const familyId = await ctx.db.insert("families", { name, code: await newFamilyCode(ctx, name) });
-    await ctx.db.patch("users", userId, { familyId });
-    return null;
-  },
+/**
+ * The space a signed-in caller may use, or null. Used by the assistant, which
+ * needs an account even for the sample, since every question costs a Gemini call.
+ */
+export const currentSpace = internalQuery({
+  args: { sample: v.boolean() },
+  returns: v.union(vSpace, v.null()),
+  handler: async (ctx, { sample }) => await writableSpace(ctx, sample),
 });

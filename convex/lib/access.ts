@@ -1,7 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v, type Infer } from "convex/values";
-import type { Id } from "./_generated/dataModel";
-import { internalQuery, type MutationCtx, type QueryCtx } from "./_generated/server";
+import type { Id } from "../_generated/dataModel";
+import type { MutationCtx, QueryCtx } from "../_generated/server";
 
 /**
  * Who may touch what:
@@ -10,12 +10,18 @@ import { internalQuery, type MutationCtx, type QueryCtx } from "./_generated/ser
  * - a real family: only signed-in people who joined it with its family code.
  *
  * A "space" is the tree a request works in: the sample, or one family.
+ *
+ * These are helpers, not API functions: every query and mutation calls one of
+ * them first, so no function can skip the check.
  */
 export const vSpace = v.union(
   v.object({ sample: v.literal(true) }),
   v.object({ sample: v.literal(false), familyId: v.id("families") }),
 );
 export type Space = Infer<typeof vSpace>;
+
+/** The argument a page passes to choose its tree: its own family, or the sample. */
+export const spaceArg = { sample: v.optional(v.boolean()) };
 
 /** Rows that belong to a space: people and gatherings. */
 type Scoped = { sample?: boolean; familyId?: Id<"families"> };
@@ -30,7 +36,7 @@ export function spaceFields(space: Space): Scoped {
 }
 
 /** The space the caller may change, or null when they may not. */
-async function writableSpace(ctx: QueryCtx | MutationCtx, sample: boolean): Promise<Space | null> {
+export async function writableSpace(ctx: QueryCtx | MutationCtx, sample: boolean): Promise<Space | null> {
   const userId = await getAuthUserId(ctx);
   if (!userId) return null;
   if (sample) return { sample: true };
@@ -80,18 +86,3 @@ export async function canAccessGathering(ctx: QueryCtx | MutationCtx, id: Id<"ga
 export async function requireGatheringAccess(ctx: QueryCtx | MutationCtx, id: Id<"gatherings">): Promise<Space> {
   return (await accessTo(ctx, await ctx.db.get("gatherings", id), true)) ?? (await refuse(ctx));
 }
-
-/** For the assistant, which can't read the database directly. It needs an
- *  account even for the sample, since every question costs a Gemini call. */
-export const check = internalQuery({
-  args: { sample: v.boolean() },
-  returns: v.union(vSpace, v.null()),
-  handler: async (ctx, { sample }) => await writableSpace(ctx, sample),
-});
-
-/** The signed-in user's id, for actions (which can't call getAuthUserId with their context). */
-export const currentUserId = internalQuery({
-  args: {},
-  returns: v.union(v.id("users"), v.null()),
-  handler: async (ctx) => await getAuthUserId(ctx),
-});

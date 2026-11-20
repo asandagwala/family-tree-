@@ -270,7 +270,7 @@ function SignInScreen() {
   const [sent, setSent] = useState<{ to: string; why: "confirm" | "reset" } | null>(null);
   const [leaving, setLeaving] = useState(false);
   const pending = signingIn || signingUp || sending || leaving;
-  const loadSample = useMutation(api.family.loadSampleFamily);
+  const loadSample = useMutation(api.sample.loadSampleFamily);
   const { enterSample } = useSampleMode();
   const router = useRouter();
 
@@ -499,9 +499,9 @@ function ResetPasswordScreen({ code }: { code: string }) {
 
 /** After signing in: join a family's tree with its code, or start a new one. */
 function FamilyCodeScreen({ name }: { name: string | null }) {
-  const joinFamily = useMutation(api.users.joinFamily);
-  const startFamily = useMutation(api.users.startFamily);
-  const loadSample = useMutation(api.family.loadSampleFamily);
+  const joinFamily = useMutation(api.families.joinFamily);
+  const startFamily = useMutation(api.families.startFamily);
+  const loadSample = useMutation(api.sample.loadSampleFamily);
   const { signOut } = useAuthActions();
   const { enterSample } = useSampleMode();
   const router = useRouter();

@@ -15,7 +15,7 @@ export type FamilySettings = {
 
 /** Edit the family-wide details: isiduko, izithakazelo, WhatsApp group. */
 export function FamilyDetailsEditor({ settings, onClose }: { settings: FamilySettings; onClose: () => void }) {
-  const update = useMutation(api.family.updateSettings);
+  const update = useMutation(api.families.updateSettings);
   const [clanName, setClanName] = useState(settings.clanName ?? "");
   const [clanPraise, setClanPraise] = useState(settings.clanPraise ?? "");
   const [whatsappGroupUrl, setWhatsappGroupUrl] = useState(settings.whatsappGroupUrl ?? "");
