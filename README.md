@@ -1,109 +1,79 @@
 # Imvelaphi · Family Tree
 
-*Imvelaphi: where we come from.* A family archive: an organic family tree,
-rich profiles with photographs, a dashboard of the family at a glance, and an
-assistant that answers questions from what the family has recorded.
+_Imvelaphi: where we come from._ A private family archive: an organic family
+tree, profiles with photographs, a family album, birthdays, and an assistant
+that answers questions from what the family has recorded. Many families can
+use it, each with its own private tree, joined with a family code.
 
-Built with Next.js 16, React 19, Tailwind CSS 4, Convex, and Google Gemini.
+Live at **https://imvelaphi-family-tree.vercel.app**
 
-## What's inside
+Built with Next.js 16, React 19, Tailwind CSS 4, Convex, Convex Auth, Google
+Gemini and Resend.
 
-- **Overview dashboard**: family name, generations, living and remembered,
-  births by decade, coming birthdays, birthplaces, clan names (iziduko), a
-  featured story, and whose profiles still need details.
-- **Family tree**: portraits on curved branches, grouped by generation.
-  Drag to pan, scroll to zoom, search to jump to someone, tap for a summary.
-- **Profiles**: story, life details, clan name, parents, partners, children
-  and siblings, plus a photo gallery (upload, drag and drop, set as portrait,
-  lightbox).
+## What it does
+
+- **Sign in** with Google, or an email address and password. Visitors can
+  explore a made-up **sample family** without an account.
+- **Families**: start a family tree (and get a code to share), or join one
+  with a relative's code. Nobody sees a family they haven't joined.
+- **Overview**: the family at a glance: generations, living and remembered,
+  births by decade, coming birthdays, roots, clan names (iziduko), the
+  family's izithakazelo, a featured story, and whose profiles need details.
+- **Family tree**: portraits on curved branches by generation; drag, zoom,
+  search, tap for a summary.
+- **Profiles**: story, life details, clan name, relatives, photo gallery,
+  gatherings they were at, and ways to reach them.
 - **Family album**: a page per gathering (wedding, umemulo, graduation,
-  funeral, reunion...) with its photos, its story and who was there. People's
-  profiles list the gatherings they were at.
-- **Ask the family**: a chat drawer, open from anywhere, that answers from the
-  tree's records and links each person it mentions to their profile.
+  funeral, reunion…) with photos, story and who was there.
+- **Birthdays** and a **Stay connected** card with the family WhatsApp group.
+- **Ask the family**: an assistant that answers from the tree's records and
+  links everyone it mentions.
 
-## Running locally
+## Quick start
 
 ```bash
 pnpm install
-npx convex dev      # keeps the backend running; first run sets up .env.local
-pnpm dev            # in a second terminal, then open http://localhost:3000
+npx convex dev      # terminal 1: the backend (first run writes .env.local)
+pnpm dev            # terminal 2: then open http://localhost:3000
 ```
 
-### Switching on the assistant
+Sign-in needs Google OAuth credentials on the backend, and the assistant needs
+a Gemini key. Every setting is listed in
+[docs/operations.md](docs/operations.md#environment-variables).
 
-The assistant uses Google Gemini. Give the Convex backend your Google AI
-Studio key (it prompts for the value, so it stays out of your shell history):
+## Documentation
 
-```bash
-npx convex env set GEMINI_API_KEY
-```
-
-Without a key the chat still opens and explains how to switch it on. To pin a
-specific model, also set `GEMINI_MODEL` (e.g. `gemini-flash-latest`).
-
-### Sample data
-
-An empty tree offers a sample three-generation family. To wipe the tree
-during development: `npx convex run family:clearAll` (internal; the app can't
-call it).
-
-## Sign-in and the family code
-
-Everyone signs in with their **Google account** or an **email address and
-password** (email accounts confirm their address through a link first).
-
-Many families can use the same site, each with its own private tree. After
-signing in for the first time, a person either **starts a new family tree**
-(they give the family name and get a family code, e.g. `RUBULUZA-7KQ4MX2P`) or
-**joins** one by entering the code a relative shared. The code shows on the
-front door and in the Stay connected card, with a copy button. Until they join,
-people can only explore the sample family.
-
-A deployment that ran the app before families existed moves its one family
-into a family row with `npx convex run migrations:intoFamilies` (add `--prod`
-for the live site); it prints the new family code.
-
-Set these on each Convex deployment (`npx convex env set NAME` prompts for the
-value; add `--prod` for the live site):
-
-| Name | What it is |
-| --- | --- |
-| `AUTH_GOOGLE_CLIENT_ID`, `AUTH_GOOGLE_CLIENT_SECRET` | A Google Cloud OAuth client (Web application) |
-| `RESEND_API_KEY` | From resend.com, sends confirmation and reset emails |
-| `RESEND_FROM` | e.g. `Imvelaphi <hello@your-domain>` on a domain verified with Resend |
-| `SITE_URL` | Where the app is served, e.g. `https://imvelaphi-family-tree.vercel.app` (defaults to `http://localhost:3000`) |
-
-In the Google OAuth client, add the redirect URI
-`<your Convex site URL>/oauth/google/callback` (the Convex site URL ends in
-`.convex.site`). Until `RESEND_FROM` uses a verified domain, Resend only
-delivers to the address you signed up to Resend with.
-
-## Deploying
-
-Live at https://imvelaphi-family-tree.vercel.app (Vercel project
-`imvelaphi-family-tree`, backed by the Convex **production** deployment).
-
-```bash
-npx convex deploy                 # push backend changes to production
-npx vercel deploy --prod          # build and publish the website
-```
-
-The production backend needs its own Gemini key, once:
-`npx convex env set GEMINI_API_KEY --prod`.
+| Guide                                  | What's in it                                                                                                 |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| [Architecture](docs/architecture.md)   | How the pieces fit together, families and spaces, how a page loads and a change is saved                     |
+| [Backend reference](docs/backend.md)   | The data model and every backend function: arguments, who may call it, what it does                          |
+| [Frontend reference](docs/frontend.md) | Every route, component and helper, by feature                                                                |
+| [Security](docs/security.md)           | Privacy between families, sign-in, rate limits, input checks, browser headers, and what you must do yourself |
+| [Operations](docs/operations.md)       | Settings, shipping changes, everyday commands, troubleshooting                                               |
 
 ## Project layout
 
-| Path | What it holds |
-| --- | --- |
-| `convex/schema.ts` | `people`, `parentLinks`, `partnerships`, `photos` |
-| `convex/family.ts` | Tree queries, relationship rules, photo storage |
-| `convex/assistant.ts` | The assistant: tree → prompt → Gemini |
-| `lib/tree-layout.ts` | Generation layout and branch geometry |
-| `components/dashboard.tsx` | Overview page |
-| `components/tree-view.tsx` | Interactive tree |
-| `components/person-profile.tsx` | Profile, relatives, gallery |
-| `convex/album.ts` | Gatherings and their photos |
-| `components/album-view.tsx`, `gathering-view.tsx` | Album and gathering pages |
-| `components/chat/` | Assistant drawer and conversation state |
-| `public/heritage/` | Archive photographs used in the design |
+```
+app/          pages and the sign-in route handlers
+components/   screens by feature: layout, auth, home, dashboard, tree, people,
+              album, birthdays, family, chat, brand, ui
+lib/          hooks and helpers (family data, sample mode, dates, links, tree layout)
+convex/       the backend: one file per area (families, tree, people, photos,
+              album, sample, assistant, users, auth), shared rules in convex/lib/
+docs/         the guides above
+public/heritage/   archive photographs used in the design
+```
+
+## Shipping
+
+Deploy the backend first (`npx convex deploy`), then push `main`; Vercel
+publishes the website. Details in [docs/operations.md](docs/operations.md#shipping-a-change).
+
+## Scripts
+
+| Command                             | What it does                        |
+| ----------------------------------- | ----------------------------------- |
+| `pnpm dev`                          | Run the website locally             |
+| `pnpm build`                        | Production build (also type-checks) |
+| `pnpm lint`                         | ESLint                              |
+| `pnpm format` / `pnpm format:check` | Prettier                            |
