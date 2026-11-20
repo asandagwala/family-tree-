@@ -1,4 +1,4 @@
-import { BirthdaysView } from "@/components/birthdays-view";
+import { BirthdaysView } from "@/components/birthdays/birthdays-view";
 
 export const metadata = { title: "Birthdays · Imvelaphi" };
 

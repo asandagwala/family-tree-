@@ -7,7 +7,7 @@ import { unknownBirthdays, upcomingBirthdays, whenLabel, type Birthday } from "@
 import { whatsappHref } from "@/lib/contact";
 import { fullName } from "@/lib/people";
 import { useFamily } from "@/lib/use-family";
-import { Portrait } from "./portrait";
+import { Portrait } from "@/components/people/portrait";
 
 export function BirthdaysView() {
   const family = useFamily();

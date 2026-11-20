@@ -9,8 +9,8 @@ import { GATHERING_KINDS, gatheringKindLabel, type GatheringKind } from "@/lib/g
 import { errorMessage, fullName, type PersonId } from "@/lib/people";
 import { useSampleMode } from "@/lib/sample-mode";
 import type { Family } from "@/lib/use-family";
-import { Portrait } from "./portrait";
-import { btnPrimary, btnSecondary, inputCls, Modal } from "./ui/modal";
+import { Portrait } from "@/components/people/portrait";
+import { btnPrimary, btnSecondary, inputCls, Modal } from "@/components/ui/modal";
 
 type Draft = {
   title: string;

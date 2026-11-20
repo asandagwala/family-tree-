@@ -4,7 +4,7 @@ import { useMutation } from "convex/react";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { api } from "@/convex/_generated/api";
 import { errorMessage } from "@/lib/people";
-import { btnPrimary, btnSecondary, inputCls, Modal } from "./ui/modal";
+import { btnPrimary, btnSecondary, inputCls, Modal } from "@/components/ui/modal";
 
 export type FamilySettings = {
   familyName: string | null;

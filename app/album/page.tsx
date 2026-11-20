@@ -1,4 +1,4 @@
-import { AlbumView } from "@/components/album-view";
+import { AlbumView } from "@/components/album/album-view";
 
 export const metadata = { title: "Album · Imvelaphi" };
 

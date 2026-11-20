@@ -24,13 +24,13 @@ import { contactLinks } from "@/lib/contact";
 import { gatheringKindLabel } from "@/lib/gatherings";
 import { uploadImage } from "@/lib/upload";
 import { siblingsOf, useFamily, type Family } from "@/lib/use-family";
-import { UmbhacoBand } from "./beadwork";
-import { useChat } from "./chat/chat-context";
+import { UmbhacoBand } from "@/components/brand/beadwork";
+import { useChat } from "@/components/chat/chat-context";
 import { PersonEditor, type EditorMode, type Relation } from "./person-editor";
-import { Lightbox } from "./lightbox";
+import { Lightbox } from "@/components/album/lightbox";
 import { Portrait } from "./portrait";
-import { btnGhost, btnPrimary, btnSecondary, Modal } from "./ui/modal";
-import { AskIcon } from "./ask-icon";
+import { btnGhost, btnPrimary, btnSecondary, Modal } from "@/components/ui/modal";
+import { AskIcon } from "@/components/brand/ask-icon";
 
 export function PersonProfile() {
   const params = useParams<{ id: string }>();

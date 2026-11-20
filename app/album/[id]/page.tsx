@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { GatheringView } from "@/components/gathering-view";
+import { GatheringView } from "@/components/album/gathering-view";
 
 export const metadata = { title: "Gathering · Imvelaphi" };
 

@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { PersonProfile } from "@/components/person-profile";
+import { PersonProfile } from "@/components/people/person-profile";
 
 export const metadata = { title: "Profile · Imvelaphi" };
 

@@ -1,4 +1,4 @@
-import { convexAuthNextjsProxy } from "@/lib/convexAuth";
+import { convexAuthNextjsProxy } from "@/lib/auth/convexAuth";
 
 // Refreshes the session before each page renders. Pages decide for themselves
 // what a signed-out visitor sees, so no redirects here.

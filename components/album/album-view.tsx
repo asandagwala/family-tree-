@@ -11,8 +11,8 @@ import { formatDate, fullName } from "@/lib/people";
 import { useSampleMode } from "@/lib/sample-mode";
 import { useFamily } from "@/lib/use-family";
 import { GatheringEditor } from "./gathering-editor";
-import { Portrait } from "./portrait";
-import { btnPrimary } from "./ui/modal";
+import { Portrait } from "@/components/people/portrait";
+import { btnPrimary } from "@/components/ui/modal";
 
 export function AlbumView() {
   const { sample } = useSampleMode();

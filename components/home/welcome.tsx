@@ -8,10 +8,10 @@ import { api } from "@/convex/_generated/api";
 import { errorMessage } from "@/lib/people";
 import { useSampleMode } from "@/lib/sample-mode";
 import { useFamily } from "@/lib/use-family";
-import { UmbhacoBand } from "./beadwork";
-import { FamilyCode } from "./family-code";
-import { PersonEditor } from "./person-editor";
-import { btnPrimary, btnSecondary } from "./ui/modal";
+import { UmbhacoBand } from "@/components/brand/beadwork";
+import { FamilyCode } from "@/components/family/family-code";
+import { PersonEditor } from "@/components/people/person-editor";
+import { btnPrimary, btnSecondary } from "@/components/ui/modal";
 
 /**
  * The front door: words on the left, the archive photograph filling the right.

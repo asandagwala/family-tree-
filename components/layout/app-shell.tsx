@@ -7,13 +7,13 @@ import { Suspense, type ReactNode } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { AuthGate } from "./auth-gate";
-import { ChatDrawer } from "./chat/chat-drawer";
-import { useChat } from "./chat/chat-context";
-import { LogoMark } from "./logo";
+import { AuthGate } from "@/components/auth/auth-gate";
+import { ChatDrawer } from "@/components/chat/chat-drawer";
+import { useChat } from "@/components/chat/chat-context";
+import { LogoMark } from "@/components/brand/logo";
 import { useSampleMode } from "@/lib/sample-mode";
-import { AskIcon } from "./ask-icon";
-import { UmbhacoTrim } from "./beadwork";
+import { AskIcon } from "@/components/brand/ask-icon";
+import { UmbhacoTrim } from "@/components/brand/beadwork";
 
 const NAV = [
   { href: "/overview", label: "Overview", icon: LayoutGrid },

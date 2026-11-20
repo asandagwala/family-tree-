@@ -12,14 +12,14 @@ import { contactLinks } from "@/lib/contact";
 import { layoutTree } from "@/lib/tree-layout";
 import { useSampleMode } from "@/lib/sample-mode";
 import { useFamily, type Family } from "@/lib/use-family";
-import { AskIcon } from "./ask-icon";
-import { UmbhacoBand } from "./beadwork";
-import { useChat } from "./chat/chat-context";
-import { FamilyCode } from "./family-code";
-import { FamilyDetailsEditor, type FamilySettings } from "./family-details-editor";
-import { PersonEditor } from "./person-editor";
-import { Portrait } from "./portrait";
-import { Welcome } from "./welcome";
+import { AskIcon } from "@/components/brand/ask-icon";
+import { UmbhacoBand } from "@/components/brand/beadwork";
+import { useChat } from "@/components/chat/chat-context";
+import { FamilyCode } from "@/components/family/family-code";
+import { FamilyDetailsEditor, type FamilySettings } from "@/components/family/family-details-editor";
+import { PersonEditor } from "@/components/people/person-editor";
+import { Portrait } from "@/components/people/portrait";
+import { Welcome } from "@/components/home/welcome";
 
 export function Dashboard() {
   const family = useFamily();

@@ -7,11 +7,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fullName, initialsTone, INITIALS_TEXT, lifespan, type PersonId } from "@/lib/people";
 import { CARD_H, CARD_W, PORTRAIT, layoutTree, type Layout } from "@/lib/tree-layout";
 import { useFamily, type Family } from "@/lib/use-family";
-import { useChat } from "./chat/chat-context";
-import { PersonEditor } from "./person-editor";
-import { Portrait } from "./portrait";
-import { btnPrimary } from "./ui/modal";
-import { AskIcon } from "./ask-icon";
+import { useChat } from "@/components/chat/chat-context";
+import { PersonEditor } from "@/components/people/person-editor";
+import { Portrait } from "@/components/people/portrait";
+import { btnPrimary } from "@/components/ui/modal";
+import { AskIcon } from "@/components/brand/ask-icon";
 
 type View = { x: number; y: number; k: number };
 const MIN_K = 0.2;

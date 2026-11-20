@@ -1,4 +1,4 @@
-import { Welcome } from "@/components/welcome";
+import { Welcome } from "@/components/home/welcome";
 
 // The front door. The dashboard lives at /overview.
 // Every page waits for the sign-in check, so there is no instant shell to validate.

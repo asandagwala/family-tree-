@@ -1,4 +1,4 @@
-import { TreeView } from "@/components/tree-view";
+import { TreeView } from "@/components/tree/tree-view";
 
 export const metadata = { title: "Family tree · Imvelaphi" };
 

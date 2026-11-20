@@ -9,7 +9,7 @@ import { errorMessage, fullName, genderLabel, type Gender, type Person, type Per
 import { uploadImage } from "@/lib/upload";
 import { useSampleMode } from "@/lib/sample-mode";
 import type { Family } from "@/lib/use-family";
-import { btnPrimary, btnSecondary, inputCls, Modal } from "./ui/modal";
+import { btnPrimary, btnSecondary, inputCls, Modal } from "@/components/ui/modal";
 
 export type Relation = "parent" | "partner" | "child";
 

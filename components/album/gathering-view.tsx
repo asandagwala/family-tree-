@@ -11,12 +11,12 @@ import { gatheringKindLabel } from "@/lib/gatherings";
 import { errorMessage, formatDate, fullName } from "@/lib/people";
 import { uploadImage } from "@/lib/upload";
 import { useFamily } from "@/lib/use-family";
-import { AskIcon } from "./ask-icon";
-import { useChat } from "./chat/chat-context";
+import { AskIcon } from "@/components/brand/ask-icon";
+import { useChat } from "@/components/chat/chat-context";
 import { GatheringEditor } from "./gathering-editor";
 import { Lightbox } from "./lightbox";
-import { Portrait } from "./portrait";
-import { btnGhost, btnPrimary, btnSecondary, Modal } from "./ui/modal";
+import { Portrait } from "@/components/people/portrait";
+import { btnGhost, btnPrimary, btnSecondary, Modal } from "@/components/ui/modal";
 
 export function GatheringView() {
   const params = useParams<{ id: string }>();

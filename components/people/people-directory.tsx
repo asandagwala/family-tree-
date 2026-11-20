@@ -2,7 +2,7 @@
 
 import { Search, UserPlus } from "lucide-react";
 import Link from "next/link";
-import { MonoBeadTrim } from "./beadwork";
+import { MonoBeadTrim } from "@/components/brand/beadwork";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { fullName, lifespan } from "@/lib/people";

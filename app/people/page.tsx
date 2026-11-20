@@ -1,4 +1,4 @@
-import { PeopleDirectory } from "@/components/people-directory";
+import { PeopleDirectory } from "@/components/people/people-directory";
 
 export const metadata = { title: "People · Imvelaphi" };
 

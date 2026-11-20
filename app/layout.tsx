@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Geist } from "next/font/google";
 import { Suspense } from "react";
-import { AppShell } from "@/components/app-shell";
+import { AppShell } from "@/components/layout/app-shell";
 import { ChatProvider } from "@/components/chat/chat-context";
-import { ConvexAuthNextjsServerProvider } from "@/lib/convexAuth";
+import { ConvexAuthNextjsServerProvider } from "@/lib/auth/convexAuth";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });

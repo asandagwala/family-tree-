@@ -19,9 +19,9 @@ import { Suspense, useEffect, useState, type FormEvent, type ReactNode } from "r
 import { api } from "@/convex/_generated/api";
 import { errorMessage } from "@/lib/people";
 import { useSampleMode } from "@/lib/sample-mode";
-import { UmbhacoBand } from "./beadwork";
-import { LogoMark } from "./logo";
-import { btnPrimary, btnSecondary, inputCls } from "./ui/modal";
+import { UmbhacoBand } from "@/components/brand/beadwork";
+import { LogoMark } from "@/components/brand/logo";
+import { btnPrimary, btnSecondary, inputCls } from "@/components/ui/modal";
 
 /**
  * Shows the app only to signed-in family members. Signed-out visitors get the

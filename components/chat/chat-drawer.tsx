@@ -2,10 +2,10 @@
 
 import { ArrowUp, RotateCcw, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { LogoMark } from "../logo";
+import { LogoMark } from "@/components/brand/logo";
 import { useChat } from "./chat-context";
 import { RichText } from "./rich-text";
-import { AskIcon } from "../ask-icon";
+import { AskIcon } from "@/components/brand/ask-icon";
 
 export const SUGGESTIONS = [
   "Who is the eldest living member of the family?",
