@@ -95,13 +95,13 @@ function AuthLayout({ children }: { children: ReactNode }) {
           </div>
           {children}
         </div>
-        {/* On wide screens the panel takes the portrait's own shape, so the photo is barely enlarged. */}
-        <div className="relative order-first h-20 shrink-0 @xl:h-44 @3xl:order-2 @3xl:aspect-[500/688] @3xl:h-full">
+        {/* Phones: as tall a photo band as the screen allows while the form still fits below it. */}
+        <div className="relative order-first h-[clamp(5rem,calc(100dvh-600px),14rem)] shrink-0 @3xl:order-2 @3xl:h-full @3xl:w-[44%]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/heritage/beadwork.jpg"
-            alt="A woman wearing beaded collars and a beaded panel"
-            className="absolute inset-0 h-full w-full object-cover object-[50%_45%]"
+            src="/heritage/gathering.jpg"
+            alt="Women gathered on the grass beside a thatched rondavel"
+            className="duotone absolute inset-0 h-full w-full object-cover object-[50%_65%]"
           />
         </div>
       </div>
