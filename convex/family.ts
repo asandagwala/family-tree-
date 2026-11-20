@@ -439,8 +439,13 @@ export const loadSampleFamily = mutation({
   handler: async (ctx) => {
     // Visitors may load it too: it is the same made-up family for everyone,
     // and once it exists this does nothing.
-    const existing = (await peopleIn(ctx, { sample: true })).length > 0;
-    if (existing) return null;
+    const existing = await peopleIn(ctx, { sample: true });
+    if (existing.length > 0) {
+      // Samples loaded before Ayanda was shown under her birth surname: fix them in place.
+      const ayanda = existing.find((p) => p.firstName === "Ayanda" && p.lastName === "Rubuluza");
+      if (ayanda) await ctx.db.patch("people", ayanda._id, { lastName: "Sondlo", notes: "Married Luthando Rubuluza. Followed her father into teaching." });
+      return null;
+    }
 
     type P = {
       firstName: string;
@@ -498,10 +503,11 @@ export const loadSampleFamily = mutation({
       clanName: "Jola", occupation: "Nurse",
     });
     const ayanda = await add({
-      firstName: "Ayanda", lastName: "Rubuluza", gender: "female",
+      // Shown under her birth surname, so the tree never reads as two Rubuluza siblings marrying.
+      firstName: "Ayanda", lastName: "Sondlo", gender: "female",
       birthDate: "1967-12-09", birthPlace: "Engcobo", currentPlace: "Cape Town",
       clanName: "Tshawe", occupation: "High school teacher",
-      notes: "Born Ayanda Sondlo; took the Rubuluza name on marrying Luthando. Followed her father into teaching.",
+      notes: "Married Luthando Rubuluza. Followed her father into teaching.",
     });
     const siyabonga = await add({
       firstName: "Siyabonga", lastName: "Sondlo", gender: "male",
