@@ -47,14 +47,16 @@ function LinkLanding({ children }: { children: ReactNode }) {
 }
 
 function Gate({ children }: { children: ReactNode }) {
+  const { sample } = useSampleMode();
+  // The front door stays the sign-in screen; visitors exploring the sample see the rest.
+  const pathname = usePathname();
+  const exploring = sample && pathname !== "/";
   return (
     <>
       <AuthLoading>
         <Splash />
       </AuthLoading>
-      <Unauthenticated>
-        <SignInScreen />
-      </Unauthenticated>
+      <Unauthenticated>{exploring ? children : <SignInScreen />}</Unauthenticated>
       <Authenticated>
         <MemberGate>{children}</MemberGate>
       </Authenticated>
@@ -85,8 +87,8 @@ function AuthLayout({ children }: { children: ReactNode }) {
     // Exactly one screen tall: the words, the photograph and the hem all fit without scrolling.
     <div className="@container flex h-full flex-col bg-cream text-ink">
       <div className="flex min-h-0 flex-1 flex-col @3xl:flex-row">
-        <div className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto px-6 py-5 @xl:px-14 @3xl:py-6 @5xl:px-20">
-          <div className="mb-4 flex items-center gap-3">
+        <div className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto px-6 py-4 @xl:px-14 @3xl:py-4 @5xl:px-20">
+          <div className="mb-3 flex items-center gap-3">
             <LogoMark className="text-forest" />
             <span>
               <span className="block font-display text-2xl font-semibold leading-none">Imvelaphi</span>
@@ -96,7 +98,7 @@ function AuthLayout({ children }: { children: ReactNode }) {
           {children}
         </div>
         {/* Phones: as tall a photo band as the screen allows while the form still fits below it. */}
-        <div className="relative order-first h-[clamp(5rem,calc(100dvh-600px),14rem)] shrink-0 @3xl:order-2 @3xl:h-full @3xl:w-[44%]">
+        <div className="relative order-first h-[clamp(2.5rem,calc(100dvh-640px),14rem)] shrink-0 @3xl:order-2 @3xl:h-full @3xl:w-[44%]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/heritage/gathering.jpg"
@@ -223,6 +225,18 @@ function SignInScreen() {
   const [sent, setSent] = useState<{ to: string; why: "confirm" | "reset" } | null>(null);
   const [leaving, setLeaving] = useState(false);
   const pending = signingIn || signingUp || sending || leaving;
+  const loadSample = useMutation(api.family.loadSampleFamily);
+  const { enterSample } = useSampleMode();
+  const router = useRouter();
+
+  function explore() {
+    loadSample()
+      .then(() => {
+        enterSample();
+        router.push("/overview");
+      })
+      .catch((e) => setError(errorMessage(e)));
+  }
 
   function switchTo(next: Mode) {
     setMode(next);
@@ -294,13 +308,13 @@ function SignInScreen() {
           : "Sign in with your Google account or your email address."}
       </p>
 
-      <div className="mt-5 max-w-md space-y-3">
+      <div className="mt-4 max-w-md space-y-3">
         {mode !== "forgot" && (
           <>
             <button type="button" onClick={() => void google()} disabled={pending} className={`${btnSecondary} w-full`}>
               <GoogleMark /> Continue with Google
             </button>
-            <div className="flex items-center gap-3 py-1 text-xs uppercase tracking-wider text-muted">
+            <div className="flex items-center gap-3 text-xs uppercase tracking-wider text-muted">
               <span className="h-px flex-1 bg-ink/10" /> or <span className="h-px flex-1 bg-ink/10" />
             </div>
           </>
@@ -355,6 +369,13 @@ function SignInScreen() {
             </button>
           )}
         </div>
+        <p className="border-t border-ink/10 px-1 pt-2 text-sm text-muted">
+          Just looking?{" "}
+          <button type="button" onClick={explore} className="font-medium text-ink underline-offset-4 hover:underline">
+            Explore a sample family
+          </button>{" "}
+          without signing in.
+        </p>
       </div>
     </AuthLayout>
   );
@@ -418,7 +439,7 @@ function ResetPasswordScreen({ code }: { code: string }) {
       <Heading eyebrow="Reset your password">
         Choose a new <span className="italic text-ochre-deep">password</span>
       </Heading>
-      <form onSubmit={submit} className="mt-5 max-w-md space-y-3">
+      <form onSubmit={submit} className="mt-4 max-w-md space-y-3">
         <input
           type="password"
           value={password}
@@ -489,7 +510,7 @@ function FamilyCodeScreen({ name }: { name: string | null }) {
           ? "Give your family's name. You'll get a family code to share, so relatives can join the same tree."
           : "Each family's archive is private. Ask a relative for your family code: it connects your account to your family's tree, and you only need to enter it once."}
       </p>
-      <form onSubmit={submit} className="mt-5 max-w-md space-y-3">
+      <form onSubmit={submit} className="mt-4 max-w-md space-y-3">
         <input
           value={value}
           onChange={(e) => setValue(e.target.value)}

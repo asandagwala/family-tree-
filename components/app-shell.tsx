@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { useQuery } from "convex/react";
+import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { AuthGate } from "./auth-gate";
 import { ChatDrawer } from "./chat/chat-drawer";
@@ -125,6 +125,7 @@ function AccountRow() {
 function Shell({ children }: { children: ReactNode }) {
   const chat = useChat();
   const leave = useLeave();
+  const { isAuthenticated } = useConvexAuth();
 
   return (
     <div className="flex h-full">
@@ -188,14 +189,16 @@ function Shell({ children }: { children: ReactNode }) {
         >
           <AskIcon size={18} />
         </button>
-              <button
-          type="button"
-          aria-label="Sign out"
-          onClick={() => void leave()}
-          className="grid h-10 w-10 place-items-center rounded-full text-muted"
-        >
-          <LogOut size={18} />
-        </button>
+        {isAuthenticated && (
+          <button
+            type="button"
+            aria-label="Sign out"
+            onClick={() => void leave()}
+            className="grid h-10 w-10 place-items-center rounded-full text-muted"
+          >
+            <LogOut size={18} />
+          </button>
+        )}
       </nav>
 
       <ChatDrawer />
@@ -208,12 +211,15 @@ function SampleBanner() {
   const { sample, exitSample } = useSampleMode();
   const chat = useChat();
   const router = useRouter();
+  const { isAuthenticated } = useConvexAuth();
   if (!sample) return null;
   return (
     <div className="sticky top-0 z-20 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-b border-ochre/30 bg-ochre-soft px-4 py-2.5 text-sm text-ink">
       <span>
-        <strong className="font-semibold">You&apos;re exploring a sample family.</strong> None of these people are part of
-        your family&apos;s archive.
+        <strong className="font-semibold">You&apos;re exploring a sample family.</strong>{" "}
+        {isAuthenticated
+          ? "None of these people are part of your family's archive."
+          : "These people are made up. Sign in to start your own family's tree."}
       </span>
       <button
         type="button"
@@ -224,7 +230,7 @@ function SampleBanner() {
         }}
         className="rounded-full bg-ink px-4 py-1.5 text-xs font-medium text-white hover:bg-coal"
       >
-        Back to my family
+        {isAuthenticated ? "Back to my family" : "Sign in"}
       </button>
     </div>
   );

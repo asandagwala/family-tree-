@@ -437,8 +437,8 @@ export const removePartner = mutation({
 export const loadSampleFamily = mutation({
   args: {},
   handler: async (ctx) => {
-    await requireAccess(ctx, true);
-    // The sample lives in its own space; load it once and reuse it.
+    // Visitors may load it too: it is the same made-up family for everyone,
+    // and once it exists this does nothing.
     const existing = (await peopleIn(ctx, { sample: true })).length > 0;
     if (existing) return null;
 
